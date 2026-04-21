@@ -1,6 +1,6 @@
 ﻿using Service.API.DTOs;
 
-namespace Service.API.Service.Interface
+namespace NDISPortal.API.Services.Interfaces
 {
     public interface IServiceCategoryService
     {

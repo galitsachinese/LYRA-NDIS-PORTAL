@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +8,7 @@ using NdisPortal.BookingsApi.Services.Implementations;
 using NdisPortal.BookingsApi.Services.Interfaces;
 // Standardize your namespaces below based on where your logic moved
 using Service.API.Configurations; 
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +19,9 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 // ==================================================
-// 2. DATABASE (Using the unified AppDbContext)
+// 2. DATABASE (Using the unified ApplicationDbContext)
 // ==================================================
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ==================================================
@@ -105,7 +105,7 @@ var app = builder.Build();
 // Auto-run Migrations/Creation (Development only usually)
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await context.Database.EnsureCreatedAsync(); 
 }
 
@@ -123,7 +123,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Custom Middleware
-app.UseMiddleware<ResponseWrappingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
 

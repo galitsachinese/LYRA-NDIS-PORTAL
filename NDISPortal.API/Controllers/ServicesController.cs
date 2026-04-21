@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NDISPortal.API.Services.Interfaces;
 using Service.API.DTOs;
-using Service.API.Service.Interface;
 
 namespace Service.API.Controllers
 {

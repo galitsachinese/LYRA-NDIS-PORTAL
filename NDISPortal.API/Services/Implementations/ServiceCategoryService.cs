@@ -1,9 +1,9 @@
 ﻿using Service.API.Data;
 using Service.API.DTOs;
 using Microsoft.EntityFrameworkCore;
-using Service.API.Service.Interface;
+using NDISPortal.API.Services.Interfaces;
 
-namespace Service.API.Service.Implementation
+namespace NDISPortal.API.Services.Implementations
 {
     public class ServiceCategoryService : IServiceCategoryService
     {

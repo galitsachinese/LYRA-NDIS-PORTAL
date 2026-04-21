@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NDISPortal.API.Services.Interfaces;
 using Service.API.Data;
 using Service.API.DTOs;
 using Service.API.Model;
-using Service.API.Service.Interface;
 
-namespace Service.API.Service.Implementation
+namespace NDISPortal.API.Services.Implementations
 {
     public class ServiceService : IServiceService
     {
@@ -64,7 +64,7 @@ namespace Service.API.Service.Implementation
             if (!categoryExists)
                 throw new Exception("Invalid CategoryId");
 
-            var serviceItem = new ServiceItem
+            var serviceItem = new Service.API.Model.Service
             {
                 name = dto.Name,
                 description = dto.Description,

@@ -4,11 +4,11 @@ using Service.API.Commons;
 namespace Service.API.Middleware
 {
 
-    public class ResponseWrappingMiddleware
+    public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public ResponseWrappingMiddleware(RequestDelegate next)
+        public ErrorHandlingMiddleware(RequestDelegate next)
         {
             _next = next;
         }

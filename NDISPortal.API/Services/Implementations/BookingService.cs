@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NdisPortal.BookingsApi.Data;
+using NDISPortal.API.Data;
 using NdisPortal.BookingsApi.DTOs;
 using NdisPortal.BookingsApi.Models;
 using NdisPortal.BookingsApi.Services.Interfaces;
@@ -96,7 +96,7 @@ public class BookingService : IBookingService
             throw new ArgumentException("PreferredDate must be today or a future date.");
 
         var service = await _context.Services
-            .FirstOrDefaultAsync(s => s.Id == createDto.ServiceId && s.IsActive);
+            .FirstOrDefaultAsync(s => s.Id == createDto.ServiceId && s.is_active);
         if (service == null)
             throw new ArgumentException("Service not found or is not active.");
 

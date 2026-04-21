@@ -1,3 +1,5 @@
+using Service.API.Model;
+
 namespace NDIS.API.Model
 {
     public class ServiceCategory
@@ -7,6 +9,6 @@ namespace NDIS.API.Model
         public DateTime created_date { get; set; }
         public DateTime modified_date { get; set; }
 
-        public ICollection<Service> Services { get; set; }
+        public ICollection<ServiceItem> Services { get; set; }
     }
 }

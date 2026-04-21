@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using NDIS.API.Model;
+
 namespace Service.API.Model
 {
     // Fix: Rename to ServiceItem (Uppercase I) to match the rest of the app
-    public class Service
+    public class ServiceItem
     {
         public int Id { get; set; }
 

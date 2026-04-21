@@ -1,4 +1,4 @@
-﻿using Service.API.Data;
+﻿using NDISPortal.API.Data;
 using Service.API.DTOs;
 using Microsoft.EntityFrameworkCore;
 using NDISPortal.API.Services.Interfaces;

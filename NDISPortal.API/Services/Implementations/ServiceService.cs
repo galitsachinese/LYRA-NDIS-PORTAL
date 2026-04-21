@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NDISPortal.API.Services.Interfaces;
 using Service.API.DTOs;
-using Service.API.Model;
-using NdisPortal.BookingsApi.Data;
+using NDISPortal.API.Data;
+
 
 namespace NDISPortal.API.Services.Implementations
 {
@@ -64,7 +64,7 @@ namespace NDISPortal.API.Services.Implementations
             if (!categoryExists)
                 throw new Exception("Invalid CategoryId");
 
-            var service = new Service.API.Model.Service
+            var service = new Service.API.Model.ServiceItem
             {
                 Name = dto.Name,
                 Description = dto.Description,

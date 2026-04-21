@@ -2,13 +2,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NdisPortal.BookingsApi.Data;
-using NDISPortalErrorHandling.Middleware;
 using NdisPortal.BookingsApi.Services.Implementations;
 using NdisPortal.BookingsApi.Services.Interfaces;
-using NDISPortal.API.Services.Interfaces;
+using NDISPortal.API.Data;
 using NDISPortal.API.Services.Implementations;
-
+using NDISPortal.API.Services.Interfaces;
+using NDISPortalErrorHandling.Middleware;
 // Standardize your namespaces below based on where your logic moved
 using Service.API.Configurations; 
 using System.Text;
@@ -127,7 +126,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Custom Middleware
-app.UseMiddleware<ResponseWrappingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
 

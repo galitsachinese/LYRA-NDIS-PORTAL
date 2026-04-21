@@ -1,42 +1,32 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Service.API.Configurations;
-using Service.API.Data;
-using Service.API.Middleware;
-using Service.API.Service.Implementation;
-using Service.API.Service.Interface;
-using System.Text;
+using NdisPortal.BookingsApi.Data;
+using NdisPortal.BookingsApi.Middleware;
+using NdisPortal.BookingsApi.Services.Implementations;
+using NdisPortal.BookingsApi.Services.Interfaces;
+// Standardize your namespaces below based on where your logic moved
+using Service.API.Configurations; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =========================
-// JWT SETTINGS
-// =========================
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection("JwtSettings"));
+// ==================================================
+// 1. CONFIGURATION & SETTINGS
+// ==================================================
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
-var jwtSettings = builder.Configuration
-    .GetSection("JwtSettings")
-    .Get<JwtSettings>();
-
-// =========================
-// ADD SERVICES
-// =========================
-builder.Services.AddControllers();
-
-// Database
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+// ==================================================
+// 2. DATABASE (Using the unified AppDbContext)
+// ==================================================
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Dependency Injection
-builder.Services.AddScoped<IServiceCategoryService, ServiceCategoryService>();
-builder.Services.AddScoped<IServiceService, ServiceService>();
-
-// =========================
-// AUTHENTICATION (JWT)
-// =========================
+// ==================================================
+// 3. AUTHENTICATION & AUTHORIZATION
+// ==================================================
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,14 +43,36 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings?.Issuer,
         ValidAudience = jwtSettings?.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings?.Key ?? "fallback-key"))
+            Encoding.UTF8.GetBytes(jwtSettings?.Key ?? "your-ultra-secret-fallback-key-32-chars"))
     };
 });
 
-// =========================
-// SWAGGER WITH JWT SUPPORT
-// =========================
+builder.Services.AddAuthorization();
+
+// ==================================================
+// 4. DEPENDENCY INJECTION (Combined Services)
+// ==================================================
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Booking Services
+builder.Services.AddScoped<IBookingService, BookingService>();
+// Service/Category Services
+builder.Services.AddScoped<IServiceCategoryService, ServiceCategoryService>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") 
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// Swagger with JWT Security Definitions
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -78,35 +90,25 @@ builder.Services.AddSwaggerGen(options =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
 
-//CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:4200") // your frontend
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
-
-
+// ==================================================
+// 5. MIDDLEWARE PIPELINE (Order is Critical!)
+// ==================================================
 var app = builder.Build();
 
-// =========================
-// MIDDLEWARE PIPELINE
-// =========================
+// Auto-run Migrations/Creation (Development only usually)
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await context.Database.EnsureCreatedAsync(); 
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -114,15 +116,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowFrontend");
-// 🔥 ORDER MATTERS
-app.UseAuthentication();   
+
+// IMPORTANT: Authentication MUST come before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Custom Middleware
 app.UseMiddleware<ResponseWrappingMiddleware>();
 
-// Map controllers
 app.MapControllers();
 
 app.Run();

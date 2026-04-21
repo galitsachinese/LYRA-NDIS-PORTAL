@@ -8,9 +8,9 @@ namespace NdisPortal.BookingsApi.Services.Implementations;
 
 public class BookingService : IBookingService
 {
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public BookingService(AppDbContext context)
+    public BookingService(ApplicationDbContext context)
     {
         _context = context;
     }

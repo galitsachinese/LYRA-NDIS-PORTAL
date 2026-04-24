@@ -7,7 +7,6 @@ import {
   ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StatusIconComponent } from '../icons/svg-icons/status-icon';
 
 export interface DropdownOption {
   label: string;
@@ -16,19 +15,17 @@ export interface DropdownOption {
 }
 
 @Component({
-  selector: 'app-dropdown',
+  selector: 'app-dropdown-ui',
   standalone: true,
-  imports: [
-    CommonModule,
-    StatusIconComponent, // Importing the StatusIconComponent for use in the dropdown
-  ],
-  templateUrl: './dropdown.component.html',
-  styleUrl: './dropdown.component.css',
+  imports: [CommonModule],
+  templateUrl: './dropdown.ui.html',
+  styleUrl: './dropdown.ui.css',
 })
-export class DropdownComponent {
+export class DropdownUIComponent {
   @Input() label: string = 'Select';
   @Input() options: DropdownOption[] = [];
   @Input() selectedValue: any;
+  @Input() showIcon: boolean = true;
 
   @Output() onSelect = new EventEmitter<any>();
 
@@ -46,7 +43,6 @@ export class DropdownComponent {
     this.isOpen = false;
   }
 
-  // Closes the dropdown if you click anywhere outside of this component
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {

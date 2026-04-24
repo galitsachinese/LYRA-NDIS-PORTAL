@@ -83,6 +83,11 @@
   font-weight: 500;
 }
 
+.nav-link.active .icon-wrapper {
+  color: #6b21a8;
+  /* Ensures the SVG icon also turns purple */
+}
+
 .icon-wrapper {
   display: flex;
   align-items: center;

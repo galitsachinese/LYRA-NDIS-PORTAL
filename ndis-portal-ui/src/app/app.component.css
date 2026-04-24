@@ -2,22 +2,22 @@
     display: flex;
     min-height: 100vh;
     width: 100%;
+    background-color: #ffffff;
+    /* Light gray background for contrast */
 }
 
-app-sidebar {
-    width: 260px;
-    flex-shrink: 0;
-}
-
+/* Sidebar is fixed, so the content area needs to move over */
 .content-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
+    margin-left: 260px;
+    /* Matches your sidebar width */
 }
 
-/* Ensure page-body doesn't have weird constraints */
 .page-body {
-    padding: 32px;
-    flex: 1;
+    /* High-fashion spacing for your NDIS layout */
+    width: 100%;
+    box-sizing: border-box;
 }

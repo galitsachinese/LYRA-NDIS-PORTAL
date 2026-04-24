@@ -1,0 +1,45 @@
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th class="cell-drag"></th>
+        <th class="cell-checkbox"><input type="checkbox"></th>
+        <th *ngFor="let col of columns">{{ col.label }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of data">
+        <td class="cell-drag">
+          <div class="drag-icon">⠿</div>
+        </td>
+        <td class="cell-checkbox"><input type="checkbox"></td>
+
+        <td *ngFor="let col of columns">
+          <ng-container [ngSwitch]="col.type">
+            <span *ngSwitchCase="'category'" class="badge-category">{{ getValue(row, col.key) }}</span>
+
+            <div *ngSwitchCase="'status'" class="badge-status" [ngClass]="getValue(row, col.key)?.toLowerCase()">
+              <span class="status-dot">•</span> {{ getValue(row, col.key) }}
+            </div>
+
+            <button *ngSwitchCase="'view'" class="btn-view" (click)="viewAction.emit(row)">
+              <app-icon-view></app-icon-view>
+              View
+            </button>
+
+            <div *ngSwitchCase="'action'" class="action-cell">
+              <div class="menu-container">
+                <button class="btn-dots" (click)="toggleMenu(row)">⋮</button>
+                <div class="dropdown-menu shadow-md" *ngIf="activeMenuRow === row">
+                  <button class="menu-item destructive" (click)="cancelAction.emit(row)">Cancel</button>
+                </div>
+              </div>
+            </div>
+
+            <span *ngSwitchDefault [class.font-semibold]="col.key === 'service'">{{ getValue(row, col.key) }}</span>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

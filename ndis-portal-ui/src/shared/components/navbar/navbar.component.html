@@ -5,12 +5,12 @@
 
   <div class="nav-right">
     <div class="actions">
-      <button class="icon-btn" aria-label="Chat">
-        <img src="../assets/icons/bell.svg" width="20" height="20" alt="Bell Icon">
-      </button>
-      <button class="icon-btn" aria-label="Notifications">
+      <div class="icon-wrapper">
+        <app-icon-chat [size]="20" class="icon"></app-icon-chat>
+      </div>
+      <div class="icon-wrapper">
         <app-icon-bell [size]="20" class="icon"></app-icon-bell>
-      </button>
+      </div>
     </div>
 
     <div class="user-profile">

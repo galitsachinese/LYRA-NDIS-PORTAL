@@ -1,0 +1,20 @@
+<div class="page-container">
+    <div class="header-section">
+        <h1 class="page-title">My Bookings</h1>
+
+        <div class="filter-actions">
+            <app-status-dropdown (statusChange)="handleStatusFilter($event)"></app-status-dropdown>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <app-booking-table [bookings]="filteredBookings" [currentFilter]="activeFilter"
+            (cancelBooking)="handleCancel($event)">
+        </app-booking-table>
+    </div>
+
+    <div class="pagination-footer">
+        <app-pagination [currentPage]="currentPage" [totalPages]="10" (pageChange)="handlePageChange($event)">
+        </app-pagination>
+    </div>
+</div>

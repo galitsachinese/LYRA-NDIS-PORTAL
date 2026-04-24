@@ -5,7 +5,7 @@
     </div>
     <div class="brand-text">
       <span class="company-name">NDIS</span>
-      <span class="sub-text">Enterprise</span>
+      <span class="sub-text">{{ subText }}</span>
     </div>
   </div>
 
@@ -15,8 +15,8 @@
       <div class="icon-wrapper">
         <ng-container [ngSwitch]="item.icon">
           <app-icon-home *ngSwitchCase="'home'" [size]="20"></app-icon-home>
-          <app-icon-chat *ngSwitchCase="'services'" [size]="20"></app-icon-chat>
-          <app-icon-chat *ngSwitchCase="'bookings'" [size]="20"></app-icon-chat>
+          <app-icon-service *ngSwitchCase="'services'" [size]="20"></app-icon-service>
+          <app-icon-book *ngSwitchCase="'bookings'" [size]="20"></app-icon-book>
         </ng-container>
       </div>
 

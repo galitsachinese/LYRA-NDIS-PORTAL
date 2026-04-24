@@ -35,5 +35,39 @@
 
 .actions {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  /* Vertically centers the icons in the row */
+  gap: 16px;
+  /* Increased gap for a cleaner look */
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  /* Removes extra bottom spacing from text-baseline */
+  color: #64748b;
+  /* Slate color to match your sidebar */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.icon:hover {
+  color: #0f172a;
+  /* Darken on hover */
+}
+
+.icon-wrapper {
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.icon-wrapper:hover {
+  background-color: #f8fafc;
 }

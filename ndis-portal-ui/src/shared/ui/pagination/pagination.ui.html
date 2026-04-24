@@ -1,0 +1,31 @@
+<nav class="pagination-container">
+    <button class="nav-btn" [disabled]="currentPage === 1" (click)="onPageClick(currentPage - 1)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M8.84182 3.13514C9.04327 3.32401 9.05348 3.64042 9.1 3.84182L5.61852 7.5L9.1 11.1582C9.05348 11.3596 9.04327 11.676 8.84182 11.8649C8.64038 12.0537 8.32396 12.0435 8.1351 11.8421L4.1351 7.84208C3.9551 7.65208 3.9551 7.34792 4.1351 7.15792L8.1351 3.15792C8.32396 2.95646 8.64038 2.94625 8.84182 3.13514Z"
+                fill="currentColor" />
+        </svg>
+        <span>Previous</span>
+    </button>
+
+    <div class="page-numbers">
+        <ng-container *ngFor="let page of pages">
+            <button *ngIf="page !== '...'; else dots" class="page-btn" [class.active]="page === currentPage"
+                (click)="onPageClick(page)">
+                {{ page }}
+            </button>
+            <ng-template #dots>
+                <span class="dots">···</span>
+            </ng-template>
+        </ng-container>
+    </div>
+
+    <button class="nav-btn" [disabled]="currentPage === totalPages" (click)="onPageClick(currentPage + 1)">
+        <span>Next</span>
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M6.1582 3.13514C5.95674 3.32401 5.94653 3.64042 5.9 3.84182L9.38148 7.5L5.9 11.1582C5.94653 11.3596 5.95674 11.676 6.1582 11.8649C6.35964 12.0537 6.67606 12.0435 6.86492 11.8421L10.8649 7.84208C11.0449 7.65208 11.0449 7.34792 10.8649 7.15792L6.8649 3.15792C6.67606 2.95646 6.35964 2.94625 6.1582 3.13514Z"
+                fill="currentColor" />
+        </svg>
+    </button>
+</nav>

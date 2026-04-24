@@ -1,26 +1,26 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-icon-bell',
+  selector: 'app-icon-view',
   standalone: true,
   template: `
     <svg
-      width="16"
-      height="18"
-      viewBox="0 0 16 18"
+      width="14"
+      height="11"
+      viewBox="0 0 14 11"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M10.6457 13.6665C10.6457 15.2773 9.40513 16.5832 7.87484 16.5832C6.34455 16.5832 5.104 15.2773 5.104 13.6665"
-        stroke="#737373"
+        d="M0.75 5.25C0.75 5.25 2.55 0.75 6.75 0.75C10.95 0.75 12.75 5.25 12.75 5.25C12.75 5.25 10.95 9.75 6.75 9.75C2.55 9.75 0.75 5.25 0.75 5.25Z"
+        stroke="#444444"
         stroke-width="1.5"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
-        d="M13.5996 13.6667H2.15036C1.37696 13.6667 0.75 13.0067 0.75 12.1926C0.75 11.8017 0.897537 11.4267 1.16015 11.1503L1.63771 10.6476C2.08311 10.1788 2.33333 9.54287 2.33333 8.87983V6.58333C2.33333 3.36167 4.81442 0.75 7.875 0.75C10.9356 0.75 13.4167 3.36167 13.4167 6.58333V8.87983C13.4167 9.54287 13.6669 10.1788 14.1123 10.6476L14.5898 11.1503C14.8525 11.4267 15 11.8017 15 12.1926C15 13.0067 14.373 13.6667 13.5996 13.6667Z"
-        stroke="#737373"
+        d="M6.75 7.17857C7.74411 7.17857 8.55 6.31512 8.55 5.25C8.55 4.18488 7.74411 3.32143 6.75 3.32143C5.75589 3.32143 4.95 4.18488 4.95 5.25C4.95 6.31512 5.75589 7.17857 6.75 7.17857Z"
+        stroke="#444444"
         stroke-width="1.5"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -41,6 +41,6 @@ import { Component, Input } from '@angular/core';
     `,
   ],
 })
-export class BellIconComponent {
+export class ViewIconComponent {
   @Input() size: number = 20;
 }

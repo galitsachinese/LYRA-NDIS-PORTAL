@@ -1,0 +1,24 @@
+<div class="dropdown-container">
+  <button type="button" class="dropdown-trigger" (click)="toggle()" [class.active]="isOpen">
+    <span class="trigger-content">
+      <ng-content select="[icon]"></ng-content>
+      <span class="selected-text">{{ label }}</span>
+    </span>
+    <span class="chevron" [class.rotated]="isOpen">
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M1 1L5 5L9 1" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+  </button>
+
+  <div class="dropdown-menu" *ngIf="isOpen">
+    <ng-container *ngFor="let option of options">
+      <div *ngIf="option.isDivider" class="divider"></div>
+      <button *ngIf="!option.isDivider" type="button" class="dropdown-item"
+        [class.selected]="option.value === selectedValue" (click)="selectOption(option)">
+        <span class="item-label">{{ option.label }}</span>
+        <span class="check-mark" *ngIf="option.value === selectedValue">✓</span>
+      </button>
+    </ng-container>
+  </div>
+</div>

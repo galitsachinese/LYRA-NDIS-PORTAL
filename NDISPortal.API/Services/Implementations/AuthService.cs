@@ -20,7 +20,6 @@ namespace Register.API.Services
             _connectionString = config.GetConnectionString("DefaultConnection");
         }
 
-        // REGISTER
         public async Task<object> Register(RegistserDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.FullName) ||
@@ -103,7 +102,6 @@ namespace Register.API.Services
             };
         }
 
-        // LOGIN
         public async Task<object> Login(LoginDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Email) ||

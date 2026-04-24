@@ -20,7 +20,7 @@ namespace Register.API.Services
             _connectionString = config.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<object> Register(RegistserDto dto)
+        public async Task<object> Register(RegisterDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.FullName) ||
                 string.IsNullOrWhiteSpace(dto.Email) ||
@@ -31,7 +31,11 @@ namespace Register.API.Services
             }
 
             var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@gmail\.com$", RegexOptions.IgnoreCase);
+
             if (!emailRegex.IsMatch(dto.Email))
+
+            if (!emailRegex.IsMatch(dto.Email.Trim()))
+
             {
                 return new { status = 400, message = "Email must be in @gmail.com format" };
             }
@@ -94,9 +98,17 @@ namespace Register.API.Services
             {
                 status = 201,
                 message = "Account successfully created",
+
                 id = newUserId,
                 email = dto.Email.Trim(),
-                role = dto.Role
+                role = dto.Role,
+
+                user = new
+                {
+                    id = newUserId,
+                    role = dto.Role
+                }
+
             };
         }
 
@@ -178,9 +190,11 @@ namespace Register.API.Services
                 status = 200,
                 message = "Login successful",
                 token = jwt,
-                userId = userId,
-                email = email,
-                role = role
+                user = new
+                {
+                    id = userId,
+                    role = role
+                }
             };
         }
     }

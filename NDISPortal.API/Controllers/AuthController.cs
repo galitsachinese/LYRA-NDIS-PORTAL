@@ -9,27 +9,29 @@ namespace Register.API.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _service;
+        private readonly IAuthService _authService;
 
-        public AuthController(IAuthService service)
+        public AuthController(IAuthService authService)
         {
-            _service = service;
+            _authService = authService;
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegistserDto dto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var result = await _service.Register(dto);
-            return Ok(result);
+            var result = await _authService.Register(dto);
+            dynamic res = result;
+            return StatusCode(res.status, res);
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var result = await _service.Login(dto);
-            return Ok(result);
+            var result = await _authService.Login(dto);
+            dynamic res = result;
+            return StatusCode(res.status, res);
         }
     }
 }

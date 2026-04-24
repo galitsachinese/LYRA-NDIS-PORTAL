@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Service.API.DTOs.Service;
 using NDISPortal.API.Services.Interfaces;
-using Service.API.DTOs;
 
 namespace Service.API.Controllers
 {
@@ -16,17 +16,23 @@ namespace Service.API.Controllers
             _service = service;
         }
 
+        // GET: api/services
         [HttpGet]
+
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ServicesDto>>> GetServices([FromQuery] int? categoryId)
+        public async Task<ActionResult<IEnumerable<ServiceDto>>> GetServices([FromQuery] int? categoryId)
+
+
         {
             var services = await _service.GetAllAsync(categoryId);
             return Ok(services);
         }
-
+        // GET: api/services/5
         [HttpGet("{id}")]
+
         [AllowAnonymous]
-        public async Task<ActionResult<ServicesDto>> GetServiceItem(int id)
+         public async Task<ActionResult<ServiceDto>> GetServiceItem(int id)
+
         {
             var service = await _service.GetByIdAsync(id);
 
@@ -38,11 +44,9 @@ namespace Service.API.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Coordinator")]
-        public async Task<IActionResult> PutServiceItem(int id, ServicesDto dto)
+        public async Task<IActionResult> PutServiceItem(int id, UpdateServiceDto dto)
         {
-            if (id != dto.Id)
-                return BadRequest();
-
+            
             var updated = await _service.UpdateAsync(id, dto);
 
             if (updated == null)
@@ -53,7 +57,7 @@ namespace Service.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Coordinator")]
-        public async Task<ActionResult<ServicesDto>> PostServiceItem(ServicesDto dto)
+        public async Task<ActionResult<ServiceDto>> PostServiceItem(CreateServiceDto dto)
         {
             var created = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetServiceItem), new { id = created.Id }, created);

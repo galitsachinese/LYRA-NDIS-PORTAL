@@ -106,6 +106,7 @@ namespace NDISPortal.API.Controllers
             }
 
             var worker = new SupportWorker
+            var worker = new SupportWorkers
             {
                 ServiceId = request.AssignedServiceId,
                 FirstName = firstName,

@@ -18,6 +18,11 @@ namespace NdisPortal.BookingsApi.Controllers
             _service = service;
         }
 
+        // GET /api/bookings
+        // Authenticated - any role
+        // Participant: own bookings only
+        // Coordinator: all bookings with participant and service name
+        // Supports ?status=Pending
         [HttpGet]
         public async Task<IActionResult> GetBookings([FromQuery] string? status)
         {
@@ -32,11 +37,45 @@ namespace NdisPortal.BookingsApi.Controllers
 
             if (string.IsNullOrWhiteSpace(roleClaim) || !int.TryParse(userIdClaim, out int userId))
                 return Unauthorized(new { message = "Missing or invalid claims." });
+            if (string.IsNullOrWhiteSpace(roleClaim))
+            {
+                return Unauthorized(new
+                {
+                    message = "Role claim is missing."
+                });
+            }
 
-            var bookings = await _service.GetBookingsAsync(status, roleClaim, userId);
-            return Ok(bookings);
+            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new
+                {
+                    message = "User ID claim is missing or invalid."
+                });
+            }
+
+            try
+            {
+                var bookings = await _service.GetBookingsAsync(status, roleClaim, userId);
+                return Ok(bookings);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
+        // GET /api/bookings/{id}
+        // Extra endpoint for CreatedAtAction and viewing one booking
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBooking(int id)
         {
@@ -49,23 +88,49 @@ namespace NdisPortal.BookingsApi.Controllers
                 User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
                 User.FindFirst("sub")?.Value;
 
-            if (string.IsNullOrWhiteSpace(roleClaim) || !int.TryParse(userIdClaim, out int userId))
-                return Unauthorized(new { message = "Missing or invalid claims." });
+            if (string.IsNullOrWhiteSpace(roleClaim))
+            {
+                return Unauthorized(new
+                {
+                    message = "Role claim is missing."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new
+                {
+                    message = "User ID claim is missing or invalid."
+                });
+            }
 
             var booking = await _service.GetBookingByIdAsync(id);
 
             if (booking == null)
-                return NotFound(new { message = "Booking not found." });
+            {
+                return NotFound(new
+                {
+                    message = "Booking not found."
+                });
+            }
 
             if (roleClaim.Equals("Participant", StringComparison.OrdinalIgnoreCase) && booking.UserId != userId)
-                return Forbid();
+            {
+                return StatusCode(403, new
+                {
+                    message = "You are not allowed to view another participant's booking."
+                });
+            }
 
             return Ok(booking);
         }
 
+        // POST /api/bookings
+        // Participant only
+        // Status is automatically Pending
         [HttpPost]
         [Authorize(Roles = "Participant")]
-        public async Task<IActionResult> PostBooking(BookingCreateDto dto)
+        public async Task<IActionResult> PostBooking([FromBody] BookingCreateDto dto)
         {
             var userIdClaim =
                 User.FindFirst("userId")?.Value ??
@@ -73,53 +138,123 @@ namespace NdisPortal.BookingsApi.Controllers
                 User.FindFirst("sub")?.Value;
 
             if (!int.TryParse(userIdClaim, out int userId))
-                return Unauthorized(new { message = "Missing or invalid user claim." });
+            {
+                return Unauthorized(new
+                {
+                    message = "Missing or invalid user claim."
+                });
+            }
 
-            var created = await _service.CreateBookingAsync(dto, userId);
-            return CreatedAtAction(nameof(GetBooking), new { id = created.Id }, created);
+            try
+            {
+                var created = await _service.CreateBookingAsync(dto, userId);
+                return CreatedAtAction(nameof(GetBooking), new { id = created.Id }, created);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
+        // PUT /api/bookings/{id}/status
+        // Coordinator only
+        // Body: { "status": "Approved" } or { "status": "Cancelled" }
         [HttpPut("{id}/status")]
         [Authorize(Roles = "Coordinator")]
-        public async Task<IActionResult> PutBookingStatus(int id, BookingStatusUpdateDto dto)
+        public async Task<IActionResult> PutBookingStatus(int id, [FromBody] BookingStatusUpdateDto dto)
         {
-            var updated = await _service.UpdateBookingStatusAsync(id, dto);
+            try
+            {
+                var updated = await _service.UpdateBookingStatusAsync(id, dto);
 
-            if (updated == null)
-                return NotFound(new { message = "Booking not found." });
+                if (updated == null)
+                {
+                    return NotFound(new
+                    {
+                        message = "Booking not found."
+                    });
+                }
 
-            return Ok(updated);
+                return Ok(updated);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
+        // DELETE /api/bookings/{id}
+        // Participant only
+        // Participant can only delete their own Pending booking
         [HttpDelete("{id}")]
         [Authorize(Roles = "Participant")]
         public async Task<IActionResult> DeleteBooking(int id)
         {
-            var userIdClaim =
-                User.FindFirst("userId")?.Value ??
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                User.FindFirst("sub")?.Value;
+            var userId = GetCurrentUserId();
 
-            if (!int.TryParse(userIdClaim, out int userId))
-                return Unauthorized(new { message = "Missing or invalid user claim." });
+            if (userId == null)
+            {
+                return Unauthorized(new
+                {
+                    message = "Missing or invalid user claim."
+                });
+            }
 
             try
             {
-                var result = await _service.DeleteBookingAsync(id, userId);
+                var deleted = await _service.DeleteBookingAsync(id, userId.Value);
 
-                if (!result)
-                    return NotFound(new { message = "Booking not found." });
+                if (!deleted)
+                {
+                    return NotFound(new
+                    {
+                        message = "Booking not found."
+                    });
+                }
 
                 return NoContent();
             }
             catch (UnauthorizedAccessException ex)
             {
-                return StatusCode(403, new { message = ex.Message });
+                return StatusCode(403, new
+                {
+                    message = ex.Message
+                });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
             }
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdClaim =
+                User.FindFirst("userId")?.Value ??
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst("sub")?.Value;
+
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                return userId;
+            }
+
+            return null;
+        }
+
+        private string? GetCurrentUserRole()
+        {
+            return User.FindFirst(ClaimTypes.Role)?.Value ??
+                   User.FindFirst("role")?.Value;
         }
     }
 }

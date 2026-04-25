@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.API.DTOs.Service;
 using NDISPortal.API.Services.Interfaces;
+using Service.API.DTOs.Service;
 
 namespace Service.API.Controllers
 {
@@ -17,6 +18,8 @@ namespace Service.API.Controllers
         }
 
         // GET: api/services
+        // Public endpoint - returns active services only
+        // Optional filter: api/services?categoryId=1
         [HttpGet]
 
         [AllowAnonymous]
@@ -27,42 +30,102 @@ namespace Service.API.Controllers
             var services = await _service.GetAllAsync(categoryId);
             return Ok(services);
         }
+
         // GET: api/services/5
+        // Public endpoint - returns one active service
         [HttpGet("{id}")]
 
         [AllowAnonymous]
          public async Task<ActionResult<ServiceDto>> GetServiceItem(int id)
 
+        public async Task<ActionResult<ServiceDto>> GetServiceItem(int id)
         {
             var service = await _service.GetByIdAsync(id);
 
             if (service == null)
                 return NotFound(new { message = "Service not found or inactive." });
+            {
+                return NotFound(new
+                {
+                    message = "Service not found or inactive."
+                });
+            }
 
             return Ok(service);
         }
 
         [HttpPut("{id}")]
+        // POST: api/services
+        // Coordinator only
+        [HttpPost]
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> PutServiceItem(int id, UpdateServiceDto dto)
+        public async Task<ActionResult<ServiceDto>> PostServiceItem([FromBody] ServiceDto dto)
         {
             
             var updated = await _service.UpdateAsync(id, dto);
+            if (dto == null)
+            {
+                return BadRequest(new
+                {
+                    message = "Service data is required."
+                });
+            }
 
             if (updated == null)
                 return NotFound();
+            var created = await _service.CreateAsync(dto);
+
+            return Ok(updated);
+            return CreatedAtAction(
+                nameof(GetServiceItem),
+                new { id = created.Id },
+                created
+            );
+        }
+
+        [HttpPost]
+        // PUT: api/services/5
+        // Coordinator only
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Coordinator")]
+        public async Task<ActionResult<ServiceDto>> PostServiceItem(CreateServiceDto dto)
+        public async Task<IActionResult> PutServiceItem(int id, [FromBody] ServiceDto dto)
+        {
+            var created = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetServiceItem), new { id = created.Id }, created);
+            if (dto == null)
+            {
+                return BadRequest(new
+                {
+                    message = "Service data is required."
+                });
+            }
+
+            if (id != dto.Id)
+            {
+                return BadRequest(new
+                {
+                    message = "Service ID in the URL does not match the ID in the request body."
+                });
+            }
+
+            var updated = await _service.UpdateAsync(id, dto);
+
+            if (updated == null)
+            {
+                return NotFound(new
+                {
+                    message = "Service not found."
+                });
+            }
 
             return Ok(updated);
         }
 
-        [HttpPost]
-        [Authorize(Roles = "Coordinator")]
-        public async Task<ActionResult<ServiceDto>> PostServiceItem(CreateServiceDto dto)
-        {
-            var created = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetServiceItem), new { id = created.Id }, created);
-        }
-
+        // DELETE: api/services/5
+        // Coordinator only
+        // Soft delete: set is_active = false
         [HttpDelete("{id}")]
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> DeleteServiceItem(int id)
@@ -71,6 +134,12 @@ namespace Service.API.Controllers
 
             if (!deleted)
                 return NotFound();
+            {
+                return NotFound(new
+                {
+                    message = "Service not found."
+                });
+            }
 
             return NoContent();
         }

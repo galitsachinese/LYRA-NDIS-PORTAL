@@ -32,7 +32,11 @@ namespace Register.API.Services
 
             var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@gmail\.com$", RegexOptions.IgnoreCase);
 
+
             if (!emailRegex.IsMatch(dto.Email))
+
+            if (!emailRegex.IsMatch(dto.Email.Trim()))
+
 
             if (!emailRegex.IsMatch(dto.Email.Trim()))
 
@@ -99,9 +103,11 @@ namespace Register.API.Services
                 status = 201,
                 message = "Account successfully created",
 
+
                 id = newUserId,
                 email = dto.Email.Trim(),
                 role = dto.Role,
+
 
                 user = new
                 {

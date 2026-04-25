@@ -25,7 +25,7 @@ namespace NDISPortal.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetSupportWorkers()
         {
-            var workers = await _context.SupportWorkers
+            var workers = await _context.SupportWorker
                 .Include(sw => sw.AssignedService)
                 .Select(sw => new
                 {
@@ -82,7 +82,7 @@ namespace NDISPortal.API.Controllers
 
             var normalizedEmail = request.Email.Trim();
 
-            var emailExists = await _context.SupportWorkers
+            var emailExists = await _context.SupportWorker
                 .AnyAsync(sw => sw.Email == normalizedEmail);
 
             if (emailExists)
@@ -120,7 +120,7 @@ namespace NDISPortal.API.Controllers
             _context.SupportWorker.Add(worker);
             await _context.SaveChangesAsync();
 
-            var createdWorker = await _context.SupportWorkers
+            var createdWorker = await _context.SupportWorker
                 .Include(sw => sw.AssignedService)
                 .Where(sw => sw.Id == worker.Id)
                 .Select(sw => new

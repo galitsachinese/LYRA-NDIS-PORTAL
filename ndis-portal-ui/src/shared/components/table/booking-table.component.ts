@@ -13,13 +13,13 @@ import { TableComponent, TableColumn } from '../../ui/table/table.ui';
   standalone: true,
   imports: [TableComponent],
   template: `
-    <app-table
+    <app-table-ui
       [columns]="visibleColumns"
       [data]="bookings"
       (viewAction)="viewBooking.emit($event)"
       (cancelAction)="cancelBooking.emit($event)"
     >
-    </app-table>
+    </app-table-ui>
   `,
 })
 export class BookingTableComponent implements OnChanges {

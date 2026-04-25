@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookingTableComponent } from '../../../shared/components/table/booking-table.component';
-import { StatusDropdownComponent } from '../../../shared/components/dropdown/status/status-dropdown.component';
+import { CardComponent } from '../../../shared/components/card/card.component'; // Double check this path!
+import { CategoryDropdownComponent } from '../../../shared/components/dropdown/category/category-dropdown.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
@@ -9,34 +9,58 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
   standalone: true,
   imports: [
     CommonModule,
-    BookingTableComponent,
-    StatusDropdownComponent,
+    CardComponent, // This must be here to use <app-card-component>
+    CategoryDropdownComponent,
     PaginationComponent,
   ],
   templateUrl: './services-list.page.html',
   styleUrl: './services-list.page.css',
 })
 export class ServicesListComponent {
+  currentPage = 1;
+
   activeFilter = 'all';
-  // Original source from your context
+
   allBookings = [
     {
-      service: 'Personal Hygiene',
-      category: 'Daily Personal Activities',
+      service: 'Personal Hygiene Assistance', // Matches card title
+      category: 'Daily Personal Activities', // Matches card tag
+      description:
+        'Comprehensive building upkeep including HVAC, electrical, and plumbing inspections.', // Match image text
       date: 'Apr 21, 2026',
       status: 'Approved',
     },
     {
-      service: 'Personal Hygiene',
-      category: 'Daily Personal Activities',
+      service: 'Personal Hygiene Assistance', // Matches card title
+      category: 'Daily Personal Activities', // Matches card tag
+      description:
+        'Comprehensive building upkeep including HVAC, electrical, and plumbing inspections.', // Match image text
       date: 'Apr 21, 2026',
-      status: 'Pending',
+      status: 'Approved',
     },
     {
-      service: 'Personal Hygiene',
-      category: 'Daily Personal Activities',
+      service: 'Personal Hygiene Assistance', // Matches card title
+      category: 'Daily Personal Activities', // Matches card tag
+      description:
+        'Comprehensive building upkeep including HVAC, electrical, and plumbing inspections.', // Match image text
       date: 'Apr 21, 2026',
-      status: 'Cancelled',
+      status: 'Approved',
+    },
+    {
+      service: 'Personal Hygiene Assistance', // Matches card title
+      category: 'Daily Personal Activities', // Matches card tag
+      description:
+        'Comprehensive building upkeep including HVAC, electrical, and plumbing inspections.', // Match image text
+      date: 'Apr 21, 2026',
+      status: 'Approved',
+    },
+    {
+      service: 'Personal Hygiene Assistance',
+      category: 'Daily Personal Activities',
+      description:
+        'Comprehensive building upkeep including HVAC, electrical, and plumbing inspections.',
+      date: 'Apr 21, 2026',
+      status: 'Pending',
     },
   ];
 
@@ -52,18 +76,6 @@ export class ServicesListComponent {
       );
     }
   }
-
-  handleCancel(booking: any) {
-    if (confirm('Are you sure you want to cancel this booking?')) {
-      booking.status = 'Cancelled';
-      this.handleCategoryFilter('all'); // Refresh view
-    }
-  }
-  handleView(booking: any) {
-    console.log('Viewing booking:', booking);
-  }
-
-  currentPage = 1;
 
   handlePageChange(page: number) {
     this.currentPage = page;

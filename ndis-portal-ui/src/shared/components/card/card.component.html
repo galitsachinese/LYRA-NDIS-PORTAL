@@ -1,0 +1,5 @@
+<section class="card-grid">
+    <app-card-ui *ngFor="let item of services" [title]="item.service" [description]="item.description"
+        [tag]="item.category">
+    </app-card-ui>
+</section>

@@ -4,18 +4,23 @@ import {
   DropdownUIComponent,
   DropdownOption,
 } from '../../../ui/dropdown/dropdown.ui';
+import { CategoryIconComponent } from '../../icons/svg-icons/category-icon';
 
 @Component({
   selector: 'app-category-dropdown',
   standalone: true,
-  imports: [CommonModule, DropdownUIComponent],
+  imports: [CommonModule, DropdownUIComponent, CategoryIconComponent],
   template: `
     <app-dropdown-ui
       label="Category"
       [options]="categoryOptions"
       (onSelect)="handleSelect($event)"
     >
-      <span icon class="category-icon">📁</span>
+      <app-icon-category
+        icon
+        [size]="16"
+        class="status-icon"
+      ></app-icon-category>
     </app-dropdown-ui>
   `,
 })

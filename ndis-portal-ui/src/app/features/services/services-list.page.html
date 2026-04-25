@@ -1,1 +1,15 @@
-<p>This page is under construction.</p>
+<div class="page-container">
+    <div class="header-section">
+        <h1 class="page-title">Our Services</h1>
+        <div class="filter-actions">
+            <app-category-dropdown></app-category-dropdown>
+        </div>
+    </div>
+
+    <app-card-component [services]="filteredBookings"></app-card-component>
+
+    <div class="pagination-footer">
+        <app-pagination [currentPage]="currentPage" [totalPages]="10" (pageChange)="handlePageChange($event)">
+        </app-pagination>
+    </div>
+</div>

@@ -17,7 +17,7 @@ export interface TableColumn {
 import { ViewIconComponent } from '../../components/icons/svg-icons/view-icon';
 
 @Component({
-  selector: 'app-table',
+  selector: 'app-table-ui',
   standalone: true,
   imports: [CommonModule, ViewIconComponent],
   templateUrl: './table.ui.html',

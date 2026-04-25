@@ -4,7 +4,7 @@ namespace Register.API.Services
 {
     public interface IAuthService
     {
-        Task<object> Register(RegistserDto dto);
+
         Task<object> Register(RegisterDto dto);
         Task<object> Login(LoginDto dto);
     }

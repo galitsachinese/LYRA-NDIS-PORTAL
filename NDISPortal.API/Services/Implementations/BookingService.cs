@@ -15,7 +15,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
             _context = context;
         }
 
-        private static string StatusToString(int status) => status switch
+        private static string StatusToString(byte status) => status switch
         {
             0 => "Pending",
             1 => "Approved",
@@ -26,7 +26,9 @@ namespace NdisPortal.BookingsApi.Services.Implementations
         private static int? ParseStatusFilter(string? status)
         {
             if (string.IsNullOrWhiteSpace(status))
+            {
                 return null;
+            }
 
             return status.Trim().ToLower() switch
             {
@@ -37,10 +39,12 @@ namespace NdisPortal.BookingsApi.Services.Implementations
             };
         }
 
-        private static int? ParseCoordinatorUpdateStatus(string status)
+        private static int? ParseCoordinatorUpdateStatus(string? status)
         {
             if (string.IsNullOrWhiteSpace(status))
+            {
                 return null;
+            }
 
             return status.Trim().ToLower() switch
             {
@@ -50,30 +54,29 @@ namespace NdisPortal.BookingsApi.Services.Implementations
             };
         }
 
-        public async Task<IEnumerable<BookingsListDto>> GetBookingsAsync(int currentUserId, string currentUserRole, string? status)
+        public async Task<IEnumerable<BookingsListDto>> GetBookingsAsync(string? status, string role, int userId)
         {
-            int? statusFilter = null;
+            int? statusFilter = ParseStatusFilter(status);
 
-            if (!string.IsNullOrWhiteSpace(status))
+            if (!string.IsNullOrWhiteSpace(status) && statusFilter == null)
             {
-                statusFilter = ParseStatusFilter(status);
-
-                if (statusFilter == null)
-                    throw new ArgumentException("Invalid status value. Allowed values are: Pending, Approved, Cancelled.");
+                throw new ArgumentException("Invalid status value. Allowed values are: Pending, Approved, Cancelled.");
             }
+
+            var normalizedRole = role.Trim();
 
             IQueryable<Booking> query = _context.Bookings
                 .Include(b => b.Service)
                 .Include(b => b.User)
                 .AsQueryable();
 
-            if (currentUserRole == "Participant")
+            if (normalizedRole.Equals("Participant", StringComparison.OrdinalIgnoreCase))
             {
-                query = query.Where(b => b.UserId == currentUserId);
+                query = query.Where(b => b.UserId == userId);
             }
-            else if (currentUserRole == "Coordinator")
+            else if (normalizedRole.Equals("Coordinator", StringComparison.OrdinalIgnoreCase))
             {
-                // Coordinator sees all bookings
+                // Coordinator can see all bookings.
             }
             else
             {
@@ -82,7 +85,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
 
             if (statusFilter.HasValue)
             {
-                query = query.Where(b => b.Status == statusFilter.Value);
+                query = query.Where(b => b.Status == (byte)statusFilter.Value);
             }
 
             var bookings = await query
@@ -93,8 +96,10 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                     UserId = b.UserId,
                     ServiceId = b.ServiceId,
                     ServiceName = b.Service != null ? b.Service.Name : string.Empty,
-                    ParticipantName = currentUserRole == "Coordinator"
-                        ? (b.User != null ? $"{b.User.FirstName} {b.User.LastName}" : string.Empty)
+                    ParticipantName = normalizedRole.Equals("Coordinator", StringComparison.OrdinalIgnoreCase)
+                        ? b.User != null
+                            ? b.User.FirstName + " " + b.User.LastName
+                            : string.Empty
                         : null,
                     PreferredDate = b.BookingDate,
                     Notes = b.Notes,
@@ -107,28 +112,70 @@ namespace NdisPortal.BookingsApi.Services.Implementations
             return bookings;
         }
 
-        public async Task<BookingResponseDto> CreateBookingAsync(int currentUserId, BookingCreateDto createDto)
+        public async Task<BookingResponseDto?> GetBookingByIdAsync(int id)
         {
+            var booking = await _context.Bookings
+                .Include(b => b.Service)
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null)
+            {
+                return null;
+            }
+
+            return new BookingResponseDto
+            {
+                Id = booking.Id,
+                UserId = booking.UserId,
+                ServiceId = booking.ServiceId,
+                ServiceName = booking.Service != null ? booking.Service.Name : string.Empty,
+                ParticipantName = booking.User != null
+                    ? booking.User.FirstName + " " + booking.User.LastName
+                    : string.Empty,
+                PreferredDate = booking.BookingDate,
+                Notes = booking.Notes,
+                Status = StatusToString(booking.Status),
+                CreatedDate = booking.CreatedDate,
+                ModifiedDate = booking.ModifiedDate
+            };
+        }
+
+        public async Task<BookingResponseDto> CreateBookingAsync(BookingCreateDto createDto, int userId)
+        {
+            if (createDto.ServiceId <= 0)
+            {
+                throw new ArgumentException("Service ID is required.");
+            }
+
             if (createDto.PreferredDate.Date < DateTime.Today)
+            {
                 throw new ArgumentException("PreferredDate must be today or a future date.");
+            }
 
             var service = await _context.Services
                 .FirstOrDefaultAsync(s => s.Id == createDto.ServiceId && s.is_active);
 
             if (service == null)
-                throw new ArgumentException("Service must exist and be active.");
+            {
+                throw new ArgumentException("Service ID must be active or existing.");
+            }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == currentUserId);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
             if (user == null)
+            {
                 throw new ArgumentException("Authenticated user not found.");
+            }
 
             var booking = new Booking
             {
-                UserId = currentUserId,
+                UserId = userId,
                 ServiceId = createDto.ServiceId,
                 BookingDate = createDto.PreferredDate.Date,
                 Notes = createDto.Notes,
-                Status = 0, // Pending only
+                Status = 0,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow
             };
@@ -142,7 +189,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 UserId = booking.UserId,
                 ServiceId = booking.ServiceId,
                 ServiceName = service.Name,
-                ParticipantName = $"{user.FirstName} {user.LastName}",
+                ParticipantName = user.FirstName + " " + user.LastName,
                 PreferredDate = booking.BookingDate,
                 Notes = booking.Notes,
                 Status = StatusToString(booking.Status),
@@ -159,14 +206,18 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (booking == null)
+            {
                 return null;
+            }
 
             int? newStatus = ParseCoordinatorUpdateStatus(updateDto.Status);
 
             if (newStatus == null)
+            {
                 throw new ArgumentException("Invalid status value. Allowed values are: Approved or Cancelled.");
+            }
 
-            booking.Status = newStatus.Value;
+            booking.Status = (byte)newStatus.Value;
             booking.ModifiedDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -176,8 +227,10 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 Id = booking.Id,
                 UserId = booking.UserId,
                 ServiceId = booking.ServiceId,
-                ServiceName = booking.Service?.Name ?? string.Empty,
-                ParticipantName = booking.User != null ? $"{booking.User.FirstName} {booking.User.LastName}" : string.Empty,
+                ServiceName = booking.Service != null ? booking.Service.Name : string.Empty,
+                ParticipantName = booking.User != null
+                    ? booking.User.FirstName + " " + booking.User.LastName
+                    : string.Empty,
                 PreferredDate = booking.BookingDate,
                 Notes = booking.Notes,
                 Status = StatusToString(booking.Status),
@@ -186,23 +239,30 @@ namespace NdisPortal.BookingsApi.Services.Implementations
             };
         }
 
-        public async Task<string?> DeleteBookingAsync(int id, int currentUserId)
+        public async Task<bool> DeleteBookingAsync(int id, int userId)
         {
-            var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.Id == id);
 
             if (booking == null)
-                return null;
+            {
+                return false;
+            }
 
-            if (booking.UserId != currentUserId)
-                return "FORBIDDEN";
+            if (booking.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("You can only delete your own booking.");
+            }
 
             if (booking.Status != 0)
-                return "INVALID_STATUS";
+            {
+                throw new ArgumentException("Only Pending bookings can be deleted.");
+            }
 
             _context.Bookings.Remove(booking);
             await _context.SaveChangesAsync();
 
-            return "DELETED";
+            return true;
         }
     }
 }

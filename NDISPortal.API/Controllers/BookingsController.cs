@@ -21,22 +21,14 @@ namespace NdisPortal.BookingsApi.Controllers
         // GET /api/bookings
         // Authenticated - any role
         // Participant: own bookings only
-        // Coordinator: all bookings with participant and service name
+        // Coordinator: all bookings with participant name and service name
         // Supports ?status=Pending
         [HttpGet]
         public async Task<IActionResult> GetBookings([FromQuery] string? status)
         {
-            var roleClaim =
-                User.FindFirst(ClaimTypes.Role)?.Value ??
-                User.FindFirst("role")?.Value;
+            var roleClaim = GetCurrentUserRole();
+            var userId = GetCurrentUserId();
 
-            var userIdClaim =
-                User.FindFirst("userId")?.Value ??
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                User.FindFirst("sub")?.Value;
-
-            if (string.IsNullOrWhiteSpace(roleClaim) || !int.TryParse(userIdClaim, out int userId))
-                return Unauthorized(new { message = "Missing or invalid claims." });
             if (string.IsNullOrWhiteSpace(roleClaim))
             {
                 return Unauthorized(new
@@ -45,7 +37,7 @@ namespace NdisPortal.BookingsApi.Controllers
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            if (userId == null)
             {
                 return Unauthorized(new
                 {
@@ -55,7 +47,7 @@ namespace NdisPortal.BookingsApi.Controllers
 
             try
             {
-                var bookings = await _service.GetBookingsAsync(status, roleClaim, userId);
+                var bookings = await _service.GetBookingsAsync(status, roleClaim, userId.Value);
                 return Ok(bookings);
             }
             catch (ArgumentException ex)
@@ -75,18 +67,14 @@ namespace NdisPortal.BookingsApi.Controllers
         }
 
         // GET /api/bookings/{id}
-        // Extra endpoint for CreatedAtAction and viewing one booking
+        // Authenticated - any role
+        // Participant: can view only own booking
+        // Coordinator: can view any booking
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBooking(int id)
         {
-            var roleClaim =
-                User.FindFirst(ClaimTypes.Role)?.Value ??
-                User.FindFirst("role")?.Value;
-
-            var userIdClaim =
-                User.FindFirst("userId")?.Value ??
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                User.FindFirst("sub")?.Value;
+            var roleClaim = GetCurrentUserRole();
+            var userId = GetCurrentUserId();
 
             if (string.IsNullOrWhiteSpace(roleClaim))
             {
@@ -96,7 +84,7 @@ namespace NdisPortal.BookingsApi.Controllers
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            if (userId == null)
             {
                 return Unauthorized(new
                 {
@@ -114,7 +102,7 @@ namespace NdisPortal.BookingsApi.Controllers
                 });
             }
 
-            if (roleClaim.Equals("Participant", StringComparison.OrdinalIgnoreCase) && booking.UserId != userId)
+            if (roleClaim.Equals("Participant", StringComparison.OrdinalIgnoreCase) && booking.UserId != userId.Value)
             {
                 return StatusCode(403, new
                 {
@@ -132,12 +120,9 @@ namespace NdisPortal.BookingsApi.Controllers
         [Authorize(Roles = "Participant")]
         public async Task<IActionResult> PostBooking([FromBody] BookingCreateDto dto)
         {
-            var userIdClaim =
-                User.FindFirst("userId")?.Value ??
-                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                User.FindFirst("sub")?.Value;
+            var userId = GetCurrentUserId();
 
-            if (!int.TryParse(userIdClaim, out int userId))
+            if (userId == null)
             {
                 return Unauthorized(new
                 {
@@ -147,8 +132,13 @@ namespace NdisPortal.BookingsApi.Controllers
 
             try
             {
-                var created = await _service.CreateBookingAsync(dto, userId);
-                return CreatedAtAction(nameof(GetBooking), new { id = created.Id }, created);
+                var created = await _service.CreateBookingAsync(dto, userId.Value);
+
+                return CreatedAtAction(
+                    nameof(GetBooking),
+                    new { id = created.Id },
+                    created
+                );
             }
             catch (ArgumentException ex)
             {

@@ -105,7 +105,7 @@ namespace NDISPortal.API.Controllers
                 });
             }
 
-            var worker = new SupportWorker
+           
             var worker = new SupportWorkers
             {
                 ServiceId = request.AssignedServiceId,
@@ -117,7 +117,7 @@ namespace NDISPortal.API.Controllers
                 ModifiedDate = DateTime.UtcNow
             };
 
-            _context.SupportWorkers.Add(worker);
+            _context.SupportWorker.Add(worker);
             await _context.SaveChangesAsync();
 
             var createdWorker = await _context.SupportWorkers

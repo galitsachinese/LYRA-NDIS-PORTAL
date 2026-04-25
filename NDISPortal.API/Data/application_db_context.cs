@@ -16,7 +16,7 @@ namespace NDISPortal.API.Data
         public DbSet<ServiceItem> Services => Set<ServiceItem>();
         public DbSet<Booking> Bookings => Set<Booking>();
         public DbSet<SupportWorker> SupportWorkers => Set<SupportWorker>();
-        public DbSet<SupportWorkers> SupportWorkers => Set<SupportWorkers>();
+        public DbSet<SupportWorkers> SupportWorker => Set<SupportWorkers>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

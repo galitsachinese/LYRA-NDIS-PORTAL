@@ -1,0 +1,89 @@
+<div class="signup-page">
+  <div class="image-section">
+    <app-slideshow 
+      [images]="slideImages" 
+      [interval]="5000" 
+      alt="NDIS Support Services">
+    </app-slideshow>
+  </div>
+
+  <div class="form-section">
+    <div class="form-container">
+      <div class="header">
+        <div class="logo-placeholder"></div>
+        <div class="title-group">
+          <h1>Create an account</h1>
+          <p class="subtitle">Start your journey toward personalized care.</p>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSignUp()" #signupForm="ngForm">
+        <div class="input-row">
+          <div class="input-group">
+            <app-input
+              type="text"
+              placeholder="First Name"
+              name="firstName"
+              [(ngModel)]="signupData.firstName"
+              [required]="true">
+            </app-input>
+          </div>
+          <div class="input-group">
+            <app-input
+              type="text"
+              placeholder="Last Name"
+              name="lastName"
+              [(ngModel)]="signupData.lastName"
+              [required]="true">
+            </app-input>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <select name="role" [(ngModel)]="signupData.role" required class="select-input">
+            <option value="" disabled selected>Role</option>
+            <option value="participant">Participant</option>
+            <option value="coordinator">Coordinator</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <app-input
+            type="email"
+            placeholder="Email"
+            name="email"
+            [(ngModel)]="signupData.email"
+            [required]="true">
+          </app-input>
+        </div>
+
+        <div class="input-group">
+          <app-input
+            type="password"
+            placeholder="Password"
+            name="password"
+            [(ngModel)]="signupData.password"
+            [required]="true">
+          </app-input>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="terms" name="terms" [(ngModel)]="signupData.agreeToTerms" required>
+          <label for="terms">I agree to the terms and conditions.</label>
+        </div>
+
+        <button type="submit" class="btn-signup" [disabled]="isLoading">
+          {{ isLoading ? 'Creating account...' : 'Sign up' }}
+        </button>
+      </form>
+
+      <p class="footer-text">
+        Already have an account? <a routerLink="/login" class="login-link">Log in</a>
+      </p>
+    </div>
+  </div>
+</div>

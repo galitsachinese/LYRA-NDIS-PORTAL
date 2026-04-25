@@ -1,0 +1,183 @@
+/* 🔴 GLOBAL FIX (this removes the white gap) */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* 🔴 MAIN LAYOUT */
+.login-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw; /* 🔥 important: ensures full width */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden; /* prevents any accidental scroll gaps */
+}
+
+/* 🔴 IMAGE SIDE */
+.image-section {
+  flex: 0 0 42%;
+  overflow: hidden;
+  height: 100%;
+}
+
+.image-section app-slideshow {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+:host ::ng-deep .slideshow-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+:host ::ng-deep .slideshow-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+
+/* 🔴 FORM SIDE */
+.form-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  height: 100%;
+}
+
+/* 🔴 FORM CONTENT */
+.form-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c33;
+  font-size: 0.95rem;
+}
+
+input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.forgot-link {
+  margin-bottom: 30px;
+}
+
+.forgot-link a {
+  color: #6F2C91;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 15px;
+  background-color: #6F2C91;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #5a189a;
+}
+
+.footer-text {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
+
+.signup-link {
+  color: #6F2C91;
+  text-decoration: none;
+  font-weight: bold;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.logo-placeholder {
+  width: 60px;
+  height: 60px;
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.title-group h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #333;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .image-section {
+    flex: none;
+    height: 35vh;
+    min-height: 250px;
+    width: 100%;
+  }
+
+  .form-section {
+    flex: 1;
+    padding: 24px 16px;
+    height: auto;
+  }
+
+  .form-container {
+    max-width: 100%;
+  }
+
+  .title-group h1 {
+    font-size: 1.75rem;
+  }
+}

@@ -1,18 +1,32 @@
-<aside class="sidebar">
-  <div class="brand">
-    <div class="logo-box">
-      <span>NDIS</span>
+<!-- File: src/app/shared/components/sidebar/sidebar.ui.html -->
+
+<aside
+  class="h-screen bg-white border-r border-slate-200 flex flex-col p-4 transition-all duration-300 ease-in-out"
+  [class.w-64]="!isCollapsed" [class.w-20]="isCollapsed">
+
+  <!-- SIDEBAR HEADER -->
+  <div class="flex items-center gap-3 px-2 mb-8 overflow-hidden whitespace-nowrap"
+    (click)="isCollapsed ? toggleCollapse() : null" [class.cursor-pointer]="isCollapsed">
+    <div
+      class="min-w-[32px] h-8 bg-[#6b21a8] text-white rounded-lg flex items-center justify-center font-bold text-[10px]">
+      NDIS
     </div>
-    <div class="brand-text">
-      <span class="company-name">NDIS</span>
-      <span class="sub-text">{{ subText }}</span>
+
+    <!-- Title only shows when expanded -->
+    <div *ngIf="!isCollapsed" class="flex flex-col">
+      <span class="font-semibold text-sm text-slate-900">NDIS</span>
+      <span class="text-xs text-slate-500">{{ subText }}</span>
     </div>
   </div>
 
-  <nav class="nav-menu">
-    <a *ngFor="let item of navItems" [routerLink]="item.path" routerLinkActive="active" class="nav-link">
+  <!-- NAVIGATION -->
+  <nav class="flex flex-col gap-1">
+    <a *ngFor="let item of navItems" [routerLink]="item.path" routerLinkActive="bg-[#f3f0ff] text-[#6b21a8] font-medium"
+      #rla="routerLinkActive"
+      class="flex items-center gap-3 p-2.5 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all group"
+      [class.justify-center]="isCollapsed">
 
-      <div class="icon-wrapper">
+      <div class="flex items-center justify-center min-w-[20px]" [class.text-[#6b21a8]]="rla.isActive">
         <ng-container [ngSwitch]="item.icon">
           <app-icon-home *ngSwitchCase="'home'" [size]="20"></app-icon-home>
           <app-icon-service *ngSwitchCase="'services'" [size]="20"></app-icon-service>
@@ -20,7 +34,9 @@
         </ng-container>
       </div>
 
-      <span class="label">{{ item.label }}</span>
+      <span *ngIf="!isCollapsed" class="text-sm whitespace-nowrap">
+        {{ item.label }}
+      </span>
     </a>
   </nav>
 </aside>

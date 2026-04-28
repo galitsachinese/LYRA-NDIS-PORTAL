@@ -41,8 +41,8 @@ export class ServicesListComponent implements OnInit {
         if (res.Data && Array.isArray(res.Data)) {
           this.allCategory = res.Data.map((service: any) => ({
             id: service.id,
-            name: service.name || service.title, // Map to 'name'
-            category: service.category,
+            name: service.name || service.title,
+            category: service.categoryName, // Use categoryName instead of category
             description: service.description,
           }));
           this.filteredCategory = [...this.allCategory];

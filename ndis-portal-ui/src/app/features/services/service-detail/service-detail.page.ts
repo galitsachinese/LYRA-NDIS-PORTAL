@@ -42,7 +42,7 @@ export class ServiceDetailComponent implements OnInit {
           this.serviceData = {
             id: data.id,
             title: data.name || data.title,
-            category: data.category,
+            category: data.categoryName, // Use categoryName instead of category ID
             description: data.description,
           };
 

@@ -1,15 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { StatusCardComponent } from '../../../../shared/components/card/status-card/status-card.component';
+import { RecentBookingTable } from '../../../../shared/components/table/recent-bookings/recent-booking-table.component';
+import { StatusDropdownComponent } from '../../../../shared/components/dropdown/status/status-dropdown.component';
+
+import { BookingService } from '../../../../app/core/services/booking.service';
+import { Booking } from '../../../../app/core/models/booking.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, StatusCardComponent], // Import component to use in template
+  imports: [
+    CommonModule,
+    StatusCardComponent,
+    RecentBookingTable,
+    StatusDropdownComponent, // IMPORTANT
+  ],
   templateUrl: './dashboard.page.html',
 })
 export class DashboardComponent implements OnInit {
-  // Array of data objects to be rendered as cards
+  // =========================
+  // STATS (unchanged)
+  // =========================
   stats: any[] = [
     {
       label: 'Total Bookings',
@@ -41,9 +54,62 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
-  constructor() {}
+  // =========================
+  // FILTER STATE
+  // =========================
+  activeFilter: string = 'all';
+
+  // =========================
+  // BOOKINGS DATA
+  // =========================
+  recentBookings: Booking[] = [];
+
+  constructor(private bookingService: BookingService) {}
 
   ngOnInit(): void {
-    // Ready for future API integration
+    this.loadRecentBookings();
+  }
+
+  // ==========================================
+  // LOAD + FILTER BOOKINGS (MAIN FIX HERE)
+  // ==========================================
+  private loadRecentBookings(): void {
+    this.bookingService.getBookings(this.activeFilter).subscribe({
+      next: (bookings) => {
+        this.recentBookings = bookings
+          .sort(
+            (a, b) =>
+              new Date(b.preferredDate).getTime() -
+              new Date(a.preferredDate).getTime(),
+          )
+          .slice(0, 5);
+      },
+      error: (err) => {
+        console.error('Failed to load bookings:', err.message);
+      },
+    });
+  }
+
+  // ==========================================
+  // DROPDOWN HANDLER (IMPORTANT FIX)
+  // ==========================================
+  handleStatusFilter(status: string): void {
+    this.activeFilter = status;
+    this.loadRecentBookings(); // 🔥 re-fetch based on filter
+  }
+
+  // ==========================================
+  // TABLE ACTIONS
+  // ==========================================
+  onViewBooking(event: any) {
+    console.log('View booking:', event);
+  }
+
+  onCancelBooking(event: any) {
+    console.log('Cancel booking:', event);
+  }
+
+  onApproveBooking(event: any) {
+    console.log('Approve booking:', event);
   }
 }

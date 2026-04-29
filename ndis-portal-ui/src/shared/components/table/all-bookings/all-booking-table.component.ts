@@ -18,7 +18,7 @@ import { TableColumn } from '../../../models/table.model';
       [columns]="visibleColumns"
       [data]="bookings"
       (viewAction)="viewBooking.emit($event)"
-      (cancelAction)="cancelBooking.emit($event)"
+      (cancelAction)="onAction($event)"
     ></app-table-ui>
   `,
 })
@@ -27,6 +27,7 @@ export class AllBookingTable implements OnChanges {
   @Input() currentFilter: string = 'all';
   @Output() viewBooking = new EventEmitter<any>();
   @Output() cancelBooking = new EventEmitter<any>();
+  @Output() approveBooking = new EventEmitter<any>();
 
   /** * Desktop base columns
    */
@@ -47,16 +48,39 @@ export class AllBookingTable implements OnChanges {
     }
   }
 
+  /** Multi-action config for coordinator: Approve and Cancel */
+  private pendingActionConfig = [
+    { label: 'Approve', actionKey: 'approve', class: 'text-emerald-600 hover:bg-emerald-50' },
+    { label: 'Cancel', actionKey: 'cancel', class: 'text-rose-500 hover:bg-rose-50' },
+  ];
+
   /** * Action column logic: Only added when filter is 'pending'
    */
   private updateColumns() {
     if (this.currentFilter.toLowerCase() === 'pending') {
       this.visibleColumns = [
         ...this.baseColumns,
-        { key: 'action', label: '', type: 'action' },
+        { key: 'action', label: '', type: 'action', actionLabel: this.pendingActionConfig },
       ];
     } else {
       this.visibleColumns = [...this.baseColumns];
+    }
+  }
+
+  /**
+   * Handle multi-action events from table UI
+   */
+  onAction(event: any): void {
+    if (typeof event === 'object' && event.action && event.row) {
+      // Multi-action payload
+      if (event.action === 'approve') {
+        this.approveBooking.emit(event.row);
+      } else if (event.action === 'cancel') {
+        this.cancelBooking.emit(event.row);
+      }
+    } else {
+      // Legacy: direct row emission (fallback)
+      this.cancelBooking.emit(event);
     }
   }
 }

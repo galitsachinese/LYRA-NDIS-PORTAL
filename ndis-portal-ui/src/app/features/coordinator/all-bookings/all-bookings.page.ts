@@ -80,6 +80,25 @@ export class AllBookingsComponent implements OnInit {
   }
 
   /**
+   * Approves a pending booking (Coordinator only)
+   */
+  handleApprove(booking: BookingViewModel) {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.bookingService.updateBookingStatus(booking.id, 'Approved').subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.fetchBookings(); // Refresh the data list
+      },
+      error: (error: Error) => {
+        this.isLoading = false;
+        this.errorMessage = error.message;
+      },
+    });
+  }
+
+  /**
    * Resets the dialog state and closes it
    */
   closeCancelDialog() {
@@ -141,6 +160,7 @@ export class AllBookingsComponent implements OnInit {
 
     return {
       id: booking.id,
+      name: booking.participantName,
       service: booking.serviceName,
       category: this.deriveCategory(booking.serviceName),
       date: formattedDate,

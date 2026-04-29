@@ -29,7 +29,7 @@
         </div>
 
         <app-all-booking-table [bookings]="bookings" [currentFilter]="activeFilter" (viewBooking)="handleView($event)"
-            (cancelBooking)="handleCancel($event)">
+            (cancelBooking)="handleCancel($event)" (approveBooking)="handleApprove($event)">
         </app-all-booking-table>
     </div>
 

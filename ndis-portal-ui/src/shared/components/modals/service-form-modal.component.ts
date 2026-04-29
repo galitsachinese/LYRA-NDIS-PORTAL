@@ -1,6 +1,7 @@
 // FILE: service-form-modal.component.ts
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { ApiService } from '../../../app/core/services/api-service';
 import { CommonModule } from '@angular/common';
 
 // Reactive Forms imports (VERY IMPORTANT)
@@ -34,11 +35,30 @@ export class ServiceFormModalComponent {
     description: new FormControl(''),
   });
 
+  // Service categories for dropdown
+  categories: any[] = [];
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit(): void {
+    this.api.getServiceCategories().subscribe({
+      next: (res: any) => {
+        // Assuming API returns array directly or wrapped in Data
+        this.categories = res.Data ? res.Data : res;
+      },
+      error: (err: any) => {
+        console.error('Failed to load categories', err);
+      }
+    });
+  }
+
   // Submit form
   submit() {
     if (this.serviceForm.valid) {
       // Emit form data
       this.onSave.emit(this.serviceForm.value);
+      // Close the modal after successful save
+      this.onClose.emit();
     }
   }
 }

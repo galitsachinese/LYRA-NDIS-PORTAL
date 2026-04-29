@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -56,9 +56,27 @@ export class ApiService {
   }
 
   createService(service: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, service).pipe(
+    const headers = this.getAuthHeaders();
+    return this.http.post<any>(this.apiUrl, service, { headers }).pipe(
       catchError((error: any) => {
         return throwError(() => new Error('Failed to create service. Please try again.'));
+      })
+    );
+  }
+
+  // Helper to include Authorization header if token is present
+  // Returns HttpHeaders with Authorization if token exists
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
+
+  // Get service categories for dropdown
+  getServiceCategories(): Observable<any> {
+    // Assuming the API exposes /service-categories endpoint
+    return this.http.get<any>(`${environment.apiUrl}/service-categories`).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error('Failed to load service categories.'));
       })
     );
   }

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="4/29/2026 12:35:17 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="CHOKOBOT_ROBOT"
+  DTS:CreatorName="CHOKOBOT_ROBOT\jerwi"
+  DTS:DTSID="{582FE1D5-39EC-4F8F-BEF4-7D5CDF583720}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="17.0.1016.0"
+  DTS:LocaleID="13321"
+  DTS:ObjectName="Package1"
+  DTS:PackageType="5"
+  DTS:VersionGUID="{7261C95A-B6CC-4B7D-85AD-D242A0B47B26}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables />
+</DTS:Executable>

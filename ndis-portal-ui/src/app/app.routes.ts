@@ -13,7 +13,7 @@ import { AuthLayoutComponent } from './core/layouts/auth-layout/auth-layout.comp
 import { MainLayoutComponent } from './core/layouts/main-layout/main-layout.component';
 import { DashboardComponent } from './features/coordinator/dashboard/dashboard.page';
 import { ManageServicesComponent } from './features/coordinator/manage-services/manage-services.page';
-
+import { AllBookingsComponent } from './features/coordinator/all-bookings/all-bookings.page';
 export const routes: Routes = [
   // AUTH BRANCH: Clean Layout
   {
@@ -52,6 +52,12 @@ export const routes: Routes = [
       {
         path: 'dashboard/services',
         component: ManageServicesComponent,
+        data: { role: 'coordinator' },
+      },
+
+      {
+        path: 'dashboard/bookings',
+        component: AllBookingsComponent,
         data: { role: 'coordinator' },
       },
 

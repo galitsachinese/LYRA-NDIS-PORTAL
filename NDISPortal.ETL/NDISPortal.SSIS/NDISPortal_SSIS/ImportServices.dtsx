@@ -1,0 +1,1428 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="4/29/2026 12:35:17 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="CHOKOBOT_ROBOT"
+  DTS:CreatorName="CHOKOBOT_ROBOT\jerwi"
+  DTS:DTSID="{1AA9F197-1905-4173-8427-F56A7065E89B}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="17.0.1016.0"
+  DTS:LocaleID="13321"
+  DTS:ObjectName="ImportServices"
+  DTS:PackageType="5"
+  DTS:VersionBuild="16"
+  DTS:VersionGUID="{B38BBA6A-272F-4B46-9794-DCF5A240C050}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[CHOKOBOT_ROBOT.ndis_portal_db.sa]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{8032257C-F0E1-491A-B8DC-CFD3F5F92D04}"
+      DTS:ObjectName="CHOKOBOT_ROBOT.ndis_portal_db.sa">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=CHOKOBOT_ROBOT;User ID=sa;Initial Catalog=ndis_portal_db;Provider=SQLOLEDB.1;Application Name=SSIS-ImportServices-{8032257C-F0E1-491A-B8DC-CFD3F5F92D04}CHOKOBOT_ROBOT.ndis_portal_db.sa;Auto Translate=False;">
+          <DTS:Password
+            DTS:Name="Password"
+            Sensitive="1"
+            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAcW4O9CjwDU22CcYqpc20gAAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAACl+5lFJblaOnxX/ODTFUr0uggavQPfNlH7YfIxFFgH8AAAAAAOgAAAAAIAACAAAABO/v1E3wzV3WW59VdCc7DbaSkF2ABJluGqYbP9EAW9JCAAAABYJuqlyD7wISBPj0h9DXnCaH3pynW+jHZMUgnz2aYpo0AAAAAf38ABwBMtq8VBrz13JnLydVGS9soVWzuZNaf2rc4QwPclGsylr1ooNHWB4s6k/u+rLsY4goDRsZ64FlyPvHlL</DTS:Password>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[services_import_connection]"
+      DTS:CreationName="FLATFILE"
+      DTS:DTSID="{B8F3CEE6-94EA-4B30-9EE6-1C5E1284137C}"
+      DTS:ObjectName="services_import_connection">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:Format="Delimited"
+          DTS:LocaleID="13321"
+          DTS:HeaderRowDelimiter="_x000D__x000A_"
+          DTS:ColumnNamesInFirstDataRow="True"
+          DTS:RowDelimiter=""
+          DTS:TextQualifier="_x003C_none_x003E_"
+          DTS:CodePage="1252"
+          DTS:ConnectionString="C:\Users\jerwi\Downloads\services_import.csv">
+          <DTS:FlatFileColumns>
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="service_name"
+              DTS:DTSID="{A9C50CDE-1DCD-45ED-9863-7BF005F16A8B}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="category_name"
+              DTS:DTSID="{ECD0E086-9D5C-4C58-93B3-D6A8F1A44B23}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x000A_"
+              DTS:MaximumWidth="200"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="description"
+              DTS:DTSID="{815A7B02-59BF-4BB2-9239-53FAB8147DA6}"
+              DTS:CreationName="" />
+          </DTS:FlatFileColumns>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[services_import_errors_connection]"
+      DTS:CreationName="FLATFILE"
+      DTS:DTSID="{D02835F5-F9DB-4B3E-ADFF-43F6C19040AA}"
+      DTS:ObjectName="services_import_errors_connection">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:Format="Delimited"
+          DTS:LocaleID="13321"
+          DTS:HeaderRowDelimiter="_x000D__x000A_"
+          DTS:ColumnNamesInFirstDataRow="True"
+          DTS:RowDelimiter=""
+          DTS:TextQualifier="_x003C_none_x003E_"
+          DTS:CodePage="1252"
+          DTS:ConnectionString="C:\Users\jerwi\Desktop\ndis-portal\NDISPortal.ETL\services_import_errors.csv">
+          <DTS:FlatFileColumns>
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="service_name"
+              DTS:DTSID="{3D9DD39B-DF9A-4AE4-AE93-AB87ACEF78C3}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="category_name"
+              DTS:DTSID="{5E87A254-CBC5-464B-A1DD-BC0A5D3D8468}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="description"
+              DTS:DTSID="{41A92177-D732-469F-89DF-C29738EB1D44}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Copy of service_name"
+              DTS:DTSID="{7E014E7A-0D6D-49FF-BA5D-498DFEF13DE3}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="130"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Copy of category_name"
+              DTS:DTSID="{A9DD957C-C197-449B-889D-612A273F5824}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:MaximumWidth="50"
+              DTS:DataType="129"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Copy of description"
+              DTS:DTSID="{1FCEF2F9-1D0D-4A2D-A253-0977BC099BFD}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x000D__x000A_"
+              DTS:MaximumWidth="18"
+              DTS:DataType="130"
+              DTS:TextQualified="True"
+              DTS:ObjectName="error_reason"
+              DTS:DTSID="{C4367348-1C84-4EAB-9267-230C38AC5C71}"
+              DTS:CreationName="" />
+          </DTS:FlatFileColumns>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Import Service From CSV"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{4AAE232D-40EC-43AC-9E48-5D85B2C3391F}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Import Service From CSV"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Import Service From CSV\Add Error Reason"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Add Error Reason"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Import Service From CSV\Add Error Reason.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Import Service From CSV\Add Error Reason.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Output].Columns[error_reason]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="18"
+                      lineageId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Output].Columns[error_reason]"
+                      name="error_reason"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">"Category not found"</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">"Category not found"</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Import Service From CSV\Add Error Reason.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Import Service From CSV\Data Conversion"
+              componentClassID="Microsoft.DataConvert"
+              contactInfo="Data Conversion;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Data Conversion"
+              name="Data Conversion"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input]"
+                  name="Data Conversion Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input].Columns[service_name]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="service_name"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[service_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input].Columns[category_name]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="category_name"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[category_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input].Columns[description]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="200"
+                      cachedName="description"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[description]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output]"
+                  exclusionGroup="1"
+                  name="Data Conversion Output"
+                  synchronousInputId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of service_name]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="50"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of service_name]"
+                      name="Copy of service_name"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[service_name]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of category_name]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="50"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of category_name]"
+                      name="Copy of category_name"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[category_name]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of description]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="200"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of description]"
+                      name="Copy of description"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[description]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Data Conversion Error Output"
+                  synchronousInputId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Import Service From CSV\Derived Column"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Derived Column"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Import Service From CSV\Derived Column.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Import Service From CSV\Derived Column.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[is_active]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[is_active]"
+                      name="is_active"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">1</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">1</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[created_date]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[created_date]"
+                      name="created_date"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[GETDATE]()</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">GETDATE()</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[modified_date]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[modified_date]"
+                      name="modified_date"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">[GETDATE]()</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">GETDATE()</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Import Service From CSV\Derived Column.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Import Service From CSV\Flat File Destination"
+              componentClassID="Microsoft.FlatFileDestination"
+              contactInfo="Flat File Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;1"
+              description="Flat File Destination"
+              localeId="13321"
+              name="Flat File Destination"
+              version="1">
+              <properties>
+                <property
+                  dataType="System.Boolean"
+                  description="Specifies whether the data will overwrite or append to the destination file."
+                  name="Overwrite">true</property>
+                <property
+                  dataType="System.Null"
+                  description="Specifies the text to write to the destination file before any data is written."
+                  expressionType="Notify"
+                  name="Header" />
+                <property
+                  dataType="System.Boolean"
+                  description="When text qualifier is enabled, specifies whether the text qualifier in the data written to the destination file will be escaped or not."
+                  name="EscapeQualifier">false</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Import Service From CSV\Flat File Destination.Connections[FlatFileConnection]"
+                  connectionManagerID="Package.ConnectionManagers[services_import_errors_connection]"
+                  connectionManagerRefId="Package.ConnectionManagers[services_import_errors_connection]"
+                  name="FlatFileConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input]"
+                  hasSideEffects="true"
+                  name="Flat File Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[service_name]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="service_name"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[service_name]"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[service_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[category_name]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="category_name"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[category_name]"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[category_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[description]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="200"
+                      cachedName="description"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[description]"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[description]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[Copy of service_name]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Copy of service_name"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[Copy of service_name]"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of service_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[Copy of category_name]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Copy of category_name"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[Copy of category_name]"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of category_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[Copy of description]"
+                      cachedDataType="wstr"
+                      cachedLength="200"
+                      cachedName="Copy of description"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[Copy of description]"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of description]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].Columns[error_reason]"
+                      cachedDataType="wstr"
+                      cachedLength="18"
+                      cachedName="error_reason"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[error_reason]"
+                      lineageId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Output].Columns[error_reason]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[service_name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="service_name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[category_name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="category_name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[description]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="description" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[Copy of service_name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Copy of service_name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[Copy of category_name]"
+                      dataType="wstr"
+                      length="50"
+                      name="Copy of category_name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[Copy of description]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Copy of description" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[error_reason]"
+                      dataType="wstr"
+                      length="18"
+                      name="error_reason" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+            </component>
+            <component
+              refId="Package\Import Service From CSV\Flat File Source"
+              componentClassID="Microsoft.FlatFileSource"
+              contactInfo="Flat File Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;1"
+              description="Flat File Source"
+              localeId="13321"
+              name="Flat File Source"
+              usesDispositions="true"
+              version="1">
+              <properties>
+                <property
+                  dataType="System.Boolean"
+                  description="Specifies whether zero-length columns are treated as null."
+                  name="RetainNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of an output column containing the file name. If no name is specified, no output column containing the file name will be generated."
+                  name="FileNameColumnName"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Import Service From CSV\Flat File Source.Connections[FlatFileConnection]"
+                  connectionManagerID="Package.ConnectionManagers[services_import_connection]"
+                  connectionManagerRefId="Package.ConnectionManagers[services_import_connection]"
+                  name="FlatFileConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output]"
+                  name="Flat File Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[service_name]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].ExternalColumns[service_name]"
+                      length="50"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[service_name]"
+                      name="service_name"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[category_name]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].ExternalColumns[category_name]"
+                      length="50"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[category_name]"
+                      name="category_name"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[description]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].ExternalColumns[description]"
+                      length="200"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].Columns[description]"
+                      name="description"
+                      truncationRowDisposition="RedirectRow">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].ExternalColumns[service_name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="service_name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].ExternalColumns[category_name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="category_name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output].ExternalColumns[description]"
+                      codePage="1252"
+                      dataType="str"
+                      length="200"
+                      name="description" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output]"
+                  isErrorOut="true"
+                  name="Flat File Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      codePage="1252"
+                      dataType="text"
+                      description="Flat File Source Error Output Column"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      name="Flat File Source Error Output Column" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Import Service From CSV\Lookup - Match Category"
+              componentClassID="Microsoft.Lookup"
+              contactInfo="Lookup;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;6"
+              description="Joins additional columns to the data flow by looking up values in a table. For example, join to the 'employee id' column the employees table to get 'hire date' and 'employee name'. We recommend this transformation when the lookup table can fit into memory."
+              name="Lookup - Match Category"
+              usesDispositions="true"
+              version="6">
+              <properties>
+                <property
+                  dataType="System.String"
+                  description="Specifies the SQL statement that generates the lookup table."
+                  expressionType="Notify"
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT 
+    id,
+    name
+FROM service_categories;</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies a SQL statement that uses parameters to generate the lookup table."
+                  expressionType="Notify"
+                  name="SqlCommandParam"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">select * from (SELECT 
+    id,
+    name
+FROM service_categories;) [refTable]
+where [refTable].[name] = ?</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the type of connection used to access the reference dataset."
+                  name="ConnectionType"
+                  typeConverter="LookupConnectionType">0</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the cache type of the lookup table."
+                  name="CacheType"
+                  typeConverter="CacheType">0</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
+                  name="NoMatchBehavior"
+                  typeConverter="LookupNoMatchBehavior">1</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
+                  name="NoMatchCachePercentage">0</property>
+                <property
+                  dataType="System.Int32"
+                  description="Maximum Memory Usage for Reference Cache on a 32 bit platform."
+                  name="MaxMemoryUsage">25</property>
+                <property
+                  dataType="System.Int64"
+                  description="Maximum Memory Usage for Reference Cache on a 64 bit platform."
+                  name="MaxMemoryUsage64">25</property>
+                <property
+                  dataType="System.String"
+                  description="Indicates whether to reference metadata in an XML format."
+                  name="ReferenceMetadataXml">&lt;referenceMetadata&gt;&lt;referenceColumns&gt;&lt;referenceColumn name="id" dataType="DT_I4" length="0" precision="0" scale="0" codePage="0"/&gt;&lt;referenceColumn name="name" dataType="DT_WSTR" length="50" precision="0" scale="0" codePage="0"/&gt;&lt;/referenceColumns&gt;&lt;/referenceMetadata&gt;</property>
+                <property
+                  containsID="true"
+                  dataType="System.String"
+                  description="Specifies the list of lineage identifiers that map to the parameters that the SQL statement in the SQLCommand property uses. Entries in the list are separated by semicolons."
+                  name="ParameterMap">#{Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of category_name]};</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Determines whether duplicate keys in the reference data should be treated as errors when full cache mode is used."
+                  name="TreatDuplicateKeysAsError">false</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Import Service From CSV\Lookup - Match Category.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[CHOKOBOT_ROBOT.ndis_portal_db.sa]"
+                  connectionManagerRefId="Package.ConnectionManagers[CHOKOBOT_ROBOT.ndis_portal_db.sa]"
+                  description="Connection manager used to access lookup data."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Import Service From CSV\Lookup - Match Category.Inputs[Lookup Input]"
+                  name="Lookup Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Import Service From CSV\Lookup - Match Category.Inputs[Lookup Input].Columns[Copy of category_name]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Copy of category_name"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of category_name]">
+                      <properties>
+                        <property
+                          dataType="System.String"
+                          description="Specifies the column in the reference table that a column joins."
+                          name="JoinToReferenceColumn">name</property>
+                        <property
+                          dataType="System.Null"
+                          description="Specifies the column in the reference table from which a column is copied."
+                          name="CopyFromReferenceColumn" />
+                      </properties>
+                    </inputColumn>
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Match Output]"
+                  errorOrTruncationOperation="Lookup"
+                  exclusionGroup="1"
+                  name="Lookup Match Output"
+                  synchronousInputId="Package\Import Service From CSV\Lookup - Match Category.Inputs[Lookup Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Match Output].Columns[categoty_id]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Copy Column"
+                      lineageId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Match Output].Columns[categoty_id]"
+                      name="categoty_id"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.String"
+                          description="Specifies the column in the reference table from which a column is copied."
+                          name="CopyFromReferenceColumn">id</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup No Match Output]"
+                  description="The Lookup output that handles rows with no matching entries in the reference dataset. Use this output when the NoMatchBehavior property is set to &quot;Send rows with no matching entries to the no match output.&quot;"
+                  exclusionGroup="1"
+                  name="Lookup No Match Output"
+                  synchronousInputId="Package\Import Service From CSV\Lookup - Match Category.Inputs[Lookup Input]">
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Lookup Error Output"
+                  synchronousInputId="Package\Import Service From CSV\Lookup - Match Category.Inputs[Lookup Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Import Service From CSV\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[services]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Import Service From CSV\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[CHOKOBOT_ROBOT.ndis_portal_db.sa]"
+                  connectionManagerRefId="Package.ConnectionManagers[CHOKOBOT_ROBOT.ndis_portal_db.sa]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[created_date]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="created_date"
+                      externalMetadataColumnId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[created_date]"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[created_date]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[categoty_id]"
+                      cachedDataType="i4"
+                      cachedName="categoty_id"
+                      externalMetadataColumnId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[category_id]"
+                      lineageId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Match Output].Columns[categoty_id]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[is_active]"
+                      cachedDataType="i4"
+                      cachedName="is_active"
+                      externalMetadataColumnId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[is_active]"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[is_active]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[modified_date]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="modified_date"
+                      externalMetadataColumnId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[modified_date]"
+                      lineageId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output].Columns[modified_date]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Copy of service_name]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Copy of service_name"
+                      externalMetadataColumnId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[name]"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of service_name]" />
+                    <inputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Copy of description]"
+                      cachedDataType="wstr"
+                      cachedLength="200"
+                      cachedName="Copy of description"
+                      externalMetadataColumnId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[description]"
+                      lineageId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of description]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[id]"
+                      dataType="i4"
+                      name="id" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[category_id]"
+                      dataType="i4"
+                      name="category_id" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[name]"
+                      dataType="wstr"
+                      length="50"
+                      name="name" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[description]"
+                      dataType="wstr"
+                      length="200"
+                      name="description" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[is_active]"
+                      dataType="bool"
+                      name="is_active" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[created_date]"
+                      dataType="dbTimeStamp"
+                      name="created_date" />
+                    <externalMetadataColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[modified_date]"
+                      dataType="dbTimeStamp"
+                      name="modified_date" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Import Service From CSV\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Import Service From CSV\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Import Service From CSV\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Import Service From CSV.Paths[Data Conversion Output]"
+              endId="Package\Import Service From CSV\Lookup - Match Category.Inputs[Lookup Input]"
+              name="Data Conversion Output"
+              startId="Package\Import Service From CSV\Data Conversion.Outputs[Data Conversion Output]" />
+            <path
+              refId="Package\Import Service From CSV.Paths[Derived Column Output]"
+              endId="Package\Import Service From CSV\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="Derived Column Output"
+              startId="Package\Import Service From CSV\Derived Column.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Import Service From CSV.Paths[Derived Column Output1]"
+              endId="Package\Import Service From CSV\Flat File Destination.Inputs[Flat File Destination Input]"
+              name="Derived Column Output"
+              startId="Package\Import Service From CSV\Add Error Reason.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Import Service From CSV.Paths[Flat File Source Output]"
+              endId="Package\Import Service From CSV\Data Conversion.Inputs[Data Conversion Input]"
+              name="Flat File Source Output"
+              startId="Package\Import Service From CSV\Flat File Source.Outputs[Flat File Source Output]" />
+            <path
+              refId="Package\Import Service From CSV.Paths[Lookup Match Output]"
+              endId="Package\Import Service From CSV\Derived Column.Inputs[Derived Column Input]"
+              name="Lookup Match Output"
+              startId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup Match Output]" />
+            <path
+              refId="Package\Import Service From CSV.Paths[Lookup No Match Output]"
+              endId="Package\Import Service From CSV\Add Error Reason.Inputs[Derived Column Input]"
+              name="Lookup No Match Output"
+              startId="Package\Import Service From CSV\Lookup - Match Category.Outputs[Lookup No Match Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph">
+        <NodeLayout
+          Size="196.8,41.6"
+          Id="Package\Import Service From CSV"
+          TopLeft="140.83332563854,48.5333329958386" />
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\Import Service From CSV">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="151.2,41.6"
+          Id="Package\Import Service From CSV\Flat File Source"
+          TopLeft="491.333326011896,27.1111107071241" />
+        <NodeLayout
+          Size="152.8,41.6"
+          Id="Package\Import Service From CSV\Derived Column"
+          TopLeft="702.999989524484,245.777774115404" />
+        <NodeLayout
+          Size="156,41.6"
+          Id="Package\Import Service From CSV\Data Conversion"
+          TopLeft="488.555548275511,103.777776231368" />
+        <NodeLayout
+          Size="170.4,41.6"
+          Id="Package\Import Service From CSV\Flat File Destination"
+          TopLeft="339.044443588456,337.111106087764" />
+        <NodeLayout
+          Size="171.2,41.6"
+          Id="Package\Import Service From CSV\OLE DB Destination"
+          TopLeft="695.466661149926,327.666661784053" />
+        <NodeLayout
+          Size="161.6,41.6"
+          Id="Package\Import Service From CSV\Add Error Reason"
+          TopLeft="331.022221891085,264.555551613371" />
+        <NodeLayout
+          Size="194.4,41.6"
+          Id="Package\Import Service From CSV\Lookup - Match Category"
+          TopLeft="476.888881782691,172.888886312644" />
+        <EdgeLayout
+          Id="Package\Import Service From CSV.Paths[Lookup No Match Output]"
+          TopLeft="543.022215116024,214.488886312644">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-131.199993224939,50.066665300727"
+              Start="0,0"
+              End="-131.199993224939,42.566665300727">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,16.2718906033964" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,16.2718906033964"
+                    Point2="0,20.2718906033964"
+                    Point3="-4,20.2718906033964" />
+                  <mssgle:LineSegment
+                    End="-127.199993224939,20.2718906033964" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-127.199993224939,20.2718906033964"
+                    Point2="-131.199993224939,20.2718906033964"
+                    Point3="-131.199993224939,24.2718906033964" />
+                  <mssgle:LineSegment
+                    End="-131.199993224939,42.566665300727" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-121.406383331219,25.2718906033964,111.6127734375,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Import Service From CSV.Paths[Lookup Match Output]"
+          TopLeft="605.155548449358,214.488886312644">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="174.244441075126,31.2888878027599"
+              Start="0,0"
+              End="174.244441075126,23.7888878027599">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,8.66880681646443" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,8.66880681646443"
+                    Point2="0,12.6688068164644"
+                    Point3="4,12.6688068164644" />
+                  <mssgle:LineSegment
+                    End="170.244441075126,12.6688068164644" />
+                  <mssgle:CubicBezierSegment
+                    Point1="170.244441075126,12.6688068164644"
+                    Point2="174.244441075126,12.6688068164644"
+                    Point3="174.244441075126,16.6688068164644" />
+                  <mssgle:LineSegment
+                    End="174.244441075126,23.7888878027599" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="38.9308338188132,17.6688068164644,96.3827734375,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Import Service From CSV.Paths[Flat File Source Output]"
+          TopLeft="566.744437143703,68.7111107071241">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,35.0666655242443"
+              Start="0,0"
+              End="0,27.5666655242443">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,27.5666655242443" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Import Service From CSV.Paths[Derived Column Output1]"
+          TopLeft="411.822221891085,306.155551613371">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="12.4222216973702,30.9555544743935"
+              Start="0,0"
+              End="12.4222216973702,23.4555544743935">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,11.4777772371968" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,11.4777772371968"
+                    Point2="0,15.4777772371968"
+                    Point3="4,15.4777772371968" />
+                  <mssgle:LineSegment
+                    End="8.42222169737016,15.4777772371968" />
+                  <mssgle:CubicBezierSegment
+                    Point1="8.42222169737016,15.4777772371968"
+                    Point2="12.4222216973702,15.4777772371968"
+                    Point3="12.4222216973702,19.4777772371968" />
+                  <mssgle:LineSegment
+                    End="12.4222216973702,23.4555544743935" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Import Service From CSV.Paths[Derived Column Output]"
+          TopLeft="780.233325337205,287.377774115404">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,40.2888876686494"
+              Start="0,0"
+              End="0,32.7888876686494">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,32.7888876686494" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Import Service From CSV.Paths[Data Conversion Output]"
+          TopLeft="570.322215029101,145.377776231368">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,27.5111100812752"
+              Start="0,0"
+              End="0,20.0111100812752">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,20.0111100812752" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Import Service From CSV\OLE DB Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Import Service From CSV\Lookup - Match Category">
+    <Properties>
+      <Property>
+        <Name>OverwriteParamsSQLProp</Name>
+        <Value
+          type="q2:string">false</Value>
+      </Property>
+      <Property>
+        <Name>UsedTableName</Name>
+        <Value
+          type="q3:string"></Value>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q4:string">0</Value>
+      </Property>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

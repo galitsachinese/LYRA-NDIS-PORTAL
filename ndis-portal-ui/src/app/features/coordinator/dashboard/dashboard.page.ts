@@ -1,115 +1,126 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { StatusCardComponent } from '../../../../shared/components/card/status-card/status-card.component';
-import { RecentBookingTable } from '../../../../shared/components/table/recent-bookings/recent-booking-table.component';
-import { StatusDropdownComponent } from '../../../../shared/components/dropdown/status/status-dropdown.component';
-
-import { BookingService } from '../../../../app/core/services/booking.service';
-import { Booking } from '../../../../app/core/models/booking.model';
+import { ApiService } from '../../../core/services/api-service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    StatusCardComponent,
-    RecentBookingTable,
-    StatusDropdownComponent, // IMPORTANT
-  ],
+  imports: [CommonModule, StatusCardComponent],
   templateUrl: './dashboard.page.html',
 })
 export class DashboardComponent implements OnInit {
-  // =========================
-  // STATS (unchanged)
-  // =========================
+  // Stats data - will be populated from API
   stats: any[] = [
     {
       label: 'Total Bookings',
-      value: 1250,
+      value: 0,
       icon: 'fa-solid fa-calendar-days',
       color: '#6366f1',
       bg: '#e0e7ff',
     },
     {
       label: 'Pending',
-      value: 45,
+      value: 0,
       icon: 'fa-solid fa-clock',
       color: '#f59e0b',
       bg: '#fef3c7',
     },
     {
       label: 'Approved',
-      value: 1180,
+      value: 0,
       icon: 'fa-solid fa-circle-check',
       color: '#10b981',
       bg: '#d1fae5',
     },
     {
       label: 'Cancelled',
-      value: 25,
+      value: 0,
       icon: 'fa-solid fa-circle-xmark',
       color: '#ef4444',
       bg: '#fee2e2',
     },
   ];
 
-  // =========================
-  // FILTER STATE
-  // =========================
-  activeFilter: string = 'all';
+  // Recent bookings data
+  bookings: any[] = [];
+  isLoading = true;
+  isLoadingBookings = true;
 
-  // =========================
-  // BOOKINGS DATA
-  // =========================
-  recentBookings: Booking[] = [];
-
-  constructor(private bookingService: BookingService) {}
+  constructor(private api: ApiService) {}
 
   ngOnInit(): void {
-    this.loadRecentBookings();
+    this.loadStats();
+    this.loadBookings();
   }
 
-  // ==========================================
-  // LOAD + FILTER BOOKINGS (MAIN FIX HERE)
-  // ==========================================
-  private loadRecentBookings(): void {
-    this.bookingService.getBookings(this.activeFilter).subscribe({
-      next: (bookings) => {
-        this.recentBookings = bookings
-          .sort(
-            (a, b) =>
-              new Date(b.preferredDate).getTime() -
-              new Date(a.preferredDate).getTime(),
-          )
-          .slice(0, 5);
+  loadStats(): void {
+    this.api.getBookingStats().subscribe({
+      next: (res: any) => {
+        console.log('Booking stats response:', res);
+        const data = res.Data || res;
+        if (data) {
+          this.stats[0].value = data.totalBookings || 0;
+          this.stats[1].value = data.pending || 0;
+          this.stats[2].value = data.approved || 0;
+          this.stats[3].value = data.cancelled || 0;
+        }
+        this.isLoading = false;
       },
       error: (err) => {
-        console.error('Failed to load bookings:', err.message);
-      },
+        console.error('Error loading booking stats:', err);
+        this.isLoading = false;
+      }
     });
   }
 
-  // ==========================================
-  // DROPDOWN HANDLER (IMPORTANT FIX)
-  // ==========================================
-  handleStatusFilter(status: string): void {
-    this.activeFilter = status;
-    this.loadRecentBookings(); // 🔥 re-fetch based on filter
+  loadBookings(): void {
+    this.isLoadingBookings = true;
+    this.api.getBookings().subscribe({
+      next: (res: any) => {
+        console.log('Bookings response:', res);
+        const data = res.Data || res;
+        this.bookings = Array.isArray(data) ? data : [];
+        this.isLoadingBookings = false;
+      },
+      error: (err) => {
+        console.error('Error loading bookings:', err);
+        this.isLoadingBookings = false;
+      }
+    });
   }
 
-  // ==========================================
-  // TABLE ACTIONS
-  // ==========================================
-  onViewBooking(event: any) {
-    console.log('View booking:', event);
+  approveBooking(booking: any): void {
+    this.api.updateBookingStatus(booking.id, 'Approved').subscribe({
+      next: () => {
+        // Update UI immediately without reload
+        booking.status = 'Approved';
+        // Refresh stats to reflect the change
+        this.loadStats();
+      },
+      error: (err) => {
+        console.error('Error approving booking:', err);
+        alert('Failed to approve booking. Please try again.');
+      }
+    });
   }
 
-  onCancelBooking(event: any) {
-    console.log('Cancel booking:', event);
+  cancelBooking(booking: any): void {
+    this.api.updateBookingStatus(booking.id, 'Cancelled').subscribe({
+      next: () => {
+        // Update UI immediately without reload
+        booking.status = 'Cancelled';
+        // Refresh stats to reflect the change
+        this.loadStats();
+      },
+      error: (err) => {
+        console.error('Error cancelling booking:', err);
+        alert('Failed to cancel booking. Please try again.');
+      }
+    });
   }
 
-  onApproveBooking(event: any) {
-    console.log('Approve booking:', event);
+  isPending(booking: any): boolean {
+    return booking.status === 'Pending';
   }
 }

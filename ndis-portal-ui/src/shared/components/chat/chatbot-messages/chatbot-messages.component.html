@@ -2,26 +2,69 @@
   h-full
   overflow-y-auto
   px-4 py-3
-  flex flex-col
-  gap-3
   ">
 
+  <div class="min-h-full flex flex-col justify-end gap-3">
     <ng-container *ngIf="messages$ | async as messages">
 
-        <app-chat-message *ngFor="
+      <div class="flex w-full items-end justify-start gap-2">
+        <div class="
+          w-9 h-9
+          rounded-full
+          bg-[#6B3293]
+          text-white
+          flex items-center
+          justify-center
+          flex-shrink-0
+          shadow
+          ">
+          <app-icon-chat [size]="22"></app-icon-chat>
+        </div>
+
+        <div class="
+          max-w-[75%]
+          px-4 py-3
+          rounded-2xl
+          rounded-bl-none
+          bg-gray-100
+          text-gray-800
+          text-sm
+          break-words
+          shadow-sm
+          leading-relaxed
+          ">
+          Hi, I can help you understand services, bookings, and how to use the portal.
+        </div>
+      </div>
+
+      <app-chat-message *ngFor="
         let msg of messages;
         trackBy: trackById
       " [message]="msg">
-        </app-chat-message>
+      </app-chat-message>
 
-        <!-- Loading Indicator -->
-        <div *ngIf="loading$ | async" class="flex items-center gap-2 text-gray-500 text-sm">
-          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-          <span>Assistant is typing...</span>
+      <div *ngIf="loading$ | async" class="flex w-full items-end justify-start gap-2 mb-2">
+        <div class="
+          w-9 h-9
+          rounded-full
+          bg-[#6B3293]
+          text-white
+          flex items-center
+          justify-center
+          flex-shrink-0
+          shadow
+          ">
+          <app-icon-chat [size]="22"></app-icon-chat>
         </div>
 
+        <div class="bg-gray-100 rounded-2xl rounded-bl-none px-4 py-3 flex items-center gap-1 min-h-[40px]">
+          <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-duration: 0.6s"></span>
+          <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-duration: 0.6s; animation-delay: 0.15s"></span>
+          <span class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-duration: 0.6s; animation-delay: 0.3s"></span>
+        </div>
+      </div>
+
     </ng-container>
+  </div>
 
 </div>

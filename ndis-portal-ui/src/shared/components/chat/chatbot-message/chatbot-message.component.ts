@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatMessage } from '../../../models/chat-message.model';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ChatIconComponent } from '../../icons/svg-icons/chat-icon';
 
 @Component({
   selector: 'app-chat-message',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ChatIconComponent],
   templateUrl: './chatbot-message.component.html',
 })
 export class ChatMessageComponent {

@@ -3,9 +3,7 @@
     'justify-end': !isBot()
   }">
 
-  <!-- 🤖 BOT PROFILE (LEFT ONLY) -->
   <ng-container *ngIf="isBot()">
-
     <div class="
       w-9 h-9
       rounded-full
@@ -13,18 +11,12 @@
       text-white
       flex items-center
       justify-center
-      text-sm
-      font-bold
       flex-shrink-0
       shadow
       ">
-      🤖
+      <app-icon-chat [size]="22"></app-icon-chat>
     </div>
-
   </ng-container>
-
-
-  <!-- 💬 MESSAGE BUBBLE -->
 
   <div class="
     max-w-[75%]
@@ -35,17 +27,9 @@
     shadow-sm
     leading-relaxed
     " [ngClass]="{
-
-      'bg-gray-100 text-gray-800 rounded-bl-none':
-        isBot(),
-
-      'bg-[#6B3293] text-white rounded-br-none':
-        !isBot()
-
+      'bg-gray-100 text-gray-800 rounded-bl-none': isBot(),
+      'bg-[#6B3293] text-white rounded-br-none': !isBot()
     }">
-
-        <div [innerHTML]="formatMessage(message.content)"></div>
-
-    </div>
-
+    <div [innerHTML]="formatMessage(message.content)"></div>
+  </div>
 </div>

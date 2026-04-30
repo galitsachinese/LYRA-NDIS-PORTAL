@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
 import { ChatButtonComponent } from '../../../../shared/components/chat/chatbot-button/chatbot-button.component';
 import { ChatPanelComponent } from '../chatbot-panel/chatbot-panel.component';
+import { AuthService } from '../../../../app/core/services/auth.service';
 
 
 /**
@@ -10,6 +13,7 @@ import { ChatPanelComponent } from '../chatbot-panel/chatbot-panel.component';
  * Controls:
  * - Opening panel
  * - Closing panel
+ * - Role-based visibility (Participant only)
  */
 
 @Component({
@@ -18,10 +22,63 @@ import { ChatPanelComponent } from '../chatbot-panel/chatbot-panel.component';
   imports: [CommonModule, FormsModule, ChatButtonComponent, ChatPanelComponent],
   templateUrl: './chatbot-container.component.html',
 })
-export class ChatbotContainerComponent {
+export class ChatbotContainerComponent implements OnInit, OnDestroy {
   isOpen = false;
+  showChatbot = false;
+  private authSub!: Subscription;
+  private routerSub!: Subscription;
+
+  constructor(
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.checkRole();
+
+    // Re-check role when auth state changes
+    this.authSub = this.auth.isAuthenticated$.subscribe(() => {
+      this.checkRole();
+    });
+
+    // Re-check role on every navigation
+    this.routerSub = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.checkRole();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSub) {
+      this.authSub.unsubscribe();
+    }
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
+    }
+  }
+
+  /**
+   * Only show chatbot for Participants, not Coordinators
+   */
+  private checkRole(): void {
+    const role = this.auth.getRole();
+    this.showChatbot = this.auth.isAuthenticated() && role?.toLowerCase() === 'participant';
+
+    if (!this.showChatbot) {
+      this.isOpen = false;
+    }
+
+    this.cdr.detectChanges();
+  }
 
   toggleChat() {
+    if (!this.showChatbot) {
+      this.isOpen = false;
+      return;
+    }
+
     this.isOpen = !this.isOpen;
   }
 }

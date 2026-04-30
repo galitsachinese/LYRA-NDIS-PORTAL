@@ -1,16 +1,10 @@
 <div [@chatAnimation]="state" class="
   fixed bottom-0 right-0
-
-  /* 📱 MOBILE = FULL SCREEN */
   w-full h-full
-
-  /* 🖥️ DESKTOP */
   sm:bottom-6 sm:right-6
   sm:w-[380px]
   sm:h-[520px]
-
   md:h-[70vh]
-
   bg-white
   rounded-lg
   border
@@ -19,63 +13,45 @@
   z-50
   ">
 
-    <!-- HEADER -->
-    <div class="
+  <div class="
     flex items-center justify-between
     px-4 py-3
     border-b
     bg-white
     ">
-
-        <div class="flex items-center gap-2">
-
-            <!-- Bot Avatar -->
-            <div class="
-                w-8 h-8
-                rounded-full
-                bg-[#6B3293]
-                flex items-center justify-center
-                font-bold
+    <div class="flex items-center gap-2">
+      <div class="
+        w-8 h-8
+        rounded-full
+        bg-[#6B3293]
+        text-white
+        flex items-center
+        justify-center
+        shadow
         ">
-                🤖
-            </div>
+        <app-icon-chat [size]="20"></app-icon-chat>
+      </div>
 
-            <span class="font-semibold text-slate=700 ">
-
-                Assistant
-
-            </span>
-
-        </div>
-
-        <!-- Close -->
-        <button (click)="close.emit()" class="text-slate=700  text-lg">
-            ✕
-        </button>
-
+      <span class="font-semibold text-slate-700">
+        Assistant
+      </span>
     </div>
 
+    <button
+      type="button"
+      (click)="close.emit()"
+      class="text-slate-500 hover:text-slate-800 text-lg leading-none"
+      aria-label="Close chat"
+    >
+      x
+    </button>
+  </div>
 
-    <!-- MESSAGES AREA -->
-    <div class="
-    flex-1
-    overflow-hidden
-    ">
+  <div class="flex-1 overflow-hidden">
+    <app-chat-messages class="block h-full"></app-chat-messages>
+  </div>
 
-        <app-chat-messages class="block h-full">
-        </app-chat-messages>
-
-    </div>
-
-
-    <!-- INPUT -->
-    <div class="
-    border-t
-    ">
-
-        <app-chat-input>
-        </app-chat-input>
-
-    </div>
-
+  <div class="border-t">
+    <app-chat-input></app-chat-input>
+  </div>
 </div>

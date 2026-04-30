@@ -74,7 +74,7 @@ namespace NDISPortal.API.Services.Implementations
                     {
                         Recommendations = new List<RecommendationDto>(),
                         IsOutOfScope = true,
-                        OutOfScopeMessage = "Sorry, your request appears to be beyond the scope of our available NDIS services. We can only assist with services listed in our categories."
+                        OutOfScopeMessage = "Sorry, this request is outside the scope of NDIS disability support services. We can only assist with personal care, community access, therapy, respite care, and plan coordination services. For financial, legal, or medical advice, please consult appropriate professionals."
                     };
                 }
 
@@ -111,7 +111,7 @@ namespace NDISPortal.API.Services.Implementations
                     {
                         Recommendations = new List<RecommendationDto>(),
                         IsOutOfScope = true,
-                        OutOfScopeMessage = "Sorry, we couldn't find any suitable services matching your needs within our available NDIS service categories."
+                        OutOfScopeMessage = "Sorry, we couldn't find any suitable NDIS services matching your needs. Our available categories are: Daily Personal Activities, Community Access, Therapy Supports, Respite Care, and Support Coordination."
                     };
                 }
 
@@ -145,7 +145,7 @@ namespace NDISPortal.API.Services.Implementations
                     {
                         Recommendations = new List<RecommendationDto>(),
                         IsOutOfScope = true,
-                        OutOfScopeMessage = "Sorry, we couldn't find any suitable services matching your needs within our available NDIS service categories."
+                        OutOfScopeMessage = "Sorry, we couldn't find any suitable NDIS services matching your needs. Available categories: Daily Personal Activities, Community Access, Therapy Supports, Respite Care, and Support Coordination."
                     };
                 }
 
@@ -291,7 +291,7 @@ OUT_OF_SCOPE";
                 {
                     Recommendations = new List<RecommendationDto>(),
                     IsOutOfScope = true,
-                    OutOfScopeMessage = "Sorry, we couldn't find any suitable services matching your needs within our available NDIS service categories. Please check if your needs align with our service offerings."
+                    OutOfScopeMessage = "Sorry, we couldn't find any suitable NDIS services matching your needs. Available: Daily Personal Activities, Community Access, Therapy Supports, Respite Care, and Support Coordination. For financial, legal, or medical advice, please consult appropriate professionals."
                 };
             }
 

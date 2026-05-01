@@ -50,7 +50,9 @@ export class ManageServicesComponent implements OnInit {
             id: service.id,
             name: service.name || service.title,
             category: service.categoryName || service.category,
-            status: service.status || 'Active', // Default to Active if not provided
+            categoryId: service.categoryId,
+            description: service.description,
+            status: service.isActive || service.IsActive ? 'Active' : 'Inactive',
           }));
         }
         this.isLoading = false;
@@ -88,8 +90,15 @@ export class ManageServicesComponent implements OnInit {
 
   // Save new service
   saveNewService(formData: any) {
+    // Map form fields to backend expected format
+    const serviceData = {
+      Name: formData.name,
+      CategoryId: parseInt(formData.category, 10),
+      Description: formData.description || ''
+    };
+    
     // Call API to create new service
-    this.api.createService(formData).subscribe({
+    this.api.createService(serviceData).subscribe({
       next: (res: any) => {
         console.log('Service created successfully:', res);
         
@@ -106,32 +115,17 @@ export class ManageServicesComponent implements OnInit {
     });
   }
 
-  // Activate a service by setting its status to 'Active'
-  // Activate a service by setting its status to 'Active'
-  // Accepts either a service id (number) or a service object emitted from the table component.
-  activateService(service: any) {
-    const serviceId = typeof service === 'number' ? service : service?.id;
+  // Toggle service status between Active and Inactive
+  toggleServiceStatus(service: any) {
+    const serviceId = service?.id;
     if (serviceId == null) {
-      console.error('Unable to activate service: invalid id', service);
+      console.error('Unable to toggle service: invalid id', service);
       return;
     }
-    this.api.updateService(serviceId, { status: 'Active' }).subscribe({
+    const newStatus = service.status === 'Active' ? 'Inactive' : 'Active';
+    this.api.updateServiceStatus(serviceId, newStatus, service).subscribe({
       next: () => this.loadServices(),
-      error: (err) => console.error('Error activating service:', err)
-    });
-  }
-
-  // Deactivate a service by setting its status to 'Inactive'
-  // Accepts either a service id (number) or a service object.
-  deactivateService(service: any) {
-    const serviceId = typeof service === 'number' ? service : service?.id;
-    if (serviceId == null) {
-      console.error('Unable to deactivate service: invalid id', service);
-      return;
-    }
-    this.api.updateService(serviceId, { status: 'Inactive' }).subscribe({
-      next: () => this.loadServices(),
-      error: (err) => console.error('Error deactivating service:', err)
+      error: (err) => console.error('Error toggling service status:', err)
     });
   }
 }

@@ -83,7 +83,8 @@ export class ApiService {
   }
 
   updateService(id: number, service: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, service).pipe(
+    const headers = this.getAuthHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${id}`, service, { headers }).pipe(
       catchError((error: any) => {
         return throwError(() => new Error('Failed to update service. Please try again.'));
       })
@@ -124,6 +125,24 @@ export class ApiService {
     return this.http.put<any>(`${this.bookingsApiUrl}/${id}/status`, { status }, { headers }).pipe(
       catchError((error: any) => {
         return throwError(() => new Error(`Failed to ${status.toLowerCase()} booking.`));
+      })
+    );
+  }
+
+  // Update service status - Activate or Deactivate (coordinator only)
+  // Backend expects is_active (boolean), not status (string)
+  updateServiceStatus(id: number, status: 'Active' | 'Inactive', serviceData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    // Backend expects UpdateServiceDto: Name, CategoryId, Description, is_active
+    const payload = {
+      name: serviceData.name,
+      categoryId: serviceData.categoryId || serviceData.category,
+      description: serviceData.description || '',
+      is_active: status === 'Active'
+    };
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload, { headers }).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Failed to update service status.`));
       })
     );
   }

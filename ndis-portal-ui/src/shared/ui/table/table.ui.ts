@@ -37,6 +37,9 @@ export class TableComponent {
   // Cancel / Multi-action emitter
   @Output() cancelAction = new EventEmitter<any>();
 
+  // Toggle action emitter for status toggle
+  @Output() toggleAction = new EventEmitter<any>();
+
   /* ===============================
      LOCAL STATE
      =============================== */
@@ -68,7 +71,7 @@ export class TableComponent {
 
       // Status column
       case 'status':
-        return 'w-1/12 min-w-24';
+        return 'w-1/8 min-w-28';
 
       // Date column
       case 'date':
@@ -76,16 +79,20 @@ export class TableComponent {
 
       // Category column
       case 'category':
-        return 'w-1/8 min-w-32';
+        return 'w-1/6 min-w-36';
 
       // View column
       case 'view':
         return 'w-1/12 min-w-20';
 
+      // Toggle column (actions with toggle button)
+      case 'toggle':
+        return 'w-1/6 min-w-36 text-center';
+
       default:
         // Primary columns
         if (col.key === 'name' || col.key === 'service') {
-          return 'w-1/5 min-w-36';
+          return 'w-1/4 min-w-40';
         }
 
         // Default
@@ -165,6 +172,11 @@ export class TableComponent {
   /* Toggle menu open/close */
   toggleMenu(row: any): void {
     this.activeMenuRow = this.activeMenuRow === row ? null : row;
+  }
+
+  /* Emit toggle action for status changes */
+  emitToggle(row: any): void {
+    this.toggleAction.emit(row);
   }
 
   /* Close menu when clicking outside */

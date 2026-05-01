@@ -19,7 +19,6 @@ namespace NDISPortal.API.Services.Implementations
         {
             var query = _context.Services
                 .Include(s => s.ServiceCategory)
-                .Where(s => s.is_active)
                 .AsQueryable();
 
             if (categoryId.HasValue)

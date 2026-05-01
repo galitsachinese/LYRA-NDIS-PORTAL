@@ -11,17 +11,18 @@ import { TableColumn } from '../../../../shared/models/table.model';
     <app-table-ui
       [columns]="serviceColumns"
       [data]="bookings"
-      (viewAction)="onEdit.emit($event)"
-      (cancelAction)="onDeactivate.emit($event)"
+      (toggleAction)="onToggleStatus.emit($event)"
     ></app-table-ui>
   `,
 })
 export class ManageServicesTableComponent {
   @Input() bookings: any[] = [];
 
-  // These must match the event names used in the parent HTML
-  @Output() onEdit = new EventEmitter<any>();
-  @Output() onDeactivate = new EventEmitter<any>();
+  // Emits when toggle button is clicked
+  @Output() toggleStatus = new EventEmitter<any>();
+
+  // Alias for template binding
+  onToggleStatus = this.toggleStatus;
 
   serviceColumns: TableColumn[] = [
     { key: 'name', label: 'Name', type: 'name' },
@@ -30,16 +31,7 @@ export class ManageServicesTableComponent {
     {
       key: 'actions',
       label: 'Actions',
-      type: 'action',
-      // FIX: Added commas and converted to objects so the template can read .label and .actionKey
-      actionLabel: [
-        { label: 'Activate', actionKey: 'activate' },
-        {
-          label: 'Deactivate',
-          actionKey: 'deactivate',
-          class: 'text-rose-500 hover:bg-rose-50',
-        },
-      ],
+      type: 'toggle',
     },
   ];
 }

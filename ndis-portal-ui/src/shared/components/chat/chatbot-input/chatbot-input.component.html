@@ -1,24 +1,44 @@
-<div class="p-3 border-t flex gap-2">
+<div class="p-2 border-t flex flex-col gap-2">
+  <div class="flex gap-2">
+    <div class="flex-1">
+      <div class="relative">
+      <textarea [(ngModel)]="text" (keydown.enter)="send($event)" placeholder="Type message"
+        [disabled]="(loading$ | async) === true"
+        maxlength="500"
+        rows="1"
+        class="
+          w-full
+          border
+          rounded-xl
+          pl-3 pr-12 py-2
+          text-sm
+          focus:outline-none
+          focus:ring-2
+          focus:ring-indigo-500
+          resize-none
+          min-h-[40px]
+          disabled:bg-slate-50
+          disabled:cursor-not-allowed
+        "></textarea>
+        <span class="absolute bottom-2 right-3 text-[11px] text-slate-400 pointer-events-none">
+          {{ remainingChars }}
+        </span>
+      </div>
+    </div>
 
-  <input [(ngModel)]="text" (keydown.enter)="send()" placeholder="Type message..." class="
-    flex-1
-    border
-    rounded-xl
-    px-3 py-2
-    text-sm
-    focus:outline-none
-    focus:ring-2
-    focus:ring-indigo-500
-    " />
-
-  <button (click)="send()" class="
-    bg-[#6B3293]
-    text-white
-    flex justify-center items-center
-    px-4
-    rounded-xl
+    <button (click)="send()" [disabled]="!text.trim() || text.length > 500 || (loading$ | async) === true" class="
+      bg-[#6B3293]
+      text-white
+      flex justify-center items-center
+      px-4
+      rounded-xl
+      h-[40px]
+      self-start
+      disabled:opacity-50
+      disabled:cursor-not-allowed
+      transition-opacity
       ">
-    <app-icon-send></app-icon-send>
-  </button>
-
+      <app-icon-send></app-icon-send>
+    </button>
+  </div>
 </div>

@@ -3,6 +3,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatInputComponent } from '../chatbot-input/chatbot-input.component';
 import { ChatMessagesComponent } from '../chatbot-messages/chatbot-messages.component';
+import { ChatIconComponent } from '../../icons/svg-icons/chat-icon';
 import {
   trigger,
   state,
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: 'app-chat-panel',
   standalone: true,
-  imports: [CommonModule,  ChatInputComponent, ChatMessagesComponent],
+  imports: [CommonModule, ChatInputComponent, ChatMessagesComponent, ChatIconComponent],
 
   animations: [
     trigger('chatAnimation', [

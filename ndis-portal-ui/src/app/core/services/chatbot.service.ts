@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, of } from 'rxjs';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { BehaviorSubject, catchError, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 import { ChatMessage } from '../models/chat-message.model';
 
@@ -26,24 +28,52 @@ interface ChatRequest {
 export class ChatService {
   private storageKey = 'chat_history';
   private apiUrl = `${environment.apiUrl}/chat`;
+  private minimumTypingMs = 500;
 
-  private messagesSubject = new BehaviorSubject<ChatMessage[]>(
-    this.loadMessages(),
-  );
+  private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
   
   private loadingSubject = new BehaviorSubject<boolean>(false);
 
   messages$ = this.messagesSubject.asObservable();
   loading$ = this.loadingSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private http: HttpClient,
+    private auth: AuthService
+  ) {
+    this.messagesSubject.next(this.loadMessages());
+  }
+
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  /**
+   * Check if current user is participant
+   */
+  private isParticipant(): boolean {
+    const role = this.auth.getRole();
+    return role?.toLowerCase() === 'participant';
+  }
+
+  isLoading(): boolean {
+    return this.loadingSubject.value;
+  }
 
   /**
    * Send user message to API
    */
   sendMessage(text: string) {
     console.log('[ChatService] sendMessage called:', text);
-    if (!text.trim()) {
+    
+    // Block non-participants
+    if (!this.isParticipant()) {
+      console.log('[ChatService] Access denied - only participants can use chat');
+      return;
+    }
+    
+    if (!text.trim() || this.isLoading()) {
       console.log('[ChatService] Empty message, returning');
       return;
     }
@@ -69,6 +99,7 @@ export class ChatService {
    * Call backend chat API
    */
   private callChatApi(message: string, currentMessages: ChatMessage[]) {
+    const typingStartedAt = Date.now();
     this.loadingSubject.next(true);
     console.log('[ChatService] callChatApi - API URL:', this.apiUrl);
 
@@ -91,46 +122,43 @@ export class ChatService {
           console.error('[ChatService] API error:', error);
           console.error('[ChatService] Error status:', error.status);
           console.error('[ChatService] Error message:', error.message);
-          const errorMessage: ChatMessage = {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: 'Sorry, I am temporarily unavailable. Please try again later or contact your Support Coordinator for assistance.',
-            timestamp: new Date(),
-          };
-          const messagesWithError = [...this.messagesSubject.value, errorMessage];
-          this.messagesSubject.next(messagesWithError);
-          this.saveMessages(messagesWithError);
-          return of({ reply: '' });
-        }),
-        finalize(() => {
-          this.loadingSubject.next(false);
+          return of({
+            reply: 'Sorry, I am temporarily unavailable. Please try again later or contact your Support Coordinator for assistance.',
+          });
         })
       )
       .subscribe(response => {
-        console.log('[ChatService] API response received:', response);
-        console.log('[ChatService] Response structure:', JSON.stringify(response, null, 2));
-        
-        // Handle wrapped response format
-        const reply = response.Data?.reply || response.reply || response.Message?.reply;
-        
-        console.log('[ChatService] Extracted reply:', reply);
-        
-        if (reply) {
-          console.log('[ChatService] Got reply, adding bot message');
-          const botMessage: ChatMessage = {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: reply,
-            timestamp: new Date(),
-          };
+        const elapsed = Date.now() - typingStartedAt;
+        const remainingDelay = Math.max(this.minimumTypingMs - elapsed, 0);
 
-          const updatedMessages = [...this.messagesSubject.value, botMessage];
-          console.log('[ChatService] Total messages after adding bot:', updatedMessages.length);
-          this.messagesSubject.next(updatedMessages);
-          this.saveMessages(updatedMessages);
-        } else {
-          console.log('[ChatService] Empty reply from API - response keys:', Object.keys(response));
-        }
+        setTimeout(() => {
+          console.log('[ChatService] API response received:', response);
+          console.log('[ChatService] Response structure:', JSON.stringify(response, null, 2));
+          
+          // Handle wrapped response format
+          const reply = response.Data?.reply || response.reply || response.Message?.reply;
+          
+          console.log('[ChatService] Extracted reply:', reply);
+          
+          if (reply) {
+            console.log('[ChatService] Got reply, adding bot message');
+            const botMessage: ChatMessage = {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: reply,
+              timestamp: new Date(),
+            };
+
+            const updatedMessages = [...this.messagesSubject.value, botMessage];
+            console.log('[ChatService] Total messages after adding bot:', updatedMessages.length);
+            this.messagesSubject.next(updatedMessages);
+            this.saveMessages(updatedMessages);
+          } else {
+            console.log('[ChatService] Empty reply from API - response keys:', Object.keys(response));
+          }
+
+          this.loadingSubject.next(false);
+        }, remainingDelay);
       });
   }
 
@@ -138,6 +166,8 @@ export class ChatService {
    * Save to localStorage
    */
   private saveMessages(messages: ChatMessage[]) {
+    if (!this.isBrowser()) return;
+
     localStorage.setItem(this.storageKey, JSON.stringify(messages));
   }
 
@@ -145,8 +175,26 @@ export class ChatService {
    * Load stored messages
    */
   private loadMessages(): ChatMessage[] {
+    if (!this.isBrowser()) return [];
+
     const data = localStorage.getItem(this.storageKey);
 
-    return data ? JSON.parse(data) : [];
+    try {
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Clear chat history - called when user logs in
+   */
+  clearHistory(): void {
+    if (this.isBrowser()) {
+      localStorage.removeItem(this.storageKey);
+    }
+
+    this.messagesSubject.next([]);
+    console.log('[ChatService] Chat history cleared');
   }
 }

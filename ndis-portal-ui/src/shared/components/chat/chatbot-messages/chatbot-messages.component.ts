@@ -5,12 +5,13 @@ import { ChatService } from '../../../../app/core/services/chatbot.service';
 import { Observable } from 'rxjs';
 import { ChatMessage } from '../../../../shared/models/chat-message.model';
 import { ChatMessageComponent } from '../../../../shared/components/chat/chatbot-message/chatbot-message.component';
+import { ChatIconComponent } from '../../icons/svg-icons/chat-icon';
 
 @Component({
   selector: 'app-chat-messages',
   standalone: true,
 
-  imports: [CommonModule, ChatMessageComponent],
+  imports: [CommonModule, ChatMessageComponent, ChatIconComponent],
 
   templateUrl: './chatbot-messages.component.html',
 })
@@ -39,9 +40,7 @@ export class ChatMessagesComponent implements AfterViewInit {
 
   private scrollToBottom() {
     if (!this.scrollContainer) return;
-
     const el = this.scrollContainer.nativeElement;
-
     el.scrollTop = el.scrollHeight;
   }
 

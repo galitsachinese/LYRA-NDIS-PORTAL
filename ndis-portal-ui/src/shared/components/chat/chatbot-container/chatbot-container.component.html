@@ -1,5 +1,7 @@
-<app-chat-button (buttonClick)="toggleChat()">
-</app-chat-button>
+<ng-container *ngIf="showChatbot">
+  <app-chat-button (buttonClick)="toggleChat()">
+  </app-chat-button>
 
-<app-chat-panel *ngIf="isOpen" (close)="toggleChat()">
-</app-chat-panel>
+  <app-chat-panel *ngIf="isOpen" (close)="toggleChat()">
+  </app-chat-panel>
+</ng-container>

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, LoginRequest, LoginResponse } from '../../../core/services/auth.service';
+import { ChatService } from '../../../core/services/chatbot.service';
 import { SlideshowComponent } from '../../../../shared/components/slideshow/slideshow.component';
 import { InputComponent } from '../../../../shared/components/input/input.component';
 
@@ -45,6 +46,7 @@ export class MyLoginComponent {
 
   constructor(
     private authService: AuthService,
+    private chatService: ChatService,
     private router: Router,
   ) {}
 
@@ -133,6 +135,7 @@ export class MyLoginComponent {
           const role = user?.role || '';
           console.log('Login SUCCESS. userId:', userId, 'role:', role);
 
+          this.chatService.clearHistory();
           this.authService.login(token, userId, this.email, role);
           console.log('authService.login() called');
 

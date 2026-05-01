@@ -6,7 +6,7 @@ import { ChatIconComponent } from '../../../../shared/components/icons/svg-icons
 @Component({
   selector: 'app-chat-button',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatIconComponent ],
+  imports: [CommonModule, FormsModule, ChatIconComponent],
   templateUrl: './chatbot-button.component.html',
 })
 export class ChatButtonComponent {
@@ -20,8 +20,6 @@ export class ChatButtonComponent {
    * Trigger event
    */
   handleClick() {
-    console.log('Button clicked'); // debug
-
     this.buttonClick.emit();
   }
 }

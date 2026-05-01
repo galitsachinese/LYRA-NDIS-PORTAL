@@ -7,7 +7,7 @@ namespace NDISPortal.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Participant")]
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;
@@ -19,7 +19,6 @@ namespace NDISPortal.API.Controllers
             _logger = logger;
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Chat([FromBody] ChatRequestDto dto)
         {

@@ -1,5 +1,5 @@
 <!-- BACKDROP -->
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" data-testid="service-modal">
 
   <!-- MODAL -->
   <div class="w-full max-w-2xl bg-white rounded-md shadow-xl p-8">
@@ -54,7 +54,7 @@
             style="max-height:200px; overflow-y:auto;">
 
             <option value="" disabled selected>Select Category</option>
-            <option *ngFor="let cat of categories" [value]="cat.id || cat.name">
+            <option *ngFor="let cat of categories" [value]="cat.id">
               {{ cat.name || cat.title }}
             </option>
 
@@ -92,7 +92,7 @@
         </button>
 
         <!-- SAVE -->
-        <button type="submit" [disabled]="serviceForm.invalid" data-testid="save-btn"
+        <button type="submit" data-testid="save-btn" [disabled]="serviceForm.invalid"
           class="px-5 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:bg-slate-300">
           Save Service
         </button>

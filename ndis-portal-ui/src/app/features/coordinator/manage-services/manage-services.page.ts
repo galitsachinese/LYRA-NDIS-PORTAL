@@ -1,9 +1,6 @@
 // FILE: manage-services.page.ts
 
-
-
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 
@@ -28,6 +25,7 @@ import { ApiService } from '../../../core/services/api-service';
 
 
 
+import { ToastService } from '../../../core/services/toast.service'; // Import ToastService
 @Component({
 
   selector: 'app-manage-services',
@@ -69,6 +67,7 @@ export class ManageServicesComponent implements OnInit {
   isModalOpen = false;
 
 
+  private toast = inject(ToastService);
 
   constructor(private api: ApiService) {}
 
@@ -145,9 +144,6 @@ export class ManageServicesComponent implements OnInit {
   openModal() {
 
     this.isModalOpen = true;
-
-    console.log('Modal Opened');
-
   }
 
 

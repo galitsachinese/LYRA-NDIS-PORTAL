@@ -13,7 +13,6 @@ export class ButtonUiComponent {
   @Input() fullWidth: boolean = false;
   // 1. Added 'ghost' to the type
   @Input() variant: 'solid' | 'outline' | 'none' | 'ghost' = 'solid';
-  @Input() disabled: boolean = false;
 
   @Output() onClick = new EventEmitter<MouseEvent>();
 

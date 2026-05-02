@@ -14,7 +14,6 @@ export class ServiceSelectComponent {
   @Input() value: any = ''; // Initialize as empty string to match the placeholder
   @Input() options: { id: string | number; label: string }[] = [];
   @Input() required: boolean = true;
-  @Input() disabled: boolean = false;
 
   // NEW: Input for the placeholder text
   @Input() placeholder: string = 'Choose a service...';

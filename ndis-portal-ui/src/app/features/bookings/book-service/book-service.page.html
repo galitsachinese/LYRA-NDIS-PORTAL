@@ -24,31 +24,21 @@
                 <span class="text-slate-500">Loading services...</span>
             </div>
 
-            <!-- Loading Overlay -->
-            <div *ngIf="isSubmitting" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-6 flex flex-col items-center space-y-4">
-                    <div class="w-8 h-8 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
-                    <p class="text-slate-700 font-medium">Loading</p>
-                    <p class="text-slate-500 text-sm">Please wait while we process your request</p>
-                </div>
-            </div>
-
             <div class="w-full space-y-6" *ngIf="!isLoadingServices">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                    <app-select-service class="block w-full" [options]="services" [(value)]="bookingData.serviceId" [disabled]="isSubmitting">
+                    <app-select-service class="block w-full" [options]="services" [(value)]="bookingData.serviceId">
                     </app-select-service>
     
-                    <app-date-picker-component class="block w-full" [(value)]="bookingData.date" [disabled]="isSubmitting">
+                    <app-date-picker-component class="block w-full" [(value)]="bookingData.date">
                     </app-date-picker-component>
                 </div>
     
-                <app-text-area-component class="block w-full" [(value)]="bookingData.notes" [disabled]="isSubmitting">
+                <app-text-area-component class="block w-full" [(value)]="bookingData.notes">
                 </app-text-area-component>
             </div>
             <div class="flex flex-col-reverse md:flex-row justify-end items-center gap-8 pt-6">
                 <app-back-button (onClick)="navBack()"></app-back-button>
-                <app-book-button (onClick)="confirmBooking()" [disabled]="isSubmitting || !bookingData.serviceId || !bookingData.date" [isLoading]="isSubmitting">
-                </app-book-button>
+                <app-book-button (onClick)="confirmBooking()"></app-book-button>
             </div>
         </div>
     </div>

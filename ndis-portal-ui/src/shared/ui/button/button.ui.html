@@ -1,8 +1,7 @@
 <button [type]="type" (click)="onClick.emit($event)"
-  [ngClass]="[variantClasses[variant], fullWidth ? 'w-full' : 'w-auto', disabled ? 'opacity-50 cursor-not-allowed' : '']"
-  [disabled]="disabled"
+  [ngClass]="[variantClasses[variant], fullWidth ? 'w-full' : 'w-auto']"
   class="inline-flex items-center justify-center gap-2 font-semibold">
   <ng-content select="[left-icon]"></ng-content>
-  <span *ngIf="label">{{ label }}</span>
+  <span>{{ label }}</span>
   <ng-content select="[right-icon]"></ng-content>
 </button>

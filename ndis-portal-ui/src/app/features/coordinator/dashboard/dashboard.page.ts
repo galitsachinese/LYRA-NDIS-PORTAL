@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatusCardComponent } from '../../../../shared/components/card/status-card/status-card.component';
 import { ApiService } from '../../../core/services/api-service';
@@ -46,9 +46,6 @@ export class DashboardComponent implements OnInit {
   bookings: any[] = [];
   isLoading = true;
   isLoadingBookings = true;
-  
-  // Menu state
-  activeMenuId: number | null = null;
 
   constructor(private api: ApiService) {}
 
@@ -83,18 +80,7 @@ export class DashboardComponent implements OnInit {
       next: (res: any) => {
         console.log('Bookings response:', res);
         const data = res.Data || res;
-        this.bookings = Array.isArray(data) ? data.slice(0, 5) : [];
-        
-        // Debug: Log booking details
-        console.log('Bookings loaded:', this.bookings.length);
-        this.bookings.forEach((booking, index) => {
-          console.log(`Booking ${index}:`, {
-            id: booking.id,
-            status: booking.status,
-            isPending: this.isPending(booking)
-          });
-        });
-        
+        this.bookings = Array.isArray(data) ? data : [];
         this.isLoadingBookings = false;
       },
       error: (err) => {
@@ -105,9 +91,6 @@ export class DashboardComponent implements OnInit {
   }
 
   approveBooking(booking: any): void {
-    // Close menu
-    this.activeMenuId = null;
-    
     this.api.updateBookingStatus(booking.id, 'Approved').subscribe({
       next: () => {
         // Update UI immediately without reload
@@ -122,18 +105,19 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  toggleMenu(booking: any): void {
-    // Close menu if clicking the same booking, otherwise open new menu
-    this.activeMenuId = this.activeMenuId === booking.id ? null : booking.id;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const clickedMenu = target.closest('[data-testid="menu-btn"]');
-    if (!clickedMenu) {
-      this.activeMenuId = null;
-    }
+  cancelBooking(booking: any): void {
+    this.api.updateBookingStatus(booking.id, 'Cancelled').subscribe({
+      next: () => {
+        // Update UI immediately without reload
+        booking.status = 'Cancelled';
+        // Refresh stats to reflect the change
+        this.loadStats();
+      },
+      error: (err) => {
+        console.error('Error cancelling booking:', err);
+        alert('Failed to cancel booking. Please try again.');
+      }
+    });
   }
 
   isPending(booking: any): boolean {

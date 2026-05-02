@@ -3,7 +3,6 @@ export interface Booking {
   userId: number;
   serviceId: number;
   serviceName: string;
-  serviceCategory?: string;
   participantName?: string;
   preferredDate: string;
   notes?: string;

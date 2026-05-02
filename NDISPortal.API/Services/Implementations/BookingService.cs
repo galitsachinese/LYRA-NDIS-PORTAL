@@ -67,6 +67,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
 
             IQueryable<Booking> query = _context.Bookings
                 .Include(b => b.Service)
+                    .ThenInclude(s => s.ServiceCategory)
                 .Include(b => b.User)
                 .AsQueryable();
 
@@ -96,6 +97,9 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                     UserId = b.UserId,
                     ServiceId = b.ServiceId,
                     ServiceName = b.Service != null ? b.Service.Name : string.Empty,
+                    ServiceCategory = b.Service != null && b.Service.ServiceCategory != null
+                        ? b.Service.ServiceCategory.Name
+                        : string.Empty,
                     ParticipantName = normalizedRole.Equals("Coordinator", StringComparison.OrdinalIgnoreCase)
                         ? b.User != null
                             ? b.User.FirstName + " " + b.User.LastName
@@ -189,6 +193,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 UserId = booking.UserId,
                 ServiceId = booking.ServiceId,
                 ServiceName = service.Name,
+                ServiceCategory = service.ServiceCategory != null ? service.ServiceCategory.Name : string.Empty,
                 ParticipantName = user.FirstName + " " + user.LastName,
                 PreferredDate = booking.BookingDate,
                 Notes = booking.Notes,

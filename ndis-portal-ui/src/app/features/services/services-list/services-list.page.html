@@ -1,15 +1,46 @@
-<!-- services-list.page.html -->
-<div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
-    <header class="sticky flex w-full items-center justify-between">
-        <h1 class="text-xl font-bold text-slate-900">Our Services</h1>
-        <!-- Pass allServices to the dropdown for dynamic filtering -->
-        <app-category-dropdown [services]="allServices" (categoryChange)="handleCategoryFilter($event)">
-        </app-category-dropdown>
-    </header>
+<div class="services-list-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Available Services</h1>
+        <p>Browse and select from our range of NDIS support services</p>
+      </div>
+    </div>
+  </div>
 
-    <main>
-        <!-- Use filteredServices here -->
-        <app-service-card-component [services]="filteredServices" (cardSelected)="onCardClick($event)">
-        </app-service-card-component>
-    </main>
+  <div class="filter-section" *ngIf="categories.length > 0">
+    <button
+      type="button"
+      class="category-filter-btn"
+      [class.active]="selectedCategory === 'all'"
+      (click)="selectCategory('all')"
+      data-testid="category-filter-btn"
+    >
+      All
+    </button>
+
+    <button
+      type="button"
+      *ngFor="let category of categories; trackBy: trackByCategory"
+      class="category-filter-btn"
+      [class.active]="selectedCategory === category"
+      (click)="selectCategory(category)"
+      data-testid="category-filter-btn"
+    >
+      {{ category }}
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state" data-testid="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading services...</p>
+  </div>
+
+  <main *ngIf="!isLoading">
+    <app-service-card-component
+      [services]="filteredServices"
+      (cardSelected)="onCardClick($event)"
+    >
+    </app-service-card-component>
+  </main>
 </div>

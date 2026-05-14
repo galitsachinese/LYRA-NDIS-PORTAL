@@ -1,48 +1,63 @@
-<div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
+<div class="book-service-page">
+  <header class="booking-header">
+    <h1>Book a Service</h1>
+    <p>Select a service and preferred date to submit your booking request.</p>
+  </header>
 
-    <div class="w-full max-w-4xl mb-8">
-        <h1 class="text-lg md:text-xl 2xl:text-3xl 4xl:text-5xl font-bold text-slate-900 truncate">
-            Book a Service
-        </h1>
+  <section class="booking-card" aria-label="Book a service form">
+    <button type="button" class="back-link" (click)="navBack()">
+      <span aria-hidden="true">&larr;</span>
+      Back to Services
+    </button>
+
+    <div *ngIf="errorMessage" class="message message-error">
+      {{ errorMessage }}
     </div>
 
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="w-full max-w-4xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        {{ errorMessage }}
+    <div *ngIf="successMessage" class="message message-success">
+      {{ successMessage }}
     </div>
 
-    <!-- Success Message -->
-    <div *ngIf="successMessage" class="w-full max-w-4xl bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
-        {{ successMessage }}
+    <div *ngIf="isLoadingServices" class="loading-services">
+      Loading services...
     </div>
 
-    <div class="p-4 md:p-6 flex flex-col items-center justify-center max-w-[2560px] mx-auto">
-        <div class="w-full max-w-4xl space-y-10">    
-            <!-- Loading Services -->
-            <div *ngIf="isLoadingServices" class="flex items-center justify-center py-4">
-                <div class="w-6 h-6 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mr-2"></div>
-                <span class="text-slate-500">Loading services...</span>
-            </div>
+    <form *ngIf="!isLoadingServices" class="booking-form" (ngSubmit)="confirmBooking()">
+      <label class="form-field">
+        <span>Service</span>
+        <select name="service" [(ngModel)]="bookingData.serviceId" required>
+          <option value="" disabled>Select a service</option>
+          <option *ngFor="let service of services" [value]="service.id">
+            {{ service.label }}
+          </option>
+        </select>
+      </label>
 
-            <div class="w-full space-y-6" *ngIf="!isLoadingServices">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                    <app-select-service class="block w-full" [options]="services" [(value)]="bookingData.serviceId">
-                    </app-select-service>
-    
-                    <app-date-picker-component class="block w-full" [(value)]="bookingData.date">
-                    </app-date-picker-component>
-                </div>
-    
-                <app-text-area-component class="block w-full" [(value)]="bookingData.notes">
-                </app-text-area-component>
-            </div>
-            <div class="flex flex-col-reverse md:flex-row justify-end items-center gap-8 pt-6">
-                <app-back-button (onClick)="navBack()"></app-back-button>
-                <app-book-button (onClick)="confirmBooking()"></app-book-button>
-            </div>
-        </div>
-    </div>
+      <label class="form-field">
+        <span>Preferred Date</span>
+        <input
+          type="date"
+          name="preferredDate"
+          [(ngModel)]="bookingData.date"
+          required
+        />
+      </label>
 
+      <label class="form-field">
+        <span>Notes</span>
+        <textarea
+          name="notes"
+          rows="5"
+          placeholder="Add optional notes here..."
+          [(ngModel)]="bookingData.notes"
+        ></textarea>
+      </label>
 
- 
+      <p class="approval-note">Your booking request will be reviewed before approval.</p>
+
+      <button type="submit" class="submit-button" [disabled]="isLoading">
+        {{ isLoading ? 'Submitting...' : 'Submit Booking' }}
+      </button>
+    </form>
+  </section>
 </div>

@@ -35,7 +35,7 @@ export class BookingTableComponent implements OnChanges {
     { key: 'service', label: 'Service', type: 'text' },
     { key: 'category', label: 'Category', type: 'category' },
     { key: 'date', label: 'Date', type: 'date' }, // Changed to 'date' to match your table.ui logic
-    { key: 'view', label: 'Note', type: 'view' },
+    { key: 'view', label: 'Notes', type: 'view', actionLabel: 'View' },
     { key: 'status', label: 'Status', type: 'status' },
   ];
   visibleColumns: TableColumn[] = [...this.baseColumns];
@@ -52,7 +52,7 @@ export class BookingTableComponent implements OnChanges {
     if (this.currentFilter.toLowerCase() === 'pending') {
       this.visibleColumns = [
         ...this.baseColumns,
-        { key: 'action', label: '', type: 'action' },
+        { key: 'action', label: 'Action', type: 'action' },
       ];
     } else {
       this.visibleColumns = [...this.baseColumns];

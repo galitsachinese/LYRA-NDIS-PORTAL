@@ -4,15 +4,9 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SidebarService } from '../../../app/core/services/sidebar.service';
 
-// Icons
-import { HomeIconComponent } from '../../components/icons/svg-icons/home-icon';
-import { BookIconComponent } from '../../components/icons/svg-icons/book-icon';
-import { ServiceIconComponent } from '../../components/icons/svg-icons/service-icon';
-
 export interface NavItem {
   label: string;
   path: string;
-  icon: 'home' | 'services' | 'bookings';
 }
 
 @Component({
@@ -21,9 +15,6 @@ export interface NavItem {
   imports: [
     CommonModule,
     RouterModule,
-    HomeIconComponent,
-    BookIconComponent,
-    ServiceIconComponent,
   ],
   templateUrl: './sidebar.ui.html',
 })

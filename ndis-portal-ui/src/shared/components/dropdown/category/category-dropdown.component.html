@@ -1,3 +1,26 @@
-<app-dropdown-ui label="Category" [options]="categoryOptions" [selectedValue]="selectedValue" (onSelect)="handleSelect($event)">
-  <app-icon-filter icon [size]="16"></app-icon-filter>
-</app-dropdown-ui>
+<label
+  class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm"
+>
+  <svg
+    class="h-4 w-4 text-slate-500"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    aria-hidden="true"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M7 12h10M10 17h4" />
+  </svg>
+
+  <span>Category</span>
+
+  <select
+    class="bg-transparent text-sm font-semibold text-slate-700 outline-none"
+    [(ngModel)]="selectedValue"
+    (ngModelChange)="handleSelect($event)"
+  >
+    <option *ngFor="let option of categoryOptions" [value]="option.value">
+      {{ option.label }}
+    </option>
+  </select>
+</label>

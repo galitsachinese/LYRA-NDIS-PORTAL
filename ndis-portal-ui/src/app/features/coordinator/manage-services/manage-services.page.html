@@ -1,21 +1,21 @@
-<div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
-    <div class="flex flex-row items-center justify-between gap-4 w-full">
-        <h1 class="m-0 text-2xl font-bold leading-tight text-slate-950 md:text-[28px]">Manage Services</h1>
-        <!-- Trigger is already set to openModal() -->
-        <app-add-button data-testid="add-service-btn" (onClick)="openModal()"></app-add-button>
-    </div>
+<div class="min-h-[calc(100vh-5rem)] bg-white px-4 py-7 md:px-8 md:py-9">
+    <div class="mx-auto max-w-[1600px] space-y-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <h1 class="m-0 text-2xl font-bold leading-tight text-slate-950 md:text-[28px]">Manage Services</h1>
+            <app-add-button label="New Service" data-testid="add-service-btn" (onClick)="openModal()"></app-add-button>
+        </div>
 
-    <!-- Loading state -->
-    <div *ngIf="isLoading" class="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <div class="w-12 h-12 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
-        <p class="text-slate-400 font-medium">Loading services...</p>
-    </div>
+        <div *ngIf="isLoading" class="flex min-h-[320px] flex-col items-center justify-center gap-4 rounded-2xl bg-white shadow-[0_18px_44px_rgba(15,23,42,0.06)]">
+            <div class="h-11 w-11 animate-spin rounded-full border-4 border-violet-100 border-t-[#6B3293]"></div>
+            <p class="m-0 text-sm font-medium text-slate-500">Loading services...</p>
+        </div>
 
-    <!-- Services table -->
-    <div *ngIf="!isLoading" data-testid="services-table">
-        <app-manage-services-table [bookings]="services"
-          (toggleStatus)="toggleServiceStatus($event)">
-        </app-manage-services-table>
+        <div *ngIf="!isLoading" class="mt-10" data-testid="services-table">
+            <app-manage-services-table
+                [bookings]="services"
+                (toggleStatus)="toggleServiceStatus($event)">
+            </app-manage-services-table>
+        </div>
     </div>
 </div>
 

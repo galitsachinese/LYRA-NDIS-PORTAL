@@ -24,19 +24,16 @@ export class SidebarComponent {
     {
       label: 'Dashboard',
       path: '/dashboard',
-      icon: 'services',
       role: 'Coordinator',
     },
     {
       label: 'Manage Services',
       path: '/dashboard/services',
-      icon: 'services',
       role: 'Coordinator',
     },
     {
       label: 'Support Workers',
       path: '/dashboard/support-workers',
-      icon: 'services',
       role: 'Coordinator',
     },
 
@@ -44,13 +41,11 @@ export class SidebarComponent {
     {
       label: 'Services',
       path: '/services',
-      icon: 'services',
       role: 'Participant',
     },
     {
       label: 'My Bookings',
       path: '/bookings',
-      icon: 'bookings',
       role: 'Participant',
     },
   ];

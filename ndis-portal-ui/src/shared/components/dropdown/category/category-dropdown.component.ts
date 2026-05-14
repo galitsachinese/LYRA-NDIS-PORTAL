@@ -1,15 +1,12 @@
 import { Component, Output, EventEmitter, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  DropdownUIComponent,
-  DropdownOption,
-} from '../../../ui/dropdown/dropdown.ui';
-import { FilterIconComponent } from '../../icons/svg-icons/filter-icon';
+import { FormsModule } from '@angular/forms';
+import { DropdownOption } from '../../../ui/dropdown/dropdown.ui';
 
 @Component({
   selector: 'app-category-dropdown',
   standalone: true,
-  imports: [CommonModule, DropdownUIComponent, FilterIconComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './category-dropdown.component.html',
 })
 export class CategoryDropdownComponent implements OnChanges {

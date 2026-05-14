@@ -31,6 +31,14 @@ export class MyBookingsComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
+  get nextSessionLabel(): string {
+    const nextBooking = this.bookings.find(
+      (booking) => booking.status?.toLowerCase() !== 'cancelled'
+    );
+
+    return nextBooking?.service || 'No incoming session';
+  }
+
   // --- Dialog State ---
   isCancelDialogOpen = false;
   selectedBookingForCancel: BookingViewModel | null = null;

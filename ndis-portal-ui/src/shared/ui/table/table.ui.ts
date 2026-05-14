@@ -27,6 +27,8 @@ export class TableComponent {
   // Table data
   @Input() data: any[] = [];
 
+  @Input() fillFewRows = true;
+
   /* ===============================
      OUTPUT EVENTS
      =============================== */
@@ -46,6 +48,7 @@ export class TableComponent {
 
   // Currently opened action menu row
   activeMenuRow: any = null;
+  replaceActionRow: any = null;
 
   constructor(private eRef: ElementRef) {}
 
@@ -174,6 +177,29 @@ export class TableComponent {
     this.activeMenuRow = this.activeMenuRow === row ? null : row;
   }
 
+  get actionColumn(): TableColumn | undefined {
+    return this.columns.find((col) => col.type === 'action');
+  }
+
+  shouldReplaceAction(row: any): boolean {
+    return (
+      this.actionColumn?.actionDisplay === 'replace-with-action' &&
+      this.replaceActionRow === row
+    );
+  }
+
+  handleActionTrigger(row: any, event?: Event): void {
+    event?.stopPropagation();
+
+    if (this.actionColumn?.actionDisplay === 'replace-with-action') {
+      this.replaceActionRow = this.replaceActionRow === row ? null : row;
+      this.activeMenuRow = null;
+      return;
+    }
+
+    this.toggleMenu(row);
+  }
+
   /* Emit toggle action for status changes */
   emitToggle(row: any): void {
     this.toggleAction.emit(row);
@@ -184,6 +210,7 @@ export class TableComponent {
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.activeMenuRow = null;
+      this.replaceActionRow = null;
     }
   }
 }

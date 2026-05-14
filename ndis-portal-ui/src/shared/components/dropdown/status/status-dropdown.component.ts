@@ -11,7 +11,7 @@ import { FilterIconComponent } from '../../icons/svg-icons/filter-icon';
   imports: [CommonModule, DropdownUIComponent, FilterIconComponent],
   template: `
     <app-dropdown-ui
-      label="Status"
+      [label]="selectedStatusLabel"
       [options]="statusOptions"
       [selectedValue]="activeStatus"
       (onSelect)="handleSelect($event)"
@@ -26,11 +26,18 @@ export class StatusDropdownComponent {
   @Output() statusChange = new EventEmitter<string>();
 
   statusOptions: DropdownOption[] = [
-    { label: 'All Status', value: 'all' },
+    { label: 'All', value: 'all' },
     { label: 'Approved', value: 'approved' },
     { label: 'Pending', value: 'pending' },
     { label: 'Cancelled', value: 'cancelled' },
   ];
+
+  get selectedStatusLabel(): string {
+    return (
+      this.statusOptions.find((option) => option.value === this.activeStatus)
+        ?.label || 'All'
+    );
+  }
 
   handleSelect(value: string) {
     this.statusChange.emit(value);

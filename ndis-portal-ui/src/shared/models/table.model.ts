@@ -4,4 +4,5 @@ export interface TableColumn {
   type: string;
   // Update this to allow both strings and action objects
   actionLabel?: string | { label: string; actionKey: string; class?: string }[];
+  actionDisplay?: 'replace-with-action';
 }

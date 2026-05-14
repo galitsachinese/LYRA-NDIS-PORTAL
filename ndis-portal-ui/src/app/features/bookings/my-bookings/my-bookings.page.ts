@@ -19,6 +19,7 @@ import { CancelDialogComponent } from '../../../../shared/components/dialog/canc
     CancelDialogComponent, // Integrated for responsive cancellation
   ],
   templateUrl: './my-bookings.page.html',
+  styleUrls: ['./my-bookings.page.css'],
 })
 export class MyBookingsComponent implements OnInit {
   // --- Data State ---
@@ -36,6 +37,22 @@ export class MyBookingsComponent implements OnInit {
   selectedBookingForCancel: BookingViewModel | null = null;
 
   constructor(private bookingService: BookingService) {}
+
+  get nextSessionLabel(): string {
+    const now = new Date();
+    const upcoming = this.bookings
+      .filter((booking) => {
+        const date = new Date(booking.rawData.preferredDate);
+        return !Number.isNaN(date.getTime()) && date >= now;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.rawData.preferredDate).getTime() -
+          new Date(b.rawData.preferredDate).getTime(),
+      );
+
+    return upcoming[0]?.service || 'No incoming session';
+  }
 
   ngOnInit() {
     this.fetchBookings();

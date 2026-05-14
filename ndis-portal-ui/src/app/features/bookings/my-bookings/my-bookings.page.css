@@ -1,0 +1,64 @@
+:host ::ng-deep .bookings-filter app-dropdown-ui > div > button {
+  min-width: 108px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: #f0eaf5;
+}
+
+:host ::ng-deep .bookings-filter app-dropdown-ui > div > button span:last-child {
+  display: flex;
+}
+
+:host ::ng-deep .bookings-table-shell .hidden.md\:block {
+  border-radius: 14px;
+  overflow: visible;
+}
+
+:host ::ng-deep .bookings-table-shell table {
+  overflow: visible;
+  border-radius: 14px;
+}
+
+:host ::ng-deep .bookings-table-shell thead tr {
+  background: #fff;
+}
+
+:host ::ng-deep .bookings-table-shell th:first-child,
+:host ::ng-deep .bookings-table-shell td:first-child {
+  display: none;
+}
+
+:host ::ng-deep .bookings-table-shell th {
+  color: #807789;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+:host ::ng-deep .bookings-table-shell td {
+  color: #5f6471;
+  font-size: 12px;
+}
+
+:host ::ng-deep .bookings-table-shell .text-\[\#289839\] {
+  border-color: #dcfce7;
+  background: #dcfce7;
+  color: #289839;
+  border-radius: 9999px;
+}
+
+:host ::ng-deep .bookings-table-shell .text-\[\#CF971D\] {
+  border-color: #fb7a4b;
+  background: #fb7a4b;
+  color: #fff;
+  border-radius: 9999px;
+}
+
+:host ::ng-deep .bookings-table-shell .text-\[\#DB4444\] {
+  border-color: #fee2e2;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 9999px;
+}

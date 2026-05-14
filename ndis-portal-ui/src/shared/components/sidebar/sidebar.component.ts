@@ -33,6 +33,12 @@ export class SidebarComponent {
       icon: 'services',
       role: 'Coordinator',
     },
+    {
+      label: 'Support Workers',
+      path: '/dashboard/support-workers',
+      icon: 'services',
+      role: 'Coordinator',
+    },
 
     // Participant Links
     {

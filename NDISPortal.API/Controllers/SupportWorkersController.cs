@@ -112,7 +112,7 @@ namespace NDISPortal.API.Controllers
                 FirstName = firstName,
                 LastName = lastName,
                 Email = normalizedEmail,
-                Phone = request.Phone.Trim(),
+                Phone = (request.Phone ?? string.Empty).Trim(),
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow
             };
@@ -135,6 +135,120 @@ namespace NDISPortal.API.Controllers
                 .FirstAsync();
 
             return StatusCode(201, createdWorker);
+        }
+
+        // PUT /api/support-workers/{id}
+        // Coordinator only
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSupportWorker(int id, [FromBody] CreateSupportWorkerRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            var worker = await _context.SupportWorker.FindAsync(id);
+            if (worker == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Support worker with ID {id} was not found."
+                });
+            }
+
+            var cleanedFullName = (request.FullName ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(cleanedFullName))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Full name is required."
+                });
+            }
+
+            var serviceExists = await _context.Services
+                .AnyAsync(s => s.Id == request.AssignedServiceId);
+
+            if (!serviceExists)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = $"Service with ID {request.AssignedServiceId} does not exist."
+                });
+            }
+
+            var normalizedEmail = request.Email.Trim();
+
+            var emailExists = await _context.SupportWorker
+                .AnyAsync(sw => sw.Id != id && sw.Email == normalizedEmail);
+
+            if (emailExists)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "A support worker with this email already exists."
+                });
+            }
+
+            var (firstName, lastName) = SplitFullName(cleanedFullName);
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Full name must include first name and last name."
+                });
+            }
+
+            worker.ServiceId = request.AssignedServiceId;
+            worker.FirstName = firstName;
+            worker.LastName = lastName;
+            worker.Email = normalizedEmail;
+            worker.Phone = (request.Phone ?? string.Empty).Trim();
+            worker.ModifiedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var updatedWorker = await _context.SupportWorker
+                .Include(sw => sw.AssignedService)
+                .Where(sw => sw.Id == worker.Id)
+                .Select(sw => new
+                {
+                    id = sw.Id,
+                    fullName = ((sw.FirstName ?? "") + " " + (sw.LastName ?? "")).Trim(),
+                    email = sw.Email,
+                    phone = sw.Phone,
+                    assignedServiceId = sw.ServiceId,
+                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null
+                })
+                .FirstAsync();
+
+            return Ok(updatedWorker);
+        }
+
+        // DELETE /api/support-workers/{id}
+        // Coordinator only
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSupportWorker(int id)
+        {
+            var worker = await _context.SupportWorker.FindAsync(id);
+            if (worker == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Support worker with ID {id} was not found."
+                });
+            }
+
+            _context.SupportWorker.Remove(worker);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         private static (string FirstName, string LastName) SplitFullName(string fullName)
@@ -161,7 +275,6 @@ namespace NDISPortal.API.Controllers
             [StringLength(150)]
             public string Email { get; set; } = string.Empty;
 
-            [Required]
             [StringLength(50)]
             public string Phone { get; set; } = string.Empty;
 

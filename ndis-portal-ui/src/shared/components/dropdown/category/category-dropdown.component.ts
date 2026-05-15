@@ -23,7 +23,10 @@ export class CategoryDropdownComponent implements OnChanges {
   }
 
   updateCategoryOptions() {
-    if (!this.services || this.services.length === 0) return;
+    if (!this.services || this.services.length === 0) {
+      this.categoryOptions = [{ label: 'All Categories', value: 'all' }];
+      return;
+    }
 
     const uniqueCategories = new Set<string>();
     this.services.forEach(service => {
@@ -32,9 +35,11 @@ export class CategoryDropdownComponent implements OnChanges {
       }
     });
 
+    const activeCategories = Array.from(uniqueCategories).sort();
+
     this.categoryOptions = [
       { label: 'All Categories', value: 'all' },
-      ...Array.from(uniqueCategories).map(category => ({
+      ...activeCategories.map(category => ({
         label: category,
         value: category.toLowerCase().replace(/\s+/g, '-')
       }))

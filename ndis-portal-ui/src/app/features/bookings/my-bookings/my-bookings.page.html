@@ -1,12 +1,17 @@
 <div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
 
-    <div class="flex flex-row items-center justify-between gap-4 w-full">
-        <h1 class="text-lg md:text-xl 2xl:text-3xl 4xl:text-5xl font-bold text-slate-900 truncate">
-            My Bookings
-        </h1>
+    <div class="flex flex-row items-center justify-between gap-3 w-full">
+        <div>
+            <h1 class="text-lg md:text-xl 2xl:text-3xl 4xl:text-5xl font-bold text-slate-900">
+                 {{ pageTitle }}
+            </h1>    
+        </div>
 
-        <app-status-dropdown [activeStatus]="activeFilter" (statusChange)="handleStatusFilter($event)">
-        </app-status-dropdown>
+        <div>
+            <app-status-dropdown class="w-full sm:w-auto" [activeStatus]="activeFilter" (statusChange)="handleStatusFilter($event)">
+            </app-status-dropdown>    
+        </div>
+        
     </div>
 
     <div *ngIf="errorMessage"
@@ -50,4 +55,39 @@
             </p>
         </div>
     </app-cancel-dialog>
+
+    <div
+        *ngIf="selectedNotesBooking"
+        class="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+    >
+        <div class="relative w-full max-w-md overflow-hidden rounded-lg border border-slate-300 bg-white shadow-2xl ring-2 ring-slate-900/10">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <h2 class="text-base font-semibold text-slate-900">Booking Notes</h2>
+
+                <button
+                    type="button"
+                    (click)="closeNotes()"
+                    class="text-slate-400 hover:text-slate-600"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <div class="px-5 py-4">
+                <p class="whitespace-pre-wrap break-words text-sm text-slate-600">
+                    {{ selectedNotesBooking.notes || 'No notes provided.' }}
+                </p>
+            </div>
+
+            <div class="flex justify-end border-t border-slate-200 px-5 py-4">
+                <button
+                    type="button"
+                    (click)="closeNotes()"
+                    class="rounded-md bg-[#6B3293] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5a2a7b]"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

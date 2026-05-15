@@ -1,6 +1,8 @@
 <div class="min-h-full bg-[#fff7fd] p-5 pt-9 text-[#18181b] md:p-7 md:pt-10">
   <header class="mb-6 flex items-center justify-between gap-5 max-md:flex-col max-md:items-stretch">
-    <h1 class="m-0 text-[28px] font-extrabold leading-tight">My Bookings</h1>
+    <div>
+      <h1 class="m-0 text-[28px] font-extrabold leading-tight">{{ pageTitle }}</h1>
+    </div>
 
     <aside
       class="min-w-[146px] rounded-[14px] bg-white px-4 py-3.5 shadow-[0_14px_34px_#77488914] max-md:w-full"
@@ -30,9 +32,10 @@
 
   <div
     *ngIf="!isLoading && !errorMessage && bookings.length === 0"
-    class="mb-[18px] rounded-xl bg-white px-4 py-3.5 text-center text-slate-500"
+    class="mb-[18px] rounded-xl border-2 border-dashed border-slate-200 bg-gray-50 px-4 py-12 text-center text-slate-500"
   >
-    <p class="m-0">No bookings found</p>
+    <p class="m-0 text-lg font-medium 2xl:text-2xl">No bookings found</p>
+    <p class="mt-2 text-sm text-slate-400 2xl:text-lg">Try changing your filter or book a new service.</p>
   </div>
 
   <section
@@ -76,9 +79,44 @@
     (confirmed)="confirmCancellation()"
   >
     <div body class="space-y-4">
-      <p class="text-slate-900 font-semibold text-sm 2xl:text-2xl">
+      <p class="text-sm font-semibold text-slate-900 2xl:text-2xl">
         You will permanently cancel this scheduled booking.
       </p>
     </div>
   </app-cancel-dialog>
+
+  <div
+    *ngIf="selectedNotesBooking"
+    class="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+  >
+    <div class="relative w-full max-w-md overflow-hidden rounded-lg border border-slate-300 bg-white shadow-2xl ring-2 ring-slate-900/10">
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <h2 class="text-base font-semibold text-slate-900">Booking Notes</h2>
+
+        <button
+          type="button"
+          (click)="closeNotes()"
+          class="text-slate-400 hover:text-slate-600"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="px-5 py-4">
+        <p class="whitespace-pre-wrap break-words text-sm text-slate-600">
+          {{ selectedNotesBooking.notes || 'No notes provided.' }}
+        </p>
+      </div>
+
+      <div class="flex justify-end border-t border-slate-200 px-5 py-4">
+        <button
+          type="button"
+          (click)="closeNotes()"
+          class="rounded-md bg-[#6B3293] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5a2a7b]"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

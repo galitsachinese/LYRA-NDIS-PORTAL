@@ -35,15 +35,9 @@ export class BookingTableComponent implements OnChanges {
     // Add type: 'text' (or whatever your default switch case is)
     { key: 'service', label: 'Service', type: 'text' },
     { key: 'category', label: 'Category', type: 'category' },
-    { key: 'date', label: 'Booking Date', type: 'date' },
-    { key: 'notes', label: 'Notes', type: 'text' },
+    { key: 'date', label: 'Date', type: 'date' }, // Changed to 'date' to match your table.ui logic
+    { key: 'view', label: 'Notes', type: 'view', actionLabel: 'View' },
     { key: 'status', label: 'Status', type: 'status' },
-    {
-      key: 'action',
-      label: 'Actions',
-      type: 'action',
-      actionDisplay: 'replace-with-action',
-    },
   ];
   visibleColumns: TableColumn[] = [...this.baseColumns];
 
@@ -54,6 +48,18 @@ export class BookingTableComponent implements OnChanges {
   }
 
   private updateColumns() {
-    this.visibleColumns = [...this.baseColumns];
+    if (this.currentFilter.toLowerCase() === 'pending') {
+      this.visibleColumns = [
+        ...this.baseColumns,
+        {
+          key: 'action',
+          label: 'Action',
+          type: 'action',
+          actionDisplay: 'replace-with-action',
+        },
+      ];
+    } else {
+      this.visibleColumns = [...this.baseColumns];
+    }
   }
 }

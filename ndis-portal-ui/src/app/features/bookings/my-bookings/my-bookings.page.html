@@ -1,11 +1,11 @@
-<div class="min-h-full bg-[#fff7fd] p-5 pt-9 text-[#18181b] md:p-7 md:pt-10">
+<div class="min-h-full bg-white p-5 pt-9 text-[#18181b] md:p-7 md:pt-10">
   <header class="mb-6 flex items-center justify-between gap-5 max-md:flex-col max-md:items-stretch">
     <div>
-      <h1 class="m-0 text-[28px] font-extrabold leading-tight">{{ pageTitle }}</h1>
+      <h1 class="m-0 text-[28px] font-extrabold leading-tight">My Bookings</h1>
     </div>
 
     <aside
-      class="min-w-[146px] rounded-[14px] bg-white px-4 py-3.5 shadow-[0_14px_34px_#77488914] max-md:w-full"
+      class="min-w-[146px] rounded-[14px] bg-white px-4 py-3.5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] max-md:w-full"
       aria-label="Next session"
     >
       <span class="mb-2 block text-[9px] font-extrabold uppercase tracking-[1.4px] text-[#807789]">
@@ -38,10 +38,7 @@
     <p class="mt-2 text-sm text-slate-400 2xl:text-lg">Try changing your filter or book a new service.</p>
   </div>
 
-  <section
-    class="bookings-table-shell relative overflow-visible rounded-[14px] bg-white shadow-[0_16px_38px_#7748890f]"
-    *ngIf="bookings.length > 0"
-  >
+  <section class="bookings-table-shell relative overflow-visible rounded-[14px] bg-white shadow-[0_16px_38px_rgba(15,23,42,0.08)]" *ngIf="bookings.length > 0">
     <div
       *ngIf="isLoading"
       class="absolute inset-0 z-10 grid place-items-center rounded-[14px] bg-white/70 text-xs font-extrabold uppercase tracking-wider text-[#6f2da8]"

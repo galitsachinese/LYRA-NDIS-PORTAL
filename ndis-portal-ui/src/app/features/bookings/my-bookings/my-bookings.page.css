@@ -10,13 +10,9 @@
   display: flex;
 }
 
-:host ::ng-deep .bookings-table-shell .hidden.md\:block {
-  border-radius: 14px;
-  overflow: visible;
-}
-
+:host ::ng-deep .bookings-table-shell .hidden.md\:block,
 :host ::ng-deep .bookings-table-shell table {
-  overflow: visible;
+  overflow: hidden;
   border-radius: 14px;
 }
 
@@ -34,31 +30,20 @@
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1px;
+  line-height: 1;
+  padding: 11px 14px !important;
   text-transform: uppercase;
 }
 
 :host ::ng-deep .bookings-table-shell td {
   color: #5f6471;
   font-size: 12px;
+  line-height: 1.35;
+  padding: 13px 14px !important;
 }
 
-:host ::ng-deep .bookings-table-shell .text-\[\#289839\] {
-  border-color: #dcfce7;
-  background: #dcfce7;
-  color: #289839;
-  border-radius: 9999px;
-}
-
-:host ::ng-deep .bookings-table-shell .text-\[\#CF971D\] {
-  border-color: #fb7a4b;
-  background: #fb7a4b;
-  color: #fff;
-  border-radius: 9999px;
-}
-
-:host ::ng-deep .bookings-table-shell .text-\[\#DB4444\] {
-  border-color: #fee2e2;
-  background: #fee2e2;
-  color: #b91c1c;
-  border-radius: 9999px;
+.bookings-table-shell > p {
+  padding: 0 0 4px !important;
+  font-size: 12px;
+  line-height: 1;
 }

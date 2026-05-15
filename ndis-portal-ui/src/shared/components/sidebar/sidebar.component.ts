@@ -9,7 +9,6 @@ import { AuthService } from '../../../app/core/services/auth.service';
   template: `
     <app-sidebar-ui
       [navItems]="filteredLinks"
-      [subText]="currentSubText"
     ></app-sidebar-ui>
   `,
   host: { class: 'block h-full flex-none transition-all duration-300' },
@@ -24,7 +23,7 @@ export class SidebarComponent {
     {
       label: 'Dashboard',
       path: '/dashboard',
-      icon: 'services',
+      icon: 'dashboard',
       role: 'Coordinator',
     },
     {
@@ -33,12 +32,24 @@ export class SidebarComponent {
       icon: 'services',
       role: 'Coordinator',
     },
+    {
+      label: 'All Bookings',
+      path: '/dashboard/bookings',
+      icon: 'bookings',
+      role: 'Coordinator',
+    },
 
     // Participant Links
     {
       label: 'Services',
       path: '/services',
       icon: 'services',
+      role: 'Participant',
+    },
+    {
+      label: 'Book a Service',
+      path: '/participant/book-service',
+      icon: 'book-new',
       role: 'Participant',
     },
     {
@@ -51,11 +62,23 @@ export class SidebarComponent {
 
   get filteredLinks(): NavItem[] {
     const userRole = this.authService.getRole();
-    console.log('Current User Role from Storage:', userRole); // CHECK THIS IN THE BROWSER CONSOLE
-    // Case-insensitive comparison
-    return this.allLinks.filter((link) =>
-      userRole && link.role.toLowerCase() === userRole.toLowerCase()
+    
+    if (!userRole) {
+      return [];
+    }
+    
+    // Case-insensitive comparison with better logging
+    const filtered = this.allLinks.filter((link) => {
+      const matches = link.role.toLowerCase() === userRole.toLowerCase();
+      return matches;
+    });
+    
+    // Remove duplicates based on path
+    const uniqueLinks = filtered.filter((link, index, self) =>
+      index === self.findIndex((l) => l.path === link.path)
     );
+    
+    return uniqueLinks;
   }
 
   /**

@@ -28,7 +28,7 @@ export class CategoryDropdownComponent implements OnChanges {
 
   updateCategoryOptions() {
     if (!this.services || this.services.length === 0) {
-      this.categoryOptions = [{ label: 'All', value: 'all' }];
+      this.categoryOptions = [{ label: 'All Categories', value: 'all' }];
       this.selectedValue = 'all';
       return;
     }
@@ -44,9 +44,13 @@ export class CategoryDropdownComponent implements OnChanges {
       }
     });
 
+    const activeCategories = Array.from(uniqueCategories.values()).sort((a, b) =>
+      a.localeCompare(b),
+    );
+
     this.categoryOptions = [
-      { label: 'All', value: 'all' },
-      ...Array.from(uniqueCategories.values()).map(category => ({
+      { label: 'All Categories', value: 'all' },
+      ...activeCategories.map(category => ({
         label: category,
         value: this.normalizeCategory(category),
       }))

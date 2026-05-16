@@ -93,3 +93,6 @@ playwright/.cache/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+""  
+"# Exclude other project reference"  
+"dorowie-ndis-portal/" 

@@ -2,20 +2,25 @@
 <div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
     <header class="sticky flex w-full items-center justify-between">
         <h1 class="text-xl font-bold text-slate-900">Our Services</h1>
-        <!-- Pass allServices to the dropdown for dynamic filtering -->
-        <app-category-dropdown [services]="allServices" (categoryChange)="handleCategoryFilter($event)">
-        </app-category-dropdown>
+        <div class="flex items-center gap-3">
+            <button class="ai-recommendation-btn" (click)="openAiRecommendation()">
+                <span class="material-icons text-sm leading-none">lightbulb</span>
+                Service Recommendation
+            </button>
+            <app-category-dropdown [services]="allServices" (categoryChange)="handleCategoryFilter($event)">
+            </app-category-dropdown>
+        </div>
     </header>
 
     <main>
-        <!-- All Services including AI Recommendation Card -->
         <app-service-card-component [services]="filteredServices" 
-        
-            (cardSelected)="onCardClick($event)"
-            (aiRecommendationSelected)="openAiRecommendation()">
+            (cardSelected)="onCardClick($event)">
         </app-service-card-component>
     </main>
 
     <!-- Chat Container (for AI recommendation functionality) -->
     <app-chatbot-container #chatContainer></app-chatbot-container>
+
+    <!-- Service Recommendation Modal -->
+    <app-service-recommendation-modal></app-service-recommendation-modal>
 </div>

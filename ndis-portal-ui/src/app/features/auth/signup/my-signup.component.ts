@@ -44,6 +44,7 @@ export class MySignupComponent {
     role: '',
     email: '',
     password: '',
+    confirmPassword: '',
     agreeToTerms: false,
   };
 
@@ -136,6 +137,11 @@ export class MySignupComponent {
 
     if (!this.signupData.password || this.signupData.password.length < 8) {
       this.errorMessage = 'Password must be at least 8 characters.';
+      return;
+    }
+
+    if (!this.signupData.confirmPassword || this.signupData.confirmPassword !== this.signupData.password) {
+      this.errorMessage = 'Passwords do not match.';
       return;
     }
 

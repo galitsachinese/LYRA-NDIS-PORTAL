@@ -44,57 +44,27 @@
           </div>
         </div>
 
-        <!-- Role Select 
-        <div class="mb-4">
-          <select name="role" [(ngModel)]="signupData.role" required
-            class="w-full p-3.5 border border-neutral-200 rounded-lg text-sm outline-none focus:border-[#6F2C91] appearance-none bg-white text-neutral-700">
-            <option value="" disabled selected>Role</option>
-            <option value="participant">Participant</option>
-            <option value="coordinator">Coordinator</option>
-          </select>
-        </div>
-        -->
-        <div>
-          <app-role-dropdown name="role" [(value)]="signupData.role" required></app-role-dropdown>
-        </div>
-
         <!-- Email -->
         <div>
           <app-input type="email" placeholder="Email" name="email" [(ngModel)]="signupData.email" [required]="true">
           </app-input>
         </div>
 
-        <!-- Password 
-        <div class="relative w-full">
-          <input 
-            [type]="showPassword ? 'text' : 'password'"
-            placeholder="Password" 
-            name="password" 
-            [(ngModel)]="signupData.password"
-            [required]="true"
-            class="
-              w-full
-              px-3 py-2.5 pr-10
-              text-sm
-              border border-slate-300 rounded-lg
-              bg-white outline-none transition
-              focus:border-[#6F2C91]
-              focus:ring-2 focus:ring-[#6F2C91]/10
-              placeholder:text-slate-400
-              md:px-4 md:py-3.5 md:text-base 
-            "
-          />
-            <button type="button" (click)="togglePassword()"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700">
-              <app-icon-unview *ngIf="!showPassword"></app-icon-unview>
-              <app-icon-view *ngIf="showPassword"></app-icon-view>
-            </button>
-        </div>
-
-        -->
+        <!-- Password -->
         <div>
           <app-password-field placeholder="Password" name="password" [(value)]="signupData.password" [required]="true">
           </app-password-field>
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <app-password-field placeholder="Confirm Password" name="confirmPassword" [(value)]="signupData.confirmPassword" [required]="true">
+          </app-password-field>
+        </div>
+
+        <!-- Role Select -->
+        <div>
+          <app-role-dropdown name="role" [(value)]="signupData.role" required></app-role-dropdown>
         </div>
 
 

@@ -1,0 +1,116 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <button class="back-button" *ngIf="currentStep > 1" (click)="goToStep(currentStep - 1)">
+          <span class="material-icons">arrow_back</span>
+        </button>
+        <h2 class="modal-title">Find the Right Service for Me</h2>
+      </div>
+      <button class="close-button" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator" *ngIf="!isLoading && currentStep !== 3">
+      <div class="step" [class.active]="currentStep >= 1">1</div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep >= 2">2</div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep >= 3">3</div>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      
+      <!-- Step 1: User Situation -->
+      <div *ngIf="currentStep === 1 && !isLoading" class="step-content">
+        <div class="step-header">
+          <span class="material-icons step-icon">person</span>
+          <h3>Tell us about yourself</h3>
+        </div>
+        <p class="step-description">Describe your situation. For example: "I'm 45 years old and have mobility challenges"</p>
+        
+        <textarea 
+          class="text-input" 
+          [(ngModel)]="userSituation" 
+          placeholder="Type your situation here..."
+          rows="5"
+        ></textarea>
+        
+        <button class="primary-button" (click)="submitSituation()" [disabled]="!userSituation.trim()">
+          Continue
+        </button>
+      </div>
+
+      <!-- Step 2: Support Needs -->
+      <div *ngIf="currentStep === 2 && !isLoading" class="step-content">
+        <div class="step-header">
+          <span class="material-icons step-icon">help_outline</span>
+          <h3>What support do you need?</h3>
+        </div>
+        <p class="step-description">Describe the areas of daily life where you need support. For example: "I need help with personal care and transportation"</p>
+        
+        <textarea 
+          class="text-input" 
+          [(ngModel)]="supportNeeds" 
+          placeholder="Type your support needs here..."
+          rows="5"
+        ></textarea>
+        
+        <button class="primary-button" (click)="submitNeeds()" [disabled]="!supportNeeds.trim()">
+          Get Recommendations
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Analyzing your needs and finding the best services for you...</p>
+      </div>
+
+      <!-- Step 3: Results -->
+      <div *ngIf="currentStep === 3 && !isLoading" class="step-content results-content">
+        <div class="summary-box">
+          <span class="material-icons summary-icon">lightbulb</span>
+          <p>{{ summary }}</p>
+        </div>
+
+        <div class="recommendations-list">
+          <div class="recommendation-card" *ngFor="let service of recommendations">
+            <div class="card-header">
+              <div class="service-info">
+                <h4>{{ service.name }}</h4>
+                <span class="category-badge">{{ service.categoryName }}</span>
+              </div>
+            </div>
+            
+            <p class="service-description">{{ service.description }}</p>
+            
+            <div class="reason-box">
+              <span class="material-icons reason-icon">check_circle</span>
+              <p class="reason-text">{{ service.reason }}</p>
+            </div>
+
+            <button class="book-button" (click)="bookService(service.id)">
+              Book this Service
+            </button>
+          </div>
+        </div>
+
+        <div class="results-actions">
+          <button class="secondary-button" (click)="resetAndStartOver()">
+            Start Over
+          </button>
+          <button class="primary-button" (click)="closeModal()">
+            Close
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

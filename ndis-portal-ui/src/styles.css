@@ -31,3 +31,27 @@ body {
 .active-link app-icon-book {
     @apply text-purple-700;
 }
+
+/* AI Recommendation Button */
+.ai-recommendation-btn {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ease-in-out;
+    background: linear-gradient(135deg, #a855f7, #7e22ce);
+    color: white;
+    box-shadow: 0 4px 14px rgba(126, 34, 206, 0.25);
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ai-recommendation-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(126, 34, 206, 0.35);
+}
+
+.ai-recommendation-btn:active {
+    transform: scale(0.97);
+}
+
+.ai-recommendation-btn .material-icons {
+    font-size: 18px;
+}

@@ -6,14 +6,14 @@ import { CardComponent, ServiceItem } from '../../../../shared/components/card/s
 import { CategoryDropdownComponent } from '../../../../shared/components/dropdown/category/category-dropdown.component';
 import { ApiService } from '../../../core/services/api-service';
 import { ChatService } from '../../../core/services/chatbot.service';
-import { AiRecommendationCardComponent } from '../../../../shared/components/ai-recommendation/ai-recommendation-card/ai-recommendation-card.component';
 import { ChatbotContainerComponent } from '../../../../shared/components/chat/chatbot-container/chatbot-container.component';
+import { ServiceRecommendationModalComponent } from '../../../../shared/components/service-recommendation-modal/service-recommendation-modal.component';
 
 
 @Component({
   selector: 'app-services-list',
   standalone: true,
-  imports: [CommonModule, CardComponent, CategoryDropdownComponent, AiRecommendationCardComponent, ChatbotContainerComponent],
+  imports: [CommonModule, CardComponent, CategoryDropdownComponent, ChatbotContainerComponent, ServiceRecommendationModalComponent],
   templateUrl: './services-list.page.html',
 })
 export class ServicesListComponent implements OnInit {
@@ -21,6 +21,7 @@ export class ServicesListComponent implements OnInit {
   filteredServices: ServiceItem[] = [];
   
   @ViewChild(ChatbotContainerComponent) chatContainer!: ChatbotContainerComponent;
+  @ViewChild(ServiceRecommendationModalComponent) recommendationModal!: ServiceRecommendationModalComponent;
 
   // FIXED: Ensure keys here match the normalized output of your API strings
   private categoryIconMap: { [key: string]: string } = {
@@ -86,9 +87,9 @@ export class ServicesListComponent implements OnInit {
   }
 
   openAiRecommendation() {
-    // Open chat in AI recommendation mode via the container
-    if (this.chatContainer) {
-      this.chatContainer.openAiRecommendation();
+    // Open the AI recommendation modal
+    if (this.recommendationModal) {
+      this.recommendationModal.openModal();
     }
   }
 }

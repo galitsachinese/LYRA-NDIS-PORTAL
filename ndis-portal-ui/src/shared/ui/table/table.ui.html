@@ -7,9 +7,10 @@
   <div class="relative">
 
     <!-- Toggle Button -->
-    <button (click)="toggleMenu(row)"
-      class="p-1 text-slate-400 hover:text-slate-600 rounded-lg transition-all focus:outline-none">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+    <button *ngIf="!shouldReplaceAction(row)" (click)="handleActionTrigger(row, $event)"
+      [disabled]="actionColumn?.actionDisplay === 'replace-with-action' && (getValue(row, 'status') || '').toLowerCase() !== 'pending'"
+      class="table-action-trigger inline-flex h-[26px] w-6 items-center justify-center rounded border border-slate-300 bg-slate-100 p-0 text-slate-400 hover:text-slate-600 transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 
         <path d="M9.5 13a1.5 1.5 0 1 1-3 0
              1.5 1.5 0 0 1 3 0zm0-5
@@ -21,8 +22,28 @@
 
     </button>
 
+    <button *ngIf="shouldReplaceAction(row)" (click)="emitAction(row)"
+      class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700">
+      <svg
+        aria-hidden="true"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M9 9l6 6"></path>
+        <path d="M15 9l-6 6"></path>
+      </svg>
+      <span>{{ getActionLabel() }}</span>
+    </button>
+
     <!-- Dropdown -->
-    <div *ngIf="activeMenuRow === row"
+    <div *ngIf="activeMenuRow === row && !shouldReplaceAction(row)"
       class="absolute right-full top-0 mr-2 z-[100] bg-white border border-slate-200 rounded-md p-1 min-w-[120px] shadow-lg">
 
       <!-- Multi-actions -->
@@ -50,6 +71,31 @@
 
   </div>
 
+</ng-template>
+
+<ng-template #inlineCancelAction let-row="row">
+  <button
+    type="button"
+    (click)="emitAction(row)"
+    class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700"
+  >
+    <svg
+      aria-hidden="true"
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M9 9l6 6"></path>
+      <path d="M15 9l-6 6"></path>
+    </svg>
+    <span>Cancel</span>
+  </button>
 </ng-template>
 
 <!-- ==========================================
@@ -95,9 +141,9 @@
                  =========================== -->
 
             <div *ngSwitchCase="'status'" [ngClass]="getStatusClasses(getValue(row, col.key))"
-              class="px-2 py-0.5 border rounded-md text-xs font-medium flex items-center gap-2 inline-flex max-w-full">
+              class="inline-flex max-w-full items-center rounded-full px-2.5 py-1 text-[10px] font-extrabold leading-none">
 
-              <svg width="6" height="6" viewBox="0 0 10 10" fill="currentColor">
+              <svg class="hidden" width="6" height="6" viewBox="0 0 10 10" fill="currentColor">
                 <circle cx="5" cy="5" r="5" />
               </svg>
 
@@ -110,7 +156,7 @@
                  =========================== -->
 
             <span *ngSwitchCase="'category'"
-              class="inline-flex max-w-full px-2 py-1 text-xs font-medium border rounded-md bg-slate-50 text-slate-600 whitespace-normal break-words leading-snug">
+              class="block text-sm font-medium leading-5 text-slate-600">
               {{ getValue(row, col.key) }}
             </span>
 
@@ -126,6 +172,14 @@
             >
               {{ col.actionLabel || 'View Note' }}
             </button>
+
+            <!-- ===========================
+                 NOTES
+                 =========================== -->
+
+            <span *ngSwitchCase="'notes'" class="block text-sm leading-5 text-slate-600">
+              {{ getValue(row, col.key) || 'No notes provided.' }}
+            </span>
 
             <!-- ===========================
                  TOGGLE BUTTON
@@ -251,15 +305,15 @@
 
             <!-- Category -->
             <span *ngSwitchCase="'category'"
-              class="inline-flex max-w-full px-3 py-1 text-xs border rounded-md bg-white text-slate-500 border-slate-200 whitespace-normal break-words leading-snug">
+              class="block whitespace-normal break-words text-slate-600">
               {{ getValue(row, col.key) }}
             </span>
 
             <!-- Status -->
             <div *ngSwitchCase="'status'"
-              class="inline-flex items-center gap-2 px-3 py-1 border rounded-md bg-white text-xs font-medium"
+              class="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-extrabold leading-none"
               [ngClass]="getStatusClasses(getValue(row, col.key))">
-              <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor">
+              <svg class="hidden" width="8" height="8" viewBox="0 0 10 10" fill="currentColor">
                 <circle cx="5" cy="5" r="5" />
               </svg>
 
@@ -277,6 +331,11 @@
               </button>
             </div>
 
+            <!-- Notes -->
+            <span *ngSwitchCase="'notes'" class="block whitespace-normal break-words text-slate-600">
+              {{ getValue(row, col.key) || 'No notes provided.' }}
+            </span>
+
             <!-- Toggle -->
             <div *ngSwitchCase="'toggle'" class="inline-flex items-center justify-center w-full gap-2">
               <button (click)="emitToggle(row)" data-testid="toggle-btn"
@@ -288,7 +347,6 @@
                   [ngClass]="getValue(row, 'status') === 'Active' ? 'translate-x-6' : 'translate-x-1'">
                 </span>
               </button>
-              
             </div>
 
             <!-- Action -->
@@ -312,6 +370,6 @@
   </table>
 
   <!-- Prevent layout collapse -->
-  <div *ngIf="data && data.length <= 2" class="h-32"></div>
+  <div *ngIf="fillFewRows && data && data.length <= 2" class="h-32"></div>
 
 </div>

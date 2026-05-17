@@ -22,11 +22,7 @@ import { Booking, BookingViewModel } from '../../../core/models/booking.model';
 
 import { Router } from '@angular/router';
 
-// Import the generic Smart Dialog Component
-
 import { CancelDialogComponent } from '../../../../shared/components/dialog/cancel-dialog.component';
-
-
 
 @Component({
   selector: 'app-my-bookings',
@@ -42,10 +38,11 @@ import { CancelDialogComponent } from '../../../../shared/components/dialog/canc
 
     PaginationComponent,
 
-    CancelDialogComponent, // Integrated for responsive cancellation
+    CancelDialogComponent,
   ],
 
   templateUrl: './my-bookings.page.html',
+  styleUrls: ['./my-bookings.page.css'],
 })
 export class MyBookingsComponent implements OnInit {
   // --- Data State ---
@@ -85,6 +82,22 @@ export class MyBookingsComponent implements OnInit {
 
     private http: HttpClient,
   ) {}
+
+  get nextSessionLabel(): string {
+    const now = new Date();
+    const upcoming = this.bookings
+      .filter((booking) => {
+        const date = new Date(booking.rawData.preferredDate);
+        return !Number.isNaN(date.getTime()) && date >= now;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.rawData.preferredDate).getTime() -
+          new Date(b.rawData.preferredDate).getTime(),
+      );
+
+    return upcoming[0]?.service || 'No incoming session';
+  }
 
   ngOnInit() {
     console.log('MyBookingsComponent ngOnInit() called');
@@ -386,7 +399,7 @@ export class MyBookingsComponent implements OnInit {
 
   /**
 
-   * Triggered by the table action. Opens our custom responsive dialog.
+   * Triggered by the table action. Opens the cancel confirmation dialog.
 
    */
 
@@ -398,14 +411,12 @@ export class MyBookingsComponent implements OnInit {
 
   /**
 
-   * Resets the dialog state and closes it
+   * Resets the dialog state and closes it.
 
    */
 
   closeCancelDialog() {
     this.isCancelDialogOpen = false;
-
-    // Delay nulling to prevent content flashing during close animation
 
     setTimeout(() => {
       this.selectedBookingForCancel = null;
@@ -414,7 +425,7 @@ export class MyBookingsComponent implements OnInit {
 
   /**
 
-   * Performs the API call to delete the booking after user confirms in the Dialog
+   * Performs the API call to delete the booking after confirmation.
 
    */
 
@@ -423,11 +434,9 @@ export class MyBookingsComponent implements OnInit {
 
     const idToDelete = this.selectedBookingForCancel.id;
 
-    // Close UI immediately for snappy feel
+    this.isLoading = true;
 
     this.isCancelDialogOpen = false;
-
-    this.isLoading = true;
 
     this.bookingService.deleteBooking(idToDelete).subscribe({
       next: () => {

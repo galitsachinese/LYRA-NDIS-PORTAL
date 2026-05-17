@@ -26,6 +26,7 @@ export class TableComponent {
 
   // Table data
   @Input() data: any[] = [];
+  @Input() fillFewRows = true;
 
   /* ===============================
      OUTPUT EVENTS
@@ -46,6 +47,7 @@ export class TableComponent {
 
   // Currently opened action menu row
   activeMenuRow: any = null;
+  replaceActionRow: any = null;
 
   constructor(private eRef: ElementRef) {}
 
@@ -67,23 +69,27 @@ export class TableComponent {
     switch (col.type) {
       // Smallest column
       case 'action':
-        return 'w-1/12 min-w-16 text-center';
+        return 'w-[7%] min-w-14 text-center';
 
       // Status column
       case 'status':
-        return 'w-1/8 min-w-28';
+        return 'w-[11%] min-w-24';
 
       // Date column
       case 'date':
-        return 'w-1/10 min-w-28';
+        return 'w-[14%] min-w-28';
 
       // Category column
       case 'category':
-        return 'w-1/6 min-w-36';
+        return 'w-[17%] min-w-32';
 
       // View column
       case 'view':
         return 'w-1/12 min-w-20';
+
+      // Notes column
+      case 'notes':
+        return 'w-[35%] min-w-56';
 
       // Toggle column (actions with toggle button)
       case 'toggle':
@@ -92,7 +98,7 @@ export class TableComponent {
       default:
         // Primary columns
         if (col.key === 'name' || col.key === 'service') {
-          return 'w-1/4 min-w-40';
+          return 'w-[16%] min-w-40';
         }
 
         // Default
@@ -114,6 +120,7 @@ export class TableComponent {
 
     // Close menu
     this.activeMenuRow = null;
+    this.replaceActionRow = null;
   }
 
   /* Get multi-actions if exists */
@@ -130,6 +137,29 @@ export class TableComponent {
     return typeof actionCol?.actionLabel === 'string'
       ? actionCol.actionLabel
       : 'Cancel';
+  }
+
+  get actionColumn(): TableColumn | undefined {
+    return this.columns?.find((col) => col.type === 'action');
+  }
+
+  shouldReplaceAction(row: any): boolean {
+    return (
+      this.actionColumn?.actionDisplay === 'replace-with-action' &&
+      this.replaceActionRow === row
+    );
+  }
+
+  handleActionTrigger(row: any, event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (this.actionColumn?.actionDisplay === 'replace-with-action') {
+      this.activeMenuRow = null;
+      this.replaceActionRow = this.replaceActionRow === row ? null : row;
+      return;
+    }
+
+    this.toggleMenu(row);
   }
 
   /* Get action column header label */
@@ -149,14 +179,14 @@ export class TableComponent {
     switch (s) {
       case 'approved':
       case 'active':
-        return 'text-[#289839]';
+        return 'bg-[#dcfce7] text-[#289839]';
 
       case 'pending':
-        return 'text-[#CF971D]';
+        return 'bg-[#fb7a4b] text-white';
 
       case 'cancelled':
       case 'inactive':
-        return 'text-[#DB4444]';
+        return 'bg-[#fee2e2] text-[#b91c1c]';
 
       default:
         return 'text-slate-700';
@@ -178,6 +208,7 @@ export class TableComponent {
 
   /* Toggle menu open/close */
   toggleMenu(row: any): void {
+    this.replaceActionRow = null;
     this.activeMenuRow = this.activeMenuRow === row ? null : row;
   }
 
@@ -191,6 +222,7 @@ export class TableComponent {
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.activeMenuRow = null;
+      this.replaceActionRow = null;
     }
   }
 }

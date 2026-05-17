@@ -17,6 +17,7 @@ import { TableColumn } from '../../models/table.model';
     <app-table-ui
       [columns]="visibleColumns"
       [data]="bookings"
+      [fillFewRows]="false"
       (viewAction)="viewBooking.emit($event)"
       (cancelAction)="cancelBooking.emit($event)"
     ></app-table-ui>
@@ -34,9 +35,15 @@ export class BookingTableComponent implements OnChanges {
     // Add type: 'text' (or whatever your default switch case is)
     { key: 'service', label: 'Service', type: 'text' },
     { key: 'category', label: 'Category', type: 'category' },
-    { key: 'date', label: 'Date', type: 'date' }, // Changed to 'date' to match your table.ui logic
-    { key: 'view', label: 'Notes', type: 'view', actionLabel: 'View' },
+    { key: 'date', label: 'Booking Date', type: 'date' },
+    { key: 'notes', label: 'Notes', type: 'notes' },
     { key: 'status', label: 'Status', type: 'status' },
+    {
+      key: 'action',
+      label: 'Actions',
+      type: 'action',
+      actionDisplay: 'replace-with-action',
+    },
   ];
   visibleColumns: TableColumn[] = [...this.baseColumns];
 
@@ -46,16 +53,7 @@ export class BookingTableComponent implements OnChanges {
     }
   }
 
-  /** * Action column logic: Only added when filter is 'pending'
-   */
   private updateColumns() {
-    if (this.currentFilter.toLowerCase() === 'pending') {
-      this.visibleColumns = [
-        ...this.baseColumns,
-        { key: 'action', label: 'Action', type: 'action' },
-      ];
-    } else {
-      this.visibleColumns = [...this.baseColumns];
-    }
+    this.visibleColumns = [...this.baseColumns];
   }
 }

@@ -1,0 +1,202 @@
+<div class="min-h-[calc(100vh-5rem)] bg-white px-4 py-7 md:px-8 md:py-9">
+  <div class="mx-auto max-w-[1600px] space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <h1 class="m-0 text-2xl font-bold leading-tight text-slate-950 md:text-[28px]">Support Workers</h1>
+      </div>
+
+      <app-add-button label="Add Support Worker" data-testid="add-worker-btn" (onClick)="openModal()"></app-add-button>
+    </div>
+
+    <div *ngIf="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+      {{ error }}
+    </div>
+
+    <div *ngIf="isLoading" class="flex min-h-[320px] flex-col items-center justify-center gap-4 rounded-2xl bg-white">
+      <div class="h-11 w-11 animate-spin rounded-full border-4 border-violet-100 border-t-[#6B3293]"></div>
+      <p class="m-0 text-sm font-medium text-slate-500">Loading support workers...</p>
+    </div>
+
+    <section *ngIf="!isLoading && !error" class="overflow-hidden rounded-2xl bg-white shadow-[0_18px_44px_rgba(50,20,60,0.06)]">
+      <div class="border-b border-slate-100 px-5 py-4">
+        <h2 class="m-0 text-sm font-bold text-slate-950">Support Worker Registry</h2>
+      </div>
+
+      <div *ngIf="workers.length === 0" class="flex min-h-[260px] flex-col items-center justify-center px-5 py-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-violet-50 text-[#6B3293]">
+          <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11a4 4 0 1 0-8 0" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+          </svg>
+        </div>
+        <h3 class="m-0 text-lg font-bold text-slate-800">No Support Workers Found</h3>
+        <p class="mt-2 text-sm text-slate-500">Add your first support worker to assign staff to services.</p>
+      </div>
+
+      <div *ngIf="workers.length > 0" class="overflow-x-auto" data-testid="support-workers-table">
+        <table class="w-full min-w-[980px] table-fixed border-collapse">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="w-[24%] px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Full Name</th>
+              <th class="w-[24%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Email</th>
+              <th class="w-[18%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Phone</th>
+              <th class="w-[22%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</th>
+              <th class="w-[12%] px-5 py-3 text-right text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let worker of workers" class="border-t border-slate-100">
+              <td class="px-5 py-4 align-middle">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-[#6B3293]">
+                    {{ getInitials(worker.fullName) }}
+                  </div>
+                  <strong class="text-sm font-bold text-[#0057a8]">{{ worker.fullName }}</strong>
+                </div>
+              </td>
+
+              <td class="px-4 py-4 align-middle text-sm text-slate-600">{{ worker.email }}</td>
+              <td class="px-4 py-4 align-middle text-sm text-slate-600">{{ worker.phone || 'N/A' }}</td>
+
+              <td class="px-4 py-4 align-middle">
+                <span class="inline-flex max-w-full items-center truncate rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                  {{ getServiceName(worker) }}
+                </span>
+              </td>
+
+              <td class="px-5 py-4 text-right align-middle">
+                <div class="flex justify-end gap-2">
+                  <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-[#0057a8]" title="View Details" (click)="viewWorker(worker)">
+                    <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                  <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-[#7ac143]" title="Edit" (click)="editWorker(worker)">
+                    <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.5 5.5 4 4M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+                    </svg>
+                  </button>
+                  <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-red-50 hover:text-red-500" title="Delete" (click)="confirmDelete(worker)">
+                    <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p class="m-0 text-sm text-slate-500">Showing {{ workers.length }} of {{ workers.length }} Support Workers</p>
+          <div class="flex gap-1">
+            <button type="button" class="h-8 w-8 rounded-md bg-slate-100 text-sm font-semibold text-slate-400" disabled aria-label="Previous page">&#8249;</button>
+            <button type="button" class="h-8 w-8 rounded-md bg-[#0057a8] text-sm font-semibold text-white">1</button>
+            <button type="button" class="h-8 w-8 rounded-md bg-slate-100 text-sm font-semibold text-slate-400" disabled aria-label="Next page">&#8250;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="closeModal()">
+  <div class="w-full max-w-[480px] rounded-2xl bg-white shadow-2xl" data-testid="worker-modal" (click)="$event.stopPropagation()">
+    <div class="relative px-6 pt-6">
+      <h2 class="m-0 text-xl font-bold text-slate-900">{{ isEditMode ? 'Edit Support Worker' : 'Add Support Worker' }}</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        {{ isEditMode ? 'Update support worker details and assigned service.' : 'Register a new support worker and assign them to a service.' }}
+      </p>
+      <button type="button" class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md text-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700" (click)="closeModal()">x</button>
+    </div>
+
+    <div class="space-y-4 px-6 py-5">
+      <label class="block">
+        <span class="text-xs font-bold text-slate-700">Full Name <span class="text-red-500">*</span></span>
+        <input type="text" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [class.border-red-400]="formErrors['fullName']" [class.border-slate-300]="!formErrors['fullName']" [(ngModel)]="workerForm.fullName" placeholder="e.g. John Smith" />
+        <small *ngIf="formErrors['fullName']" class="mt-1 block text-xs text-red-500">{{ formErrors['fullName'] }}</small>
+      </label>
+
+      <label class="block">
+        <span class="text-xs font-bold text-slate-700">Email <span class="text-red-500">*</span></span>
+        <input type="email" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [class.border-red-400]="formErrors['email']" [class.border-slate-300]="!formErrors['email']" [(ngModel)]="workerForm.email" placeholder="e.g. john.smith@example.com" />
+        <small *ngIf="formErrors['email']" class="mt-1 block text-xs text-red-500">{{ formErrors['email'] }}</small>
+      </label>
+
+      <label class="block">
+        <span class="text-xs font-bold text-slate-700">Phone</span>
+        <input type="tel" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [class.border-red-400]="formErrors['phone']" [class.border-slate-300]="!formErrors['phone']" [(ngModel)]="workerForm.phone" placeholder="e.g. +61 412 345 678" />
+        <small *ngIf="formErrors['phone']" class="mt-1 block text-xs text-red-500">{{ formErrors['phone'] }}</small>
+      </label>
+
+      <label class="block">
+        <span class="text-xs font-bold text-slate-700">Assigned Service <span class="text-red-500">*</span></span>
+        <select class="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [class.border-red-400]="formErrors['assignedServiceId']" [class.border-slate-300]="!formErrors['assignedServiceId']" [(ngModel)]="workerForm.assignedServiceId">
+          <option value="">Select a service</option>
+          <option *ngFor="let service of services" [value]="service.id">{{ service.name }}</option>
+        </select>
+        <small *ngIf="formErrors['assignedServiceId']" class="mt-1 block text-xs text-red-500">{{ formErrors['assignedServiceId'] }}</small>
+      </label>
+    </div>
+
+    <div class="flex gap-3 px-6 pb-6">
+      <button type="button" class="flex-1 rounded-lg bg-[#0057a8] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#004a8f] disabled:cursor-not-allowed disabled:opacity-60" data-testid="save-worker-btn" [disabled]="isSaving" (click)="saveWorker()">
+        {{ isSaving ? 'Saving...' : isEditMode ? 'Update Support Worker' : 'Add Support Worker' }}
+      </button>
+      <button type="button" class="flex-1 rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200" [disabled]="isSaving" (click)="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="closeViewModal()">
+  <div class="w-full max-w-[430px] rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="relative">
+      <h2 class="m-0 text-xl font-bold text-slate-900">Support Worker Details</h2>
+      <button type="button" class="absolute right-0 top-0 flex h-8 w-8 items-center justify-center rounded-md text-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700" (click)="closeViewModal()">x</button>
+    </div>
+
+    <div *ngIf="selectedWorker" class="pt-6 text-center">
+      <div class="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-[#6B3293] text-2xl font-bold text-white">
+        {{ getInitials(selectedWorker.fullName) }}
+      </div>
+      <h3 class="m-0 text-lg font-bold text-slate-900">{{ selectedWorker.fullName }}</h3>
+
+      <div class="mt-6 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
+        <div>
+          <p class="m-0 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Email</p>
+          <p class="mt-1 break-words text-sm font-semibold text-slate-700">{{ selectedWorker.email }}</p>
+        </div>
+        <div>
+          <p class="m-0 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Phone</p>
+          <p class="mt-1 text-sm font-semibold text-slate-700">{{ selectedWorker.phone || 'Not provided' }}</p>
+        </div>
+        <div class="sm:col-span-2">
+          <p class="m-0 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</p>
+          <p class="mt-1 text-sm font-semibold text-slate-700">{{ getServiceName(selectedWorker) }}</p>
+        </div>
+      </div>
+
+      <button type="button" class="mt-6 w-full rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200" (click)="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showDeleteConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="cancelDelete()">
+  <div class="w-full max-w-[400px] rounded-2xl bg-white p-6 text-center shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500">
+      <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z" />
+      </svg>
+    </div>
+    <h2 class="m-0 text-xl font-bold text-slate-900">Delete Support Worker</h2>
+    <p class="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-600">
+      Are you sure you want to delete <strong class="text-slate-900">{{ workerToDelete?.fullName }}</strong>? This action cannot be undone.
+    </p>
+    <div class="mt-6 flex gap-3">
+      <button type="button" class="flex-1 rounded-lg bg-red-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-red-600" (click)="deleteWorker()">Delete</button>
+      <button type="button" class="flex-1 rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200" (click)="cancelDelete()">Cancel</button>
+    </div>
+  </div>
+</div>

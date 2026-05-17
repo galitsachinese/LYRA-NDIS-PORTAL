@@ -1,16 +1,21 @@
 <button (click)="handleClick()" class="
   fixed bottom-6 right-6
-  w-12 h-12
+  w-14 h-14
   rounded-full
-  border
   bg-white
-  text-slate-400
   hover:scale-105
-  transition
+  hover:shadow-lg hover:shadow-purple-200/50
+  transition-all duration-200
   z-50
   flex items-center justify-center
+  shadow-md
+  overflow-hidden
   ">
 
-  <app-icon-chat [size]="40"></app-icon-chat>
+  <img
+    src="/assets/justtell-chatbot.png"
+    alt="Assistant Chatbot"
+    class="w-full h-full object-cover"
+  />
 
 </button>

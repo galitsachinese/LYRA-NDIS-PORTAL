@@ -1,33 +1,41 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../core/services/api-service';
-import { StatusDropdownComponent } from '../../../../shared/components/dropdown/status/status-dropdown.component';
 import { ToastService } from '../../../core/services/toast.service';
+import { BookingQueueTableComponent } from '../../../../shared/components/table/booking-queue/booking-queue-table.component';
 
 @Component({
   selector: 'app-all-bookings',
   standalone: true,
-  imports: [CommonModule, StatusDropdownComponent],
+  imports: [CommonModule, BookingQueueTableComponent],
   templateUrl: './all-bookings.page.html',
 })
 export class AllBookingsComponent implements OnInit {
   allBookings: any[] = [];
   bookings: any[] = [];
+  pagedBookings: any[] = [];
   isLoadingBookings = true;
-  activeMenuId: number | null = null;
   activeFilter = 'all';
-  selectedNotesBooking: any | null = null;
+  currentPage = 1;
+  readonly pageSize = 5;
+
+  readonly statusOptions = [
+    { label: 'All', value: 'all' },
+    { label: 'Approved', value: 'approved' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Cancelled', value: 'cancelled' },
+  ];
 
   constructor(
     private api: ApiService,
-    private toast: ToastService
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
     this.loadBookings();
   }
 
-  loadBookings(): void {
+  loadBookings(showToast = false): void {
     this.isLoadingBookings = true;
 
     this.api.getBookings().subscribe({
@@ -36,19 +44,26 @@ export class AllBookingsComponent implements OnInit {
         this.allBookings = Array.isArray(data) ? data : [];
         this.applyStatusFilter();
         this.isLoadingBookings = false;
+
+        if (showToast) {
+          this.toast.show('Bookings refreshed successfully!', 'success');
+        }
       },
       error: (err) => {
         console.error('Error loading bookings:', err);
         this.allBookings = [];
         this.bookings = [];
+        this.pagedBookings = [];
         this.isLoadingBookings = false;
       },
     });
   }
 
-  approveBooking(booking: any): void {
-    this.activeMenuId = null;
+  refreshBookings(): void {
+    this.loadBookings(true);
+  }
 
+  approveBooking(booking: any): void {
     this.api.updateBookingStatus(booking.id, 'Approved').subscribe({
       next: () => {
         booking.status = 'Approved';
@@ -63,8 +78,6 @@ export class AllBookingsComponent implements OnInit {
   }
 
   cancelBooking(booking: any): void {
-    this.activeMenuId = null;
-
     this.api.updateBookingStatus(booking.id, 'Cancelled').subscribe({
       next: () => {
         booking.status = 'Cancelled';
@@ -78,47 +91,75 @@ export class AllBookingsComponent implements OnInit {
     });
   }
 
-  viewNotes(booking: any): void {
-    this.selectedNotesBooking = booking;
-    this.activeMenuId = null;
-  }
-
-  closeNotes(): void {
-    this.selectedNotesBooking = null;
-  }
-
-  toggleMenu(booking: any): void {
-    this.activeMenuId = this.activeMenuId === booking.id ? null : booking.id;
-  }
-
   handleStatusFilter(status: string): void {
     this.activeFilter = status;
-    this.activeMenuId = null;
+    this.currentPage = 1;
     this.applyStatusFilter();
+  }
+
+  previousPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) {
+      return;
+    }
+
+    this.currentPage = page;
+    this.updatePagedBookings();
+  }
+
+  get activeFilterLabel(): string {
+    return (
+      this.statusOptions.find((option) => option.value === this.activeFilter)
+        ?.label || 'All'
+    );
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.bookings.length / this.pageSize));
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, index) => index + 1);
+  }
+
+  get showingStart(): number {
+    return this.bookings.length === 0
+      ? 0
+      : (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get showingEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.bookings.length);
   }
 
   private applyStatusFilter(): void {
     if (this.activeFilter === 'all') {
       this.bookings = [...this.allBookings];
-      return;
+    } else {
+      this.bookings = this.allBookings.filter(
+        (booking) => booking.status?.toLowerCase() === this.activeFilter,
+      );
     }
 
-    this.bookings = this.allBookings.filter(
-      booking => booking.status?.toLowerCase() === this.activeFilter
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+
+    this.updatePagedBookings();
+  }
+
+  private updatePagedBookings(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.pagedBookings = this.bookings.slice(
+      startIndex,
+      startIndex + this.pageSize,
     );
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const clickedMenu = target.closest('[data-testid="menu-btn"]');
-
-    if (!clickedMenu) {
-      this.activeMenuId = null;
-    }
-  }
-
-  isPending(booking: any): boolean {
-    return booking.status === 'Pending';
   }
 }

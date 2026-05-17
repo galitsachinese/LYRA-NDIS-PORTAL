@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.filter-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.category-filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.category-filter-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.category-filter-btn.active {
+  background: #6f2da8;
+  color: #ffffff;
+  border-color: #6f2da8;
+}
+
+@media (max-width: 768px) {
+  .filter-section {
+    justify-content: flex-start;
+  }
+}

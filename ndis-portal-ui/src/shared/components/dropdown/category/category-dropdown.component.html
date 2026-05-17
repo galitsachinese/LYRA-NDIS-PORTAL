@@ -1,3 +1,12 @@
-<app-dropdown-ui label="Category" [options]="categoryOptions" [selectedValue]="selectedValue" (onSelect)="handleSelect($event)">
-  <app-icon-filter icon [size]="16"></app-icon-filter>
-</app-dropdown-ui>
+<div class="filter-section" role="group" aria-label="Filter services by category">
+  <button
+    *ngFor="let option of categoryOptions; trackBy: trackByValue"
+    type="button"
+    class="category-filter-btn"
+    [class.active]="selectedValue === option.value"
+    (click)="handleSelect(option.value)"
+    data-testid="category-filter-btn"
+  >
+    {{ option.label }}
+  </button>
+</div>

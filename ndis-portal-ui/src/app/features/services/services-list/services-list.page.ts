@@ -19,7 +19,7 @@ import { ServiceRecommendationModalComponent } from '../../../../shared/componen
 export class ServicesListComponent implements OnInit {
   allServices: ServiceItem[] = [];
   filteredServices: ServiceItem[] = [];
-  
+
   @ViewChild(ChatbotContainerComponent) chatContainer!: ChatbotContainerComponent;
   @ViewChild(ServiceRecommendationModalComponent) recommendationModal!: ServiceRecommendationModalComponent;
 
@@ -72,13 +72,13 @@ export class ServicesListComponent implements OnInit {
   }
 
   handleCategoryFilter(category: string) {
-    const target = category.toLowerCase().trim();
+    const target = this.normalizeCategory(category);
+
     this.filteredServices =
       target === 'all'
         ? [...this.allServices]
         : this.allServices.filter(
-            (s) =>
-              s.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') === target,
+            (s) => this.normalizeCategory(s.category) === target,
           );
   }
 
@@ -91,5 +91,9 @@ export class ServicesListComponent implements OnInit {
     if (this.recommendationModal) {
       this.recommendationModal.openModal();
     }
+  }
+
+  private normalizeCategory(category: string) {
+    return category.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
   }
 }

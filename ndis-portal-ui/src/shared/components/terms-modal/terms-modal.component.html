@@ -1,0 +1,74 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">Terms and Conditions</h2>
+      <button class="close-button" (click)="closeModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <div class="terms-section">
+        <h3>1. Purpose of the Portal</h3>
+        <p>This application serves as an online platform that helps Participants and Coordinators manage NDIS-related service bookings.</p>
+        <ul>
+          <li><strong>Booking Support Only:</strong> The portal allows Participants to browse available services, submit booking requests, and track their booking status.</li>
+          <li><strong>Coordinator Management:</strong> Coordinators may review bookings, update booking statuses, manage services, and monitor participant activity through the system.</li>
+          <li><strong>No Professional Advice:</strong> Any information from the chatbot or service recommendation feature is for general guidance only. It should not be considered medical, legal, financial, clinical, or official NDIS plan advice.</li>
+        </ul>
+      </div>
+
+      <div class="terms-section">
+        <h3>2. Privacy and Data Use</h3>
+        <p>We respect the privacy of user information and use collected data only for portal-related purposes.</p>
+        <ul>
+          <li><strong>Account and Booking Data:</strong> The system may store user details such as name, email, role, booking history, selected services, and submitted notes.</li>
+          <li><strong>Chatbot Sessions:</strong> Chat history may be kept only during the active session to maintain conversation flow and may be cleared once the user logs out or the session ends.</li>
+          <li><strong>Purpose of Collection:</strong> User data is used for account access, booking management, coordinator review, testing, and improving the user experience. User data will not be sold to third parties.</li>
+        </ul>
+      </div>
+
+      <div class="terms-section">
+        <h3>3. User Responsibilities and Security</h3>
+        <p>Users are expected to use the portal responsibly and protect their accounts.</p>
+        <ul>
+          <li><strong>Account Security:</strong> Users must keep their login credentials private and must not allow others to use their account.</li>
+          <li><strong>Accurate Information:</strong> Participants must provide correct booking details, including preferred dates, service selections, and notes when needed.</li>
+          <li><strong>Prohibited Actions:</strong> Users must not attempt to access another user's data, bypass role restrictions, misuse the chatbot, upload harmful content, or interfere with the portal's security and functionality.</li>
+        </ul>
+      </div>
+
+      <div class="terms-section">
+        <h3>4. Booking and Service Terms</h3>
+        <p>The portal helps manage booking requests, but submitting a request does not guarantee approval.</p>
+        <ul>
+          <li><strong>Pending Review:</strong> New booking requests are marked as Pending until reviewed by a Coordinator.</li>
+          <li><strong>Status Updates:</strong> Coordinators may approve or cancel bookings based on service availability, booking details, or administrative review.</li>
+          <li><strong>Service Availability:</strong> Services may be updated, activated, or deactivated by Coordinators. Participants are responsible for checking service information before submitting a booking.</li>
+        </ul>
+      </div>
+
+      <div class="terms-section">
+        <h3>5. Access Restriction and Limitation of Responsibility</h3>
+        <p>Access to the portal may be restricted if a user violates these terms or misuses the system.</p>
+        <ul>
+          <li><strong>Account Restriction:</strong> The project team may suspend or limit access for users who provide false information, attempt unauthorized access, misuse portal features, or compromise user privacy and system security.</li>
+          <li><strong>System Availability:</strong> The portal may experience interruptions due to testing, maintenance, technical issues, or third-party API problems.</li>
+          <li><strong>Limitation of Responsibility:</strong> This portal is a training project. The project team is not responsible for decisions made based on incorrect user input, system errors, unavailable services, or AI-generated responses.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="close-button-primary" (click)="closeModal()">Close</button>
+    </div>
+
+  </div>
+</div>

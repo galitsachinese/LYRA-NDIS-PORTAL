@@ -79,17 +79,19 @@
           <div class="text-xs md:text-sm">
             <label for="terms" class="text-neutral-600 cursor-pointer select-none">
               I agree to the
-              <a
-                href="/assets/termsofservice.pdf"
-                target="_blank"
-                rel="noopener"
-                class="font-semibold text-purple-800 hover:text-purple-900 underline underline-offset-2"
+              <button
+                type="button"
+                (click)="openTermsModal()"
+                class="font-semibold text-purple-800 hover:text-purple-900 underline underline-offset-2 cursor-pointer bg-transparent border-none p-0 inline"
               >
                 Terms of Service
-              </a>.
+              </button>.
             </label>
           </div>
         </div>
+
+        <!-- Terms & Conditions Modal -->
+        <app-terms-modal></app-terms-modal>
 
         <!-- Submit Button -->
         <button type="submit" [disabled]="isLoading"

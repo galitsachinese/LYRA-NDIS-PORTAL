@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -17,6 +17,7 @@ import { RoleDropdownComponent } from '../../../../shared/components/dropdown/ro
 
 import { UnViewIconComponent } from '../../../../shared/components/icons/svg-icons/unview-icon';
 import { ViewIconComponent } from '../../../../shared/components/icons/svg-icons/view-icon';
+import { TermsModalComponent } from '../../../../shared/components/terms-modal/terms-modal.component';
 @Component({
   selector: 'app-my-signup',
   standalone: true,
@@ -30,6 +31,7 @@ import { ViewIconComponent } from '../../../../shared/components/icons/svg-icons
     PasswordFieldComponent,
     ViewIconComponent,
     UnViewIconComponent,
+    TermsModalComponent,
   ],
   templateUrl: './my-signup.component.html',
   //styleUrls: ['./my-signup.component.css']
@@ -37,6 +39,8 @@ import { ViewIconComponent } from '../../../../shared/components/icons/svg-icons
 export class MySignupComponent {
   @HostBinding('style.display') display = 'block';
   @HostBinding('style.height') hostHeight = '100%';
+
+  @ViewChild(TermsModalComponent) termsModal!: TermsModalComponent;
 
   signupData = {
     firstName: '',
@@ -82,6 +86,10 @@ export class MySignupComponent {
   // togglePassword() {
   //   this.showPassword = !this.showPassword;
   // }
+
+  openTermsModal() {
+    this.termsModal.openModal();
+  }
 
   onSignUp() {
     if (!this.signupData.agreeToTerms) {

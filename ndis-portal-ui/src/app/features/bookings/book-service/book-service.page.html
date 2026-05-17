@@ -1,23 +1,16 @@
-<section class="min-h-full w-full px-3 py-4 sm:px-4 md:px-6 lg:px-8 2xl:px-10 min-[2560px]:px-14 min-[3840px]:px-20">
-  <div class="mx-auto flex w-full max-w-screen-2xl min-[2560px]:max-w-[2200px] min-[3840px]:max-w-[3200px] flex-col gap-5 sm:gap-6 2xl:gap-8 min-[3840px]:gap-12">
-    <header class="w-full">
-      <h1 class="text-xl sm:text-2xl lg:text-3xl 2xl:text-4xl min-[2560px]:text-5xl min-[3840px]:text-6xl font-bold leading-tight text-slate-900">
-        Book a Service
-      </h1>
-    </header>
+<div class="book-service-page">
+  <header class="booking-header">
+    <h1>Book a Service</h1>
+    <p>Select a service and preferred date to submit your booking request.</p>
+  </header>
 
-    <div
-      *ngIf="errorMessage"
-      class="w-full rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:text-base 2xl:text-lg min-[3840px]:text-2xl"
-    >
+  <section class="booking-card" aria-label="Book a service form">
+    <div *ngIf="errorMessage" class="message message-error">
       {{ errorMessage }}
     </div>
 
-    <div *ngIf="isLoadingServices" class="flex min-h-[220px] items-center justify-center gap-3 py-10">
-      <div class="h-6 w-6 rounded-full border-4 border-violet-100 border-t-violet-600 animate-spin 2xl:h-8 2xl:w-8"></div>
-      <span class="text-sm text-slate-500 sm:text-base 2xl:text-xl">
-        Loading services...
-      </span>
+    <div *ngIf="isLoadingServices" class="loading-services">
+      Loading services...
     </div>
 
     <div *ngIf="isSubmitting" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -32,8 +25,8 @@
       </div>
     </div>
 
-    <form *ngIf="!isLoadingServices" class="flex w-full flex-col gap-5 sm:gap-6 2xl:gap-8 min-[3840px]:gap-12">
-      <div class="grid w-full grid-cols-1 gap-5 lg:grid-cols-2 2xl:gap-8 min-[2560px]:gap-10 min-[3840px]:gap-14">
+    <form *ngIf="!isLoadingServices" class="booking-form">
+      <div class="grid w-full grid-cols-1 gap-5 lg:grid-cols-2">
         <app-select-service
           class="block w-full"
           [options]="services"
@@ -55,7 +48,9 @@
         [disabled]="isSubmitting">
       </app-text-area-component>
 
-      <div class="flex w-full flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-4 2xl:gap-6 min-[3840px]:gap-8">
+      <p class="approval-note">Your booking request will be reviewed before approval.</p>
+
+      <div class="flex w-full flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-4">
         <div class="w-full sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
           <app-back-button (onClick)="navBack()"></app-back-button>
         </div>
@@ -69,5 +64,5 @@
         </div>
       </div>
     </form>
-  </div>
-</section>
+  </section>
+</div>

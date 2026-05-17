@@ -1,0 +1,148 @@
+.book-service-page {
+  min-height: 100%;
+  padding: 32px 28px 72px;
+  background: #fff7fd;
+  color: #18181b;
+}
+
+.booking-header {
+  margin-bottom: 20px;
+}
+
+.booking-header h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.booking-header p,
+.loading-services {
+  margin: 0;
+  color: #5f6471;
+  font-size: 13px;
+}
+
+.booking-card {
+  width: min(100%, 680px);
+  padding: 26px;
+  border: 1px solid #f2edf4;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 40px #77488914;
+}
+
+.back-link {
+  display: inline-flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  border: 0;
+  background: transparent;
+  color: #6f2da8;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.booking-form,
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-form {
+  gap: 14px;
+}
+
+.form-field {
+  gap: 7px;
+}
+
+.form-field span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.form-field select,
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  background: #f4eef7;
+  color: #2f2438;
+  font: inherit;
+  font-size: 12px;
+  outline: 0;
+}
+
+.form-field select,
+.form-field input {
+  height: 44px;
+  padding: 0 16px;
+}
+
+.form-field textarea {
+  min-height: 130px;
+  padding: 15px 16px;
+  resize: vertical;
+}
+
+.approval-note,
+.message {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.approval-note {
+  background: #efe5f8;
+  color: #7a5894;
+}
+
+.submit-button {
+  width: 170px;
+  min-height: 40px;
+  margin-top: 2px;
+  border: 0;
+  border-radius: 8px;
+  background: #a97bea;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.message {
+  margin-bottom: 14px;
+}
+
+.message-error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.message-success {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.loading-services {
+  padding: 18px 0;
+}
+
+@media (max-width: 640px) {
+  .book-service-page {
+    padding: 24px 16px 56px;
+  }
+
+  .booking-card {
+    padding: 18px;
+  }
+
+  .submit-button {
+    width: 100%;
+  }
+}

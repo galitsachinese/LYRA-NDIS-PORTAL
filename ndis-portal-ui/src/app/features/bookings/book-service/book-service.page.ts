@@ -11,12 +11,12 @@ import { environment } from '../../../../environments/environment';
 import { ServiceSelectComponent } from '../../../../shared/components/select/select-service/select-service.component';
 import { DatePickerComponent } from '../../../../shared/components/date-picker/date-picker.component';
 import { TextAreaComponent } from '../../../../shared/components/text-area/text-area.component';
+import { BookButton } from '../../../../shared/components/button/book-button/book-button.component';
+import { BackButton } from '../../../../shared/components/button/back-button/back-button.component';
 import { BookingService } from '../../../core/services/booking.service';
 import { ApiService } from '../../../core/services/api-service';
 import { ToastService } from '../../../core/services/toast.service';
 
-import { BookButton } from '../../../../shared/components/button/book-button/book-button.component';
-import { BackButton } from '../../../../shared/components/button/back-button/back-button.component';
 @Component({
   selector: 'app-booking-service-page',
   standalone: true,
@@ -26,11 +26,11 @@ import { BackButton } from '../../../../shared/components/button/back-button/bac
     ServiceSelectComponent,
     DatePickerComponent,
     TextAreaComponent,
-    BookButton, // Added for the confirm action
-    BackButton, // Added for navigation
+    BookButton,
+    BackButton,
   ],
   templateUrl: './book-service.page.html',
-  // You can likely remove the .css file now that we are using Tailwind
+  styleUrls: ['./book-service.page.css'],
 })
 export class BookServiceComponent implements OnInit, OnDestroy {
   bookingData = {
@@ -128,7 +128,7 @@ export class BookServiceComponent implements OnInit, OnDestroy {
 
   confirmBooking() {
     console.log('confirmBooking called, isSubmitting:', this.isSubmitting);
-    
+
     // Prevent duplicate submissions with multiple checks
     const currentTime = Date.now();
     if (this.isSubmitting || (currentTime - this.lastSubmissionTime) < this.SUBMISSION_COOLDOWN) {
@@ -167,7 +167,7 @@ export class BookServiceComponent implements OnInit, OnDestroy {
           this.errorMessage = 'Cannot connect to server. Please check your internet connection and try again.';
           return;
         }
-        
+
         console.log('Backend connection successful, proceeding with booking');
         this.proceedWithBooking(bookingPayload);
       },
@@ -182,7 +182,7 @@ export class BookServiceComponent implements OnInit, OnDestroy {
 
   checkBackendConnection(): Observable<boolean> {
     // Make a simple GET request to check if backend is reachable
-    return this.http.get(`${environment.apiUrl}/bookings`, { 
+    return this.http.get(`${environment.apiUrl}/bookings`, {
       headers: { 'X-Connection-Check': 'true' }
     }).pipe(
       timeout(5000), // 5 second timeout for connection check
@@ -198,7 +198,7 @@ export class BookServiceComponent implements OnInit, OnDestroy {
     this.bookingService.createBooking(bookingPayload).subscribe({
       next: (response) => {
         console.log('Booking response received:', response);
-        
+
         // Additional validation to ensure we actually got a valid response
         if (!response || (typeof response === 'object' && Object.keys(response).length === 0)) {
           console.log('Invalid response detected, treating as error');
@@ -207,7 +207,7 @@ export class BookServiceComponent implements OnInit, OnDestroy {
           this.errorMessage = 'Invalid response from server. Booking may not have been created.';
           return;
         }
-        
+
         // Keep loading state active until navigation completes
         setTimeout(() => {
           this.router.navigate(['/bookings']).then(() => {
@@ -220,14 +220,14 @@ export class BookServiceComponent implements OnInit, OnDestroy {
       },
       error: (error: Error) => {
         console.log('Booking error caught:', error);
-        
+
         // Reset loading states immediately on error
         this.isSubmitting = false;
         this.isLoading = false;
-        
+
         // Display the error message from the service
         this.errorMessage = error.message;
-        
+
         // Log the error for debugging
         console.error('Booking failed:', error);
       },

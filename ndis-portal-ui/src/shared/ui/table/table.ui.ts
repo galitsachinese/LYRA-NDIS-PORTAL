@@ -28,8 +28,6 @@ export class TableComponent {
   @Input() data: any[] = [];
   @Input() fillFewRows = true;
 
-  @Input() fillFewRows = true;
-
   /* ===============================
      OUTPUT EVENTS
      =============================== */
@@ -212,29 +210,6 @@ export class TableComponent {
   toggleMenu(row: any): void {
     this.replaceActionRow = null;
     this.activeMenuRow = this.activeMenuRow === row ? null : row;
-  }
-
-  get actionColumn(): TableColumn | undefined {
-    return this.columns.find((col) => col.type === 'action');
-  }
-
-  shouldReplaceAction(row: any): boolean {
-    return (
-      this.actionColumn?.actionDisplay === 'replace-with-action' &&
-      this.replaceActionRow === row
-    );
-  }
-
-  handleActionTrigger(row: any, event?: Event): void {
-    event?.stopPropagation();
-
-    if (this.actionColumn?.actionDisplay === 'replace-with-action') {
-      this.replaceActionRow = this.replaceActionRow === row ? null : row;
-      this.activeMenuRow = null;
-      return;
-    }
-
-    this.toggleMenu(row);
   }
 
   /* Emit toggle action for status changes */

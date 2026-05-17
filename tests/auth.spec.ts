@@ -11,10 +11,8 @@ test.describe('Authentication Tests', () => {
     await page.getByRole('textbox', { name: 'First Name' }).fill('tine');
     await page.getByRole('textbox', { name: 'Last Name' }).fill('mae');
 
-    const email = `tine${Date.now()}@gmail.com`;
-
-    await page.getByRole('textbox', { name: 'Email' }).fill(email);
-    await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+    await page.getByRole('textbox', { name: 'Email' }).fill(`tine${Date.now()}@gmail.com`);
+    await page.getByRole('textbox', { name: 'Password', exact: true }).fill('password123');
     await page.getByRole('textbox', { name: 'Confirm Password' }).fill('password123');
 
     await page.getByRole('button', { name: 'Role' }).click();
@@ -41,7 +39,7 @@ test.describe('Authentication Tests', () => {
     await page.getByRole('textbox', { name: 'Last Name' }).fill('Ardais');
 
     await page.getByRole('textbox', { name: 'Email' }).fill('participant1@ndisportal.com');
-    await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+    await page.getByRole('textbox', { name: 'Password',exact: true  }).fill('password123');
     await page.getByRole('textbox', { name: 'Confirm Password' }).fill('password123');
 
     await page.getByRole('button', { name: 'Role' }).click();
@@ -55,7 +53,7 @@ test.describe('Authentication Tests', () => {
 
   test('Should show validation error on missing fields', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Email' }).fill('jenny@gmail.com');
-    await page.getByRole('textbox', { name: 'Password' }).fill('jenny12345');
+    await page.getByRole('textbox', { name: 'Password', exact: true  }).fill('jenny12345');
     await page.getByRole('textbox', { name: 'Confirm Password' }).fill('jenny12345');
 
     await page.getByRole('button', { name: 'Role' }).click();

@@ -1,25 +1,24 @@
 import { Component, Output, EventEmitter, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface CategoryOption {
-  label: string;
-  value: string;
-}
+import {
+  DropdownUIComponent,
+  DropdownOption,
+} from '../../../ui/dropdown/dropdown.ui';
+import { FilterIconComponent } from '../../icons/svg-icons/filter-icon';
 
 @Component({
   selector: 'app-category-dropdown',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DropdownUIComponent, FilterIconComponent],
   templateUrl: './category-dropdown.component.html',
-  styleUrls: ['./category-dropdown.component.css'],
 })
 export class CategoryDropdownComponent implements OnChanges {
   @Output() categoryChange = new EventEmitter<string>();
   @Input() services: any[] = [];
 
   selectedValue = 'all';
-  categoryOptions: CategoryOption[] = [
-    { label: 'All', value: 'all' },
+  categoryOptions: DropdownOption[] = [
+    { label: 'All Categories', value: 'all' },
   ];
 
   ngOnChanges() {
@@ -29,48 +28,29 @@ export class CategoryDropdownComponent implements OnChanges {
   updateCategoryOptions() {
     if (!this.services || this.services.length === 0) {
       this.categoryOptions = [{ label: 'All Categories', value: 'all' }];
-      this.selectedValue = 'all';
       return;
     }
 
-    const uniqueCategories = new Map<string, string>();
+    const uniqueCategories = new Set<string>();
     this.services.forEach(service => {
       if (service.category) {
-        const label = String(service.category).trim();
-
-        if (label) {
-          uniqueCategories.set(this.normalizeCategory(label), label);
-        }
+        uniqueCategories.add(service.category);
       }
     });
 
-    const activeCategories = Array.from(uniqueCategories.values()).sort((a, b) =>
-      a.localeCompare(b),
-    );
+    const activeCategories = Array.from(uniqueCategories).sort();
 
     this.categoryOptions = [
       { label: 'All Categories', value: 'all' },
       ...activeCategories.map(category => ({
         label: category,
-        value: this.normalizeCategory(category),
+        value: category.toLowerCase().replace(/\s+/g, '-')
       }))
     ];
-
-    if (!this.categoryOptions.some(option => option.value === this.selectedValue)) {
-      this.selectedValue = 'all';
-    }
   }
 
   handleSelect(value: string) {
     this.selectedValue = value;
     this.categoryChange.emit(value);
-  }
-
-  trackByValue(_index: number, option: CategoryOption) {
-    return option.value;
-  }
-
-  private normalizeCategory(category: string) {
-    return category.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
   }
 }

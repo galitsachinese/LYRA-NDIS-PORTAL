@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { SidebarUi, NavItem } from '../../ui/sidebar/sidebar.ui';
 import { AuthService } from '../../../app/core/services/auth.service';
-
 @Component({
   selector: 'app-sidebar-component',
   standalone: true,
@@ -16,8 +15,11 @@ import { AuthService } from '../../../app/core/services/auth.service';
 })
 export class SidebarComponent {
   constructor(private authService: AuthService) {}
-
+  /**
+   * Navigation links for participant role
+   */
   private allLinks: (NavItem & { role: string })[] = [
+    // Coordinator Links
     {
       label: 'Dashboard',
       path: '/dashboard',
@@ -31,17 +33,13 @@ export class SidebarComponent {
       role: 'Coordinator',
     },
     {
-      label: 'Support Workers',
-      path: '/dashboard/support-workers',
-      icon: 'support',
-      role: 'Coordinator',
-    },
-    {
       label: 'All Bookings',
       path: '/dashboard/bookings',
       icon: 'bookings',
       role: 'Coordinator',
     },
+
+    // Participant Links
     {
       label: 'Services',
       path: '/services',
@@ -64,18 +62,30 @@ export class SidebarComponent {
 
   get filteredLinks(): NavItem[] {
     const userRole = this.authService.getRole();
-
+    
     if (!userRole) {
       return [];
     }
-
-    const filtered = this.allLinks.filter(
-      (link) => link.role.toLowerCase() === userRole.toLowerCase(),
+    
+    // Case-insensitive comparison with better logging
+    const filtered = this.allLinks.filter((link) => {
+      const matches = link.role.toLowerCase() === userRole.toLowerCase();
+      return matches;
+    });
+    
+    // Remove duplicates based on path
+    const uniqueLinks = filtered.filter((link, index, self) =>
+      index === self.findIndex((l) => l.path === link.path)
     );
+    
+    return uniqueLinks;
+  }
 
-    return filtered.filter(
-      (link, index, self) =>
-        index === self.findIndex((item) => item.path === link.path),
-    );
+  /**
+   * Optional: Makes the subText dynamic too
+   */
+  get currentSubText(): string {
+    const role = this.authService.getRole();
+    return role?.toLowerCase() === 'coordinator' ? 'Coordinator Portal' : 'Participant Portal';
   }
 }

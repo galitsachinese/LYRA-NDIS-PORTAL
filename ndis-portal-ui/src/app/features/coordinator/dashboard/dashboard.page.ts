@@ -1,43 +1,64 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatusCardComponent } from '../../../../shared/components/card/status-card/status-card.component';
+import { BookingQueueTableComponent } from '../../../../shared/components/table/booking-queue/booking-queue-table.component';
 import { ApiService } from '../../../core/services/api-service';
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, StatusCardComponent],
+  imports: [CommonModule, StatusCardComponent, BookingQueueTableComponent],
   templateUrl: './dashboard.page.html',
 })
 export class DashboardComponent implements OnInit {
-  // Stats data - will be populated from API
   stats: any[] = [
     {
-      label: 'Total Bookings',
+      label: 'TOTAL BOOKINGS',
       value: 0,
+      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
+      color: '#7C3AED',
+      bg: '#FAF5FF',
     },
     {
-      label: 'Pending',
+      label: 'PENDING APPROVAL',
       value: 0,
+      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
+      color: '#F59E0B',
+      bg: '#FFFBEB',
     },
     {
-      label: 'Approved',
+      label: 'APPROVED',
       value: 0,
+      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
+      color: '#10B981',
+      bg: '#ECFDF5',
     },
     {
-      label: 'Cancelled',
+      label: 'CANCELLED',
       value: 0,
+      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
+      color: '#EF4444',
+      bg: '#FEF2F2',
     },
   ];
 
-  // Recent bookings data
   bookings: any[] = [];
+  filteredBookings: any[] = [];
+  pagedBookings: any[] = [];
   isLoading = true;
   isLoadingBookings = true;
 
-  // Menu state
-  activeMenuId: number | null = null;
+  selectedFilter = 'All';
+  currentPage = 1;
+  readonly pageSize = 5;
+
+  readonly statusOptions = [
+    { label: 'All', value: 'All' },
+    { label: 'Approved', value: 'Approved' },
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Cancelled', value: 'Cancelled' },
+  ];
 
   constructor(
     private api: ApiService,
@@ -52,7 +73,6 @@ export class DashboardComponent implements OnInit {
   loadStats(): void {
     this.api.getBookingStats().subscribe({
       next: (res: any) => {
-        console.log('Booking stats response:', res);
         const data = res.Data || res;
         if (data) {
           this.stats[0].value = data.totalBookings || 0;
@@ -73,19 +93,9 @@ export class DashboardComponent implements OnInit {
     this.isLoadingBookings = true;
     this.api.getBookings().subscribe({
       next: (res: any) => {
-        console.log('Bookings response:', res);
         const data = res.Data || res;
-        this.bookings = Array.isArray(data) ? data.slice(0, 5) : [];
-
-        // Debug: Log booking details
-        console.log('Bookings loaded:', this.bookings.length);
-        this.bookings.forEach((booking, index) => {
-          console.log(`Booking ${index}:`, {
-            id: booking.id,
-            status: booking.status,
-            isPending: this.isPending(booking),
-          });
-        });
+        this.bookings = Array.isArray(data) ? data : [];
+        this.applyCurrentFilter(false);
 
         this.isLoadingBookings = false;
       },
@@ -97,14 +107,10 @@ export class DashboardComponent implements OnInit {
   }
 
   approveBooking(booking: any): void {
-    // Close menu
-    this.activeMenuId = null;
-
     this.api.updateBookingStatus(booking.id, 'Approved').subscribe({
       next: () => {
-        // Update UI immediately without reload
         booking.status = 'Approved';
-        // Refresh stats to reflect the change
+        this.applyCurrentFilter(false);
         this.loadStats();
         this.toast.show('Booking approved successfully!', 'success');
       },
@@ -119,11 +125,10 @@ export class DashboardComponent implements OnInit {
   }
 
   cancelBooking(booking: any): void {
-    this.activeMenuId = null;
-
     this.api.updateBookingStatus(booking.id, 'Cancelled').subscribe({
       next: () => {
         booking.status = 'Cancelled';
+        this.applyCurrentFilter(false);
         this.loadStats();
         this.toast.show('Booking cancelled successfully!', 'success');
       },
@@ -134,21 +139,86 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  toggleMenu(booking: any): void {
-    // Close menu if clicking the same booking, otherwise open new menu
-    this.activeMenuId = this.activeMenuId === booking.id ? null : booking.id;
+  refreshBookings(): void {
+    this.loadBookings();
+    this.loadStats();
+    this.toast.show('Bookings refreshed successfully!', 'success');
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const clickedMenu = target.closest('[data-testid="menu-btn"]');
-    if (!clickedMenu) {
-      this.activeMenuId = null;
+  filterByStatus(status: string, showToast: boolean = true): void {
+    this.selectedFilter = status;
+    this.currentPage = 1;
+    this.applyCurrentFilter(showToast);
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) {
+      return;
+    }
+
+    this.currentPage = page;
+    this.updatePagedBookings();
+  }
+
+  previousPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredBookings.length / this.pageSize));
+  }
+
+  get activeFilterLabel(): string {
+    return this.selectedFilter;
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, index) => index + 1);
+  }
+
+  get showingStart(): number {
+    return this.filteredBookings.length === 0
+      ? 0
+      : (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get showingEnd(): number {
+    return Math.min(
+      this.currentPage * this.pageSize,
+      this.filteredBookings.length,
+    );
+  }
+
+  private applyCurrentFilter(showToast: boolean): void {
+    if (this.selectedFilter === 'All') {
+      this.filteredBookings = [...this.bookings];
+    } else {
+      this.filteredBookings = this.bookings.filter(
+        (booking) =>
+          booking.status?.toLowerCase() === this.selectedFilter.toLowerCase(),
+      );
+    }
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+
+    this.updatePagedBookings();
+
+    if (showToast) {
+      this.toast.show(`Filtered by: ${this.selectedFilter}`, 'info');
     }
   }
 
-  isPending(booking: any): boolean {
-    return booking.status === 'Pending';
+  private updatePagedBookings(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.pagedBookings = this.filteredBookings.slice(
+      startIndex,
+      startIndex + this.pageSize,
+    );
   }
 }

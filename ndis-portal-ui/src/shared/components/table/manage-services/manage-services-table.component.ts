@@ -10,9 +10,6 @@ import { CommonModule } from '@angular/common';
 export class ManageServicesTableComponent {
   @Input() bookings: any[] = [];
 
+  // Emits when toggle button is clicked
   @Output() toggleStatus = new EventEmitter<any>();
-
-  isActive(service: any): boolean {
-    return service?.status === 'Active';
-  }
 }

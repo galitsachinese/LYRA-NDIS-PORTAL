@@ -4,14 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ChatMessage } from '../../../models/chat-message.model';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ChatIconComponent } from '../../icons/svg-icons/chat-icon';
 import { ChatService } from '../../../../app/core/services/chatbot.service';
 import { DynamicIconComponent } from '../../icons/dynamic-icon.component';
 
 @Component({
   selector: 'app-chat-message',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatIconComponent, DynamicIconComponent],
+  imports: [CommonModule, FormsModule, DynamicIconComponent],
   templateUrl: './chatbot-message.component.html',
 })
 export class ChatMessageComponent implements AfterViewInit {

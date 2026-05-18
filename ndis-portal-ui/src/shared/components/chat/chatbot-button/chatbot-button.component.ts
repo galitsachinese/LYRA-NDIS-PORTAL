@@ -1,12 +1,10 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ChatIconComponent } from '../../../../shared/components/icons/svg-icons/chat-icon';
 
 @Component({
   selector: 'app-chat-button',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatIconComponent],
+  imports: [CommonModule],
   templateUrl: './chatbot-button.component.html',
 })
 export class ChatButtonComponent {

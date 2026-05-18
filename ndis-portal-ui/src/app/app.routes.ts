@@ -31,7 +31,7 @@ import { DashboardComponent } from './features/coordinator/dashboard/dashboard.p
 import { ManageServicesComponent } from './features/coordinator/manage-services/manage-services.page';
 
 import { AllBookingsComponent } from './features/coordinator/all-bookings/all-bookings.page';
-
+import { SupportWorkersComponent } from './features/coordinator/support-workers/support-workers.page';
 
 
 import  { ForbiddenComponent } from '../shared/components/error/forbidden/forbidden.component'
@@ -125,6 +125,16 @@ export const routes: Routes = [
         path: 'dashboard/bookings',
 
         component: AllBookingsComponent,
+
+        data: { role: 'coordinator' },
+
+      },
+
+      {
+
+        path: 'dashboard/support-workers',
+
+        component: SupportWorkersComponent,
 
         data: { role: 'coordinator' },
 

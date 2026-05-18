@@ -35,6 +35,9 @@ export class ServiceFormModalComponent {
     description: new FormControl(''),
   });
 
+  // Toggle state for "Active on creation"
+  isActiveOnCreation = true;
+
   // Service categories for dropdown
   categories: any[] = [];
 
@@ -55,10 +58,19 @@ export class ServiceFormModalComponent {
   // Submit form
   submit() {
     if (this.serviceForm.valid) {
-      // Emit form data
-      this.onSave.emit(this.serviceForm.value);
+      // Emit form data with active status
+      const formData = {
+        ...this.serviceForm.value,
+        isActive: this.isActiveOnCreation
+      };
+      this.onSave.emit(formData);
       // Close the modal after successful save
       this.onClose.emit();
     }
+  }
+
+  // Toggle active on creation
+  toggleActiveCreation() {
+    this.isActiveOnCreation = !this.isActiveOnCreation;
   }
 }

@@ -2,6 +2,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 // Your shared components
 import { ManageServicesTableComponent } from '../../../../shared/components/table/manage-services/manage-services-table.component';
@@ -17,6 +18,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ManageServicesTableComponent,
     AddButtonComponent,
     ServiceFormModalComponent,
@@ -26,12 +28,16 @@ import { ToastService } from '../../../core/services/toast.service';
 export class ManageServicesComponent implements OnInit {
   // Services data from API
   services: any[] = [];
+  allServices: any[] = [];
 
   // Loading state
   isLoading = true;
 
   // Controls modal visibility
   isModalOpen = false;
+
+  // Status filter
+  selectedStatusFilter = 'Active';
 
   private toast = inject(ToastService);
 
@@ -54,7 +60,7 @@ export class ManageServicesComponent implements OnInit {
         const data = Array.isArray(res?.Data) ? res.Data : [];
 
         // Map API response to match table component expectations
-        this.services = data.map((service: any) => ({
+        this.allServices = data.map((service: any) => ({
           id: service.id ?? service.Id,
           name: service.name ?? service.Name,
           category:
@@ -68,6 +74,9 @@ export class ManageServicesComponent implements OnInit {
             : 'Inactive',
         }));
 
+        // Apply filter
+        this.filterByStatus();
+
         console.log('Mapped services:', this.services); // Debug log
 
         this.isLoading = false;
@@ -76,6 +85,7 @@ export class ManageServicesComponent implements OnInit {
         console.error('Error loading services:', err);
 
         this.services = [];
+        this.allServices = [];
         this.isLoading = false;
 
         this.toast.show('Could not load services.', 'error');
@@ -148,5 +158,22 @@ export class ManageServicesComponent implements OnInit {
         );
       },
     });
+  }
+
+  // Refresh services list
+  refreshServices() {
+    this.loadServices(true);
+    this.toast.show('Services refreshed successfully!', 'success');
+  }
+
+  // Filter services by status
+  filterByStatus() {
+    if (this.selectedStatusFilter === 'All') {
+      this.services = [...this.allServices];
+    } else {
+      this.services = this.allServices.filter(
+        (service) => service.status === this.selectedStatusFilter
+      );
+    }
   }
 }

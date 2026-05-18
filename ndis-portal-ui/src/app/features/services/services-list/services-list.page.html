@@ -1,7 +1,7 @@
 <!-- services-list.page.html -->
 <div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
-    <header class="flex w-full items-center justify-between">
-        <div class="flex items-center gap-3">
+    <header class="w-full space-y-3 sm:flex sm:items-start sm:justify-between sm:space-y-0">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
             <h1 class="text-xl font-bold text-slate-900">Our Services</h1>
             <app-category-dropdown [services]="allServices" (categoryChange)="handleCategoryFilter($event)">
             </app-category-dropdown>

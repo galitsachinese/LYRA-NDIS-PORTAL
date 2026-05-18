@@ -12,22 +12,22 @@
     shadow-sm
     leading-relaxed
     " [ngClass]="{
-      'bg-gray-100 text-gray-800 rounded-bl-none rounded-br-xl': isBot(),
-      'bg-[#6B3293] text-white rounded-br-none rounded-bl-xl': !isBot()
+      'bg-gray-100 text-gray-800 rounded-bl-none': isBot(),
+      'bg-[#6B3293] text-white rounded-br-none': !isBot()
     }">
     <!-- Regular message content -->
     <div [innerHTML]="formatMessage(message.content)"></div>
-    
+
     <!-- Service Recommendations as Cards with Book Button Inside -->
     <div *ngIf="message.recommendations && message.recommendations.length > 0" class="mt-4 space-y-4">
       <!-- Brief explanation at the top -->
       <p *ngIf="message.recommendations[0]?.reason" class="text-sm text-[#4a5568] leading-relaxed mb-3">
         {{ message.recommendations[0].reason }}
       </p>
-      <div *ngFor="let rec of message.recommendations" 
+      <div *ngFor="let rec of message.recommendations"
            class="group flex flex-col rounded-[24px] border border-[#e9e2e2] bg-white p-5 shadow-sm transition-all hover:shadow-md"
            style="max-width: 260px;">
-        
+
         <!-- Icon -->
         <div class="mb-4 flex h-9 w-9 items-center justify-center rounded-full text-[#6b21a8] bg-[#f3f0f5]">
           <app-dynamic-icon [name]="getIconForCategory(rec.categoryName)"></app-dynamic-icon>

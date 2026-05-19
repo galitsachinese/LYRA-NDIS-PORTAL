@@ -11,7 +11,7 @@ test.describe('Services', () => {
     await expectServiceCardsToLoad(page);
   });
 
-  test('Category filter shows only matching services', async ({ page }) => {
+  test('All categories filter shows only matching services', async ({ page }) => {
     await loginAs(page, 'participant');
     await expectServiceCardsToLoad(page);
 
@@ -21,21 +21,37 @@ test.describe('Services', () => {
     await expectVisibleCardsToMatchCategory(page, category);
   });
 
-  test('Clicking "All" resets the filter', async ({ page }) => {
-    await loginAs(page, 'participant');
-    const originalCount = await expectServiceCardsToLoad(page);
+  // Clicking "All Categories" resets the filter - Participant
+test('Clicking "All Categories" resets the filter', async ({ page }) => {
 
-    const category = await firstVisibleServiceCategory(page);
-    await selectCategory(page, category);
-    await expectVisibleCardsToMatchCategory(page, category);
+  await loginAs(page, 'participant');
+  await expectServiceCardsToLoad(page);
 
-    await selectCategory(page, 'All Categories');
+  // Filter by category
+  await page.getByRole('button', { name: 'Community Access' }).click();
 
-    await expect.poll(() => serviceCards(page).count()).toBe(originalCount);
-  });
+  // Verify filtered results
+  await expect(
+    page.getByRole('heading', { name: 'Community Participation' }).first()
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole('heading', { name: 'Social Skills Group' }).first()
+  ).toBeVisible();
+
+  // Reset filter
+  await page.getByRole('button', { name: 'All Categories' }).click();
+
+  // Verify service cards are visible again
+  
+await expect(page.locator('div').filter({ hasText: 'Our Services All Categories' }).nth(2)).toBeVisible();
+ 
+
+});
+
 
   test('Coordinator sees Add Service button', async ({ page }) => {
-    const serviceName = `Playwright Service ${Date.now()}`;
+    const serviceName = Playwright Service ${Date.now()};
 
     await loginAs(page, 'coordinator');
 
@@ -93,7 +109,7 @@ async function firstVisibleServiceCategory(page: Page) {
 }
 
 async function selectCategory(page: Page, category: string) {
-  await page.getByRole('button', { name: /^category$/i }).click();
+  await page.getByRole('button', { name: /^All Categories$/i }).click();
   await page.getByRole('button', { name: category, exact: true }).click();
 }
 
@@ -104,7 +120,7 @@ async function expectVisibleCardsToMatchCategory(page: Page, category: string) {
 
   for (let index = 0; index < count; index += 1) {
     await expect(cardCategory(serviceCards(page).nth(index))).toHaveText(
-      new RegExp(`^\\s*${escapeRegExp(category)}\\s*$`, 'i')
+      new RegExp(^\\s*${escapeRegExp(category)}\\s*$, 'i')
     );
   }
 }

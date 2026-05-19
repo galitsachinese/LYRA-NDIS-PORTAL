@@ -104,16 +104,23 @@ test.describe('NDIS Chatbot Automation Tests', () => {
 
     await expect(chatInput).toBeVisible();
 
-    await chatInput.fill('Can you recommend a support service?');
+    await chatInput.pressSequentially(
+      'Can you recommend a support service?',
+      {
+        delay: 100,
+      }
+    );
 
     await expect(chatInput).toHaveValue('Can you recommend a support service?');
 
     const chatResponse = page.waitForResponse(res => res.url().includes('/api/chat') && res.request().method() === 'POST');
+    
     await page
       .locator('.bg-\\[\\#6B3293\\].text-white.flex.justify-center.items-center.px-4')
       .click();
 
     await chatResponse;
+
     await expect(chatInput).toHaveValue('');
   });
 

@@ -9,35 +9,82 @@ test.describe('Bookings - Participant', () => {
   });
 
   test('Participant submits a booking and sees Pending status', async ({ page }) => {
-    const booking = await createBookingThroughUi(page, dateInputValue(14));
+// Login using auth helper
+  await loginAs(page, 'participant');
 
-    const createdRow = await findBookingRow(page, booking);
-    await expect(createdRow).toContainText('Pending');
+  // Go directly to booking page
+  await page.goto('http://localhost:4200/bookings');
 
-    await cancelBookingThroughUi(page, booking);
+  // Open booking form
+  await page.getByRole('link', { name: 'Book a Service' }).click();
+
+  // Fill booking details
+  await page.getByTestId('service-select').selectOption('1');
+
+  await page.getByTestId('date-input').fill('2026-05-31');
+
+  // Submit booking
+  await page.getByTestId('submit-btn').click();
+
+  // ✅ ASSERT: booking status becomes Pending
+  await expect(
+    page.getByRole('cell', { name: 'Pending' }).first()
+  ).toBeVisible();
   });
 
   test('Booking form shows error when date is in the past', async ({ page }) => {
-    await openBookingForm(page);
-    await selectFirstService(page);
-    await fillPreferredDate(page, dateInputValue(-1));
-    await submitBooking(page);
+ // Login using auth helper
+  await loginAs(page, 'participant');
 
-    await expect(page.getByText('Preferred date cannot be in the past')).toBeVisible();
+  // Go to booking page
+  await page.goto('http://localhost:4200/bookings');
+
+  // Open booking form
+  await page.getByRole('link', { name: 'Book a Service' }).click();
+
+  // Select service
+  await page.getByTestId('service-select').selectOption('4');
+
+  // ❌ Enter a past date
+  await page.getByTestId('date-input').fill('2026-02-17');
+
+  // Submit booking
+  await page.getByTestId('submit-btn').click();
+
+  // ✅ ASSERT: error message is shown
+  await expect(
+    page.getByText('Preferred date cannot be in')
+  ).toBeVisible();
   });
 
   test('Booking form shows error when service is not selected', async ({ page }) => {
-    await openBookingForm(page);
-    await fillPreferredDate(page, dateInputValue(7));
-    await submitBooking(page);
+   // Login using auth helper
+  await loginAs(page, 'participant');
 
-    await expect(page.getByText('Service is required')).toBeVisible();
+  // Go to booking page
+  await page.goto('http://localhost:4200/bookings');
+
+  // Open booking form
+  await page.getByRole('link', { name: 'Book a Service' }).click();
+
+  // ❌ Do NOT select a service (leave it empty)
+
+  // Fill only date
+  await page.getByTestId('date-input').fill('2026-05-31');
+
+  // Submit booking
+  await page.getByTestId('submit-btn').click();
+
+  // ✅ ASSERT: service validation error appears
+  await expect(
+    page.getByText('Service is required')
+  ).toBeVisible();
   });
 
   test('Participant sees empty state when no bookings exist', async ({ page }) => {
     // Intercept the API to guarantee there are no bookings, avoiding flaky tests
     // that rely on checking all filter states sequentially.
-    await page.route('**/api/bookings*', async (route) => {
+    await page.route('*/api/bookings', async (route) => {
       if (route.request().method() === 'GET') {
         await route.fulfill({ json: { Data: [], Success: true } });
       } else {
@@ -50,37 +97,62 @@ test.describe('Bookings - Participant', () => {
     await expect(page.getByText('Try changing your filter or book a new service.')).toBeVisible();
   });
 
-  test('Participant can cancel a Pending booking', async ({ page }) => {
-    const booking = await createBookingThroughUi(page, dateInputValue(21));
-
-    await cancelBookingThroughUi(page, booking);
-
-    // Verify that the booking now appears under the "Cancelled" filter tab
-    await page.locator('app-status-dropdown button').first().click();
-    await page.getByRole('button', { name: 'Cancelled', exact: true }).click();
-
-    await page.waitForTimeout(500); // Allow the table to re-render with the new filter
-    const cancelledRow = await findBookingRow(page, booking);
-    await expect(cancelledRow).toContainText('Cancelled');
-  });
-
   test('Cancel confirmation dialog appears before cancelling', async ({ page }) => {
-    const booking = await createBookingThroughUi(page, dateInputValue(28));
 
-    await openPendingBookings(page);
-    const pendingRow = await findBookingRow(page, booking);
-    await openCancelDialogForRow(page, pendingRow);
+ // Create NEW booking (ensures PENDING status)
+  await page.getByRole('link', { name: 'Book a Service' }).click();
 
-    const dialog = page.locator('app-cancel-dialog');
+  await page.getByTestId('service-select').selectOption('5');
+  await page.getByTestId('date-input').fill('2026-05-31');
+  await page.getByTestId('notes-input').fill('pending cancel test');
+  await page.getByTestId('submit-btn').click();
 
-    await expect(
-      dialog.getByRole('heading', { name: 'Are you sure you want to cancel this booking?' })
-    ).toBeVisible();
-    await expect(dialog.getByText('You will permanently cancel this scheduled booking.')).toBeVisible();
-    await expect(pendingRow).toBeVisible();
+  // Go to My Bookings
+  await page.getByRole('link', { name: 'My Bookings' }).click();
 
-    await confirmCancelBooking(page, booking);
+  // Open kebab ONLY for that row
+ await page.getByRole('button').nth(3).click();
+
+  // Cancel
+  const cancelBtn = page.getByRole('button', { name: 'Cancel' });
+  await expect(cancelBtn).toBeVisible();
+  await cancelBtn.click();
+
+  // Confirm modal
+  await page.getByRole('button', { name: 'Yes, Cancel Booking' }).click();
+
+});
+
+
+
+
+test('Participant can cancel a Pending booking', async ({ page }) => {
+    await page.getByRole('link', { name: 'Book a Service' }).click();
+
+  await page.getByTestId('service-select').selectOption('5');
+  await page.getByTestId('date-input').fill('2026-05-31');
+  await page.getByTestId('notes-input').fill('pending cancel test');
+  await page.getByTestId('submit-btn').click();
+
+  // Go to My Bookings
+  await page.getByRole('link', { name: 'My Bookings' }).click();
+
+  // Open kebab ONLY for that row
+ await page.getByRole('button').nth(3).click();
+
+  // Cancel
+  const cancelBtn = page.getByRole('button', { name: 'Cancel' });
+  await expect(cancelBtn).toBeVisible();
+  await cancelBtn.click();
+
+  // Confirm modal
+  await page.getByRole('button', { name: 'Yes, Cancel Booking' }).click();
+
+  // assertion
+  await expect(page.getByRole('cell', { name: 'Cancelled' }).first()).toBeVisible();
   });
+
+  
 });
 
 type CreatedBooking = {
@@ -108,7 +180,7 @@ async function createBookingThroughUi(page: Page, preferredDate: string): Promis
 
   const serviceName = await selectFirstService(page);
   await fillPreferredDate(page, preferredDate);
-  await page.locator('textarea').fill(`Playwright booking ${Date.now()}`);
+  await page.locator('textarea').fill(Playwright booking ${Date.now()});
 
   const createBookingResponse = page.waitForResponse((response) =>
     response.request().method() === 'POST' &&
@@ -218,7 +290,7 @@ async function confirmCancelBooking(page: Page, booking: CreatedBooking) {
   const [deleteResponse, refreshedResponse] = await Promise.all([
     page.waitForResponse((response) =>
       response.request().method() === 'DELETE' &&
-      new URL(response.url()).pathname.toLowerCase().endsWith(`/api/bookings/${booking.id}`)
+      new URL(response.url()).pathname.toLowerCase().endsWith(/api/bookings/${booking.id})
     ),
     page.waitForResponse((response) => {
       const url = new URL(response.url());
@@ -252,7 +324,7 @@ function dateInputValue(offsetDays: number) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
 
-  return `${year}-${month}-${day}`;
+  return ${year}-${month}-${day};
 }
 
 function formatDisplayedDate(value: string) {

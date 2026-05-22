@@ -99,23 +99,57 @@ test.describe('NDIS Chatbot Automation Tests', () => {
     await page.waitForTimeout(3000);
   });
 
-  test('Input clears after message is sent', async () => {
-    const chatInput = page.getByPlaceholder('Type message');
+ test('Input clears after message is sent', async ({ page }) => {
 
-    await expect(chatInput).toBeVisible();
+  // login again inside this test
+  await loginAs(page, 'participant');
 
-    await chatInput.fill('Can you recommend a support service?');
+  // open chatbot first
+  const chatButton = page.locator('button').last();
 
-    await expect(chatInput).toHaveValue('Can you recommend a support service?');
+  await expect(chatButton).toBeVisible();
 
-    const chatResponse = page.waitForResponse(res => res.url().includes('/api/chat') && res.request().method() === 'POST');
-    await page
-      .locator('.bg-\\[\\#6B3293\\].text-white.flex.justify-center.items-center.px-4')
-      .click();
+  await chatButton.click();
 
-    await chatResponse;
-    await expect(chatInput).toHaveValue('');
+  const chatInput = page.getByPlaceholder('Type message');
+
+  await expect(chatInput).toBeVisible();
+
+  // type slowly
+  await chatInput.pressSequentially(
+    'Can you recommend a support service?',
+    {
+      delay: 100,
+    }
+  );
+
+  await expect(chatInput).toHaveValue(
+    'Can you recommend a support service?'
+  );
+
+  // safer send button
+  const sendButton = page.locator(
+    '.bg-\\[\\#6B3293\\].text-white'
+  ).last();
+
+  await expect(sendButton).toBeVisible();
+
+  // click + wait together
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/chat') &&
+        response.request().method() === 'POST'
+    ),
+
+    sendButton.click(),
+  ]);
+
+  // input should clear
+  await expect(chatInput).toHaveValue('', {
+    timeout: 5000,
   });
+});
 
   test('Sending with empty input does not trigger an API call', async () => {
     let apiCalled = false;

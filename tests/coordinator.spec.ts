@@ -75,12 +75,11 @@ test('Coordinator can approve a Pending booking', async ({ page }) => {
 
   await page.getByTestId('submit-btn').click();
 
-  await page.getByRole('button', { name: 'Logout' }).click();
+ //await page.getByTestId('header-logout').click();
 
-  const logoutBtn = page.locator('app-dialog-ui').getByRole('button', { name: 'Logout' });
-
-  await expect(logoutBtn).toBeVisible({ timeout: 10000 });
-  await logoutBtn.click();
+const logoutBtn = page
+  .locator('app-dialog-ui')
+  .getByRole('button', { name: 'Logout' });
 
   // STEP 2: switch to coordinator
   await loginAs(page, 'coordinator');

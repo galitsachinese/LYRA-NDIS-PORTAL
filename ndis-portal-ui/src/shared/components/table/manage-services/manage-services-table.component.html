@@ -1,15 +1,11 @@
 <ng-template #statusBadge let-service="service">
   <div
-    class="inline-flex max-w-full items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium 2xl:text-base min-[3840px]:gap-3 min-[3840px]:px-5 min-[3840px]:py-2 min-[3840px]:text-2xl"
+    class="inline-flex max-w-full items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold 2xl:text-base min-[3840px]:gap-3 min-[3840px]:px-5 min-[3840px]:py-2 min-[3840px]:text-2xl"
     [ngClass]="{
-      'text-[#289839]': service.status === 'Active',
-      'text-[#DB4444]': service.status === 'Inactive'
+      'bg-green-100 text-green-700': service.status === 'Active',
+      'bg-red-100 text-red-700': service.status === 'Inactive'
     }"
   >
-    <svg class="h-2 w-2 shrink-0 min-[3840px]:h-3 min-[3840px]:w-3" viewBox="0 0 10 10" fill="currentColor">
-      <circle cx="5" cy="5" r="5" />
-    </svg>
-
     <span class="truncate">{{ service.status }}</span>
   </div>
 </ng-template>
@@ -19,8 +15,8 @@
     type="button"
     (click)="toggleStatus.emit(service)"
     data-testid="toggle-btn"
-    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 2xl:h-8 2xl:w-14 min-[3840px]:h-12 min-[3840px]:w-20"
-    [ngClass]="service.status === 'Active' ? 'bg-violet-600' : 'bg-slate-300'"
+    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 2xl:h-8 2xl:w-14 min-[3840px]:h-12 min-[3840px]:w-20"
+    [ngClass]="service.status === 'Active' ? 'bg-green-500' : 'bg-slate-300'"
   >
     <span class="sr-only">Toggle status</span>
     <span
@@ -41,18 +37,23 @@
     *ngFor="let service of bookings"
     class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
   >
-    <div class="flex items-center justify-between gap-3 p-4">
-      <span class="text-sm text-slate-500">
-        Name
-      </span>
-      <p class="mt-1 break-words text-sm  font-semibold leading-5 text-slate-700">
-        {{ service.name }}
-      </p>
+    <div class="flex items-center gap-3 p-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-400 text-white font-semibold text-sm">
+        {{ getInitials(service.name) }}
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="break-words text-sm font-semibold leading-5 text-blue-900">
+          {{ service.name }}
+        </p>
+        <p class="text-xs text-blue-600">
+          ID: {{ service.id }}
+        </p>
+      </div>
     </div>
        
     <div class="flex items-center justify-between gap-4 p-4">
       <span class="text-sm text-slate-500">Category</span>
-      <p class="mt-1 max-w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-xs leading-snug text-slate-500 2xl:text-base min-[3840px]:px-5 min-[3840px]:py-2 min-[3840px]:text-2xl">
+      <p class="mt-1 max-w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-xs leading-snug text-slate-500">
         {{ service.category }}
       </p>
     </div>
@@ -99,9 +100,19 @@
       <tbody class="divide-y divide-slate-100">
         <tr *ngFor="let service of bookings" class="transition-colors hover:bg-slate-50/80">
           <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
-            <span class="block truncate font-semibold text-slate-900">
-              {{ service.name }}
-            </span>
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-semibold text-sm 2xl:h-12 2xl:w-12 2xl:text-base min-[3840px]:h-16 min-[3840px]:w-16 min-[3840px]:text-2xl">
+                {{ getInitials(service.name) }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="block truncate font-semibold text-blue-900">
+                  {{ service.name }}
+                </span>
+                <span class="block truncate text-xs text-blue-600 2xl:text-sm min-[3840px]:text-lg">
+                  ID: {{ service.id }}
+                </span>
+              </div>
+            </div>
           </td>
           <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
             <span class="inline-flex max-w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-xs leading-snug text-slate-500 2xl:text-base min-[3840px]:px-5 min-[3840px]:py-2 min-[3840px]:text-2xl">

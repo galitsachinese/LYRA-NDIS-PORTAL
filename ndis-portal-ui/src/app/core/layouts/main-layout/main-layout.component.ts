@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../../../../shared/components/sidebar/sidebar.component';
-import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
+import { HeaderComponent } from '../../../../shared/components/header/header.component';
 /* Import your chatbot container */
 import { ChatbotContainerComponent }
 from '../../../../shared/components/chat/chatbot-container/chatbot-container.component';
@@ -17,7 +17,7 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
     CommonModule,
     RouterOutlet,
     SidebarComponent,
-    NavbarComponent,
+    HeaderComponent,
     ChatbotContainerComponent,
     ToastComponent,
   ],

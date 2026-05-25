@@ -38,3 +38,12 @@ await page.getByRole('button', { name: 'Log in' }).click();
 
 await expect(page).toHaveURL(role === 'coordinator' ? /.*\/dashboard/ : /.*\/services/, { timeout: 15000 });
 }
+
+/**
+ * Logout using the header button (direct logout, no confirmation dialog)
+ */
+export async function logout(page: Page) {
+  // Use the header logout button (identified by data-testid)
+  await page.getByTestId('header-logout').click();
+  await expect(page).toHaveURL(/.*\/login/);
+}

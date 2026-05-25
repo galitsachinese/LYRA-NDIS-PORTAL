@@ -1,12 +1,14 @@
-<div class="flex h-full w-full overflow-hidden">
-    <app-sidebar-component></app-sidebar-component>
+<div class="flex h-full w-full flex-col overflow-hidden">
+    <app-header></app-header>
 
-    <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <app-navbar-component></app-navbar-component>
+    <div class="flex min-h-0 flex-1 overflow-hidden">
+        <app-sidebar-component></app-sidebar-component>
 
-        <main class="min-w-0 flex-1 overflow-y-auto">
-            <router-outlet></router-outlet>
-        </main>
+        <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <main class="min-w-0 flex-1 overflow-y-auto">
+                <router-outlet></router-outlet>
+            </main>
+        </div>
     </div>
     <app-toast></app-toast>
 </div>

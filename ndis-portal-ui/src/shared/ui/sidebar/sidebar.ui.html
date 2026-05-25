@@ -50,41 +50,11 @@
     </a>
   </nav>
 
+  <!-- Empty spacer to push content up when collapsed -->
   <div class="p-3 border-t border-slate-200">
-    <button (click)="openLogoutDialog()"
-      class="w-full flex items-center h-12 rounded-xl transition-all duration-200 hover:bg-red-50 text-red-600"
-      [class.justify-center]="isCollapsed" [class.justify-start]="!isCollapsed" [class.px-3]="!isCollapsed">
-      <!-- Icon -->
-      <div class="flex items-center justify-center min-w-[24px]">
-        <app-icon-logout class="w-5 h-5"></app-icon-logout>
-      </div>
-
-      <!-- Label -->
-      <span *ngIf="!isCollapsed" class="ml-4 text-sm font-medium">
-        Logout
-      </span>
-    </button>
+    <div class="h-12"></div>
   </div>
 </aside>
-
-<app-dialog-ui [label]="'Confirm Logout'" [isOpen]="isLogoutDialogOpen" (close)="closeLogoutDialog()">
-  <!-- BODY -->
-  <div body>
-    Are you sure you want to log out?
-  </div>
-
-  <!-- ACTIONS -->
-  <div actions class="flex gap-2 justify-end w-full">
-    <button (click)="closeLogoutDialog()"
-      class="px-4 py-2 text-sm rounded-lg border border-slate-300 hover:bg-slate-100">
-      Cancel
-    </button>
-
-    <button (click)="confirmLogout()" class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700">
-      Logout
-    </button>
-  </div>
-</app-dialog-ui>
 
 <!-- Mobile Backdrop -->
 <div *ngIf="!isCollapsed && isMobile" (click)="closeSidebar()" class="fixed inset-0 bg-black/20 z-40 md:hidden"></div>

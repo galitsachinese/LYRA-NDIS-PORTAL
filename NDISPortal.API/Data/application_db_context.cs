@@ -36,6 +36,8 @@ namespace NDISPortal.API.Data
 
         public DbSet<SupportWorkers> SupportWorker => Set<SupportWorkers>();
 
+        public DbSet<WorkerBooking> WorkerBookings => Set<WorkerBooking>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
         {
@@ -169,6 +171,124 @@ namespace NDISPortal.API.Data
 
 
                 entity.ToTable(t => t.HasCheckConstraint("CHK_Booking_Status", "[status] IN (0,1,2)"));
+
+            });
+
+
+
+            // --- Support Worker Mapping ---
+
+            modelBuilder.Entity<SupportWorkers>(entity =>
+
+            {
+
+                entity.ToTable("support_workers");
+
+                entity.HasKey(sw => sw.Id);
+
+                entity.Property(sw => sw.Id).HasColumnName("id");
+
+                entity.Property(sw => sw.ServiceId).HasColumnName("service_id");
+
+                entity.Property(sw => sw.FirstName).HasColumnName("first_name");
+
+                entity.Property(sw => sw.LastName).HasColumnName("last_name");
+
+                entity.Property(sw => sw.Email).HasColumnName("email");
+
+                entity.Property(sw => sw.Phone).HasColumnName("phone");
+
+                entity.Property(sw => sw.Status).HasColumnName("status");
+
+                entity.Property(sw => sw.EmploymentType).HasColumnName("employment_type");
+
+                entity.Property(sw => sw.WwccExpiryDate).HasColumnName("wwcc_expiry_date");
+
+                entity.Property(sw => sw.CreatedDate).HasColumnName("created_date");
+
+                entity.Property(sw => sw.ModifiedDate).HasColumnName("modified_date");
+
+                entity.HasOne(sw => sw.AssignedService)
+
+                    .WithMany()
+
+                    .HasForeignKey(sw => sw.ServiceId)
+
+                    .HasConstraintName("FK_SupportWorkers_Services")
+
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.ToTable(t =>
+
+                {
+
+                    t.HasCheckConstraint("CHK_support_workers_status", "[status] IN ('Active','Inactive','On Leave')");
+
+                    t.HasCheckConstraint("CHK_support_workers_employment_type", "[employment_type] IN ('Full Time','Part Time','Casual','Contractor','Permanent')");
+
+                });
+
+            });
+
+
+
+            // --- Worker Booking Mapping ---
+
+            modelBuilder.Entity<WorkerBooking>(entity =>
+
+            {
+
+                entity.ToTable("worker_bookings");
+
+                entity.HasKey(wb => wb.Id);
+
+                entity.Property(wb => wb.Id).HasColumnName("id");
+
+                entity.Property(wb => wb.WorkerId).HasColumnName("worker_id");
+
+                entity.Property(wb => wb.BookingId).HasColumnName("booking_id");
+
+                entity.Property(wb => wb.AssignedDate).HasColumnName("assigned_date");
+
+                entity.Property(wb => wb.ModifiedDate).HasColumnName("modified_date");
+
+                entity.Property(wb => wb.AssignedBy).HasColumnName("assigned_by");
+
+                entity.HasIndex(wb => wb.BookingId)
+
+                    .IsUnique()
+
+                    .HasDatabaseName("UQ_worker_bookings_booking");
+
+                entity.HasOne(wb => wb.Worker)
+
+                    .WithMany()
+
+                    .HasForeignKey(wb => wb.WorkerId)
+
+                    .HasConstraintName("FK_worker_bookings_worker")
+
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(wb => wb.Booking)
+
+                    .WithMany()
+
+                    .HasForeignKey(wb => wb.BookingId)
+
+                    .HasConstraintName("FK_worker_bookings_booking")
+
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(wb => wb.AssignedByUser)
+
+                    .WithMany()
+
+                    .HasForeignKey(wb => wb.AssignedBy)
+
+                    .HasConstraintName("FK_worker_bookings_assigned_by")
+
+                    .OnDelete(DeleteBehavior.Restrict);
 
             });
 

@@ -45,9 +45,16 @@ CREATE TABLE support_workers(
  last_name NVARCHAR(50) NOT NULL,
  email NVARCHAR(50) UNIQUE NOT NULL,
  phone NVARCHAR(50),
+ status NVARCHAR(20) NOT NULL DEFAULT 'Active',
+ employment_type NVARCHAR(50) NOT NULL DEFAULT 'Casual',
+ wwcc_expiry_date DATETIME NULL,
  created_date DATETIME NOT NULL DEFAULT GETDATE(),
  modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
+ CONSTRAINT CHK_support_workers_status
+ CHECK (status IN ('Active', 'Inactive', 'On Leave')),
+ CONSTRAINT CHK_support_workers_employment_type
+ CHECK (employment_type IN ('Full Time', 'Part Time', 'Casual', 'Contractor', 'Permanent')),
  CONSTRAINT FK_services
  FOREIGN KEY (service_id)
  REFERENCES services(id)

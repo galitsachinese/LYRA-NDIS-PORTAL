@@ -133,3 +133,54 @@ INNER JOIN bookings b
 WHERE 
     u.role = 'Participant'
     AND b.status = 1;
+
+
+-- 11. List all support workers
+SELECT
+    sw.id AS worker_id,
+    CONCAT(sw.first_name, ' ', sw.last_name) AS worker_full_name,
+    sw.email,
+    sw.phone,
+    s.name AS assigned_service_name,
+    sc.name AS service_category,
+    sw.created_date,
+    sw.modified_date
+FROM support_workers sw
+INNER JOIN services s
+    ON sw.service_id = s.id
+INNER JOIN service_categories sc
+    ON s.category_id = sc.id
+ORDER BY worker_full_name;
+
+
+-- 12. List all bookings assigned to support workers
+SELECT
+    b.id AS booking_id,
+    CONCAT(u.first_name, ' ', u.last_name) AS participant_full_name,
+    s.name AS service_name,
+    sc.name AS category_name,
+    b.booking_date,
+    CASE b.status
+        WHEN 0 THEN 'Pending'
+        WHEN 1 THEN 'Approved'
+        WHEN 2 THEN 'Cancelled'
+        ELSE 'Unknown'
+    END AS booking_status,
+    CONCAT(sw.first_name, ' ', sw.last_name) AS support_worker_full_name,
+    sw.phone AS worker_phone,
+    wb.assigned_date,
+    CONCAT(coordinator.first_name, ' ', coordinator.last_name) AS assigned_by_coordinator_name
+FROM worker_bookings wb
+INNER JOIN support_workers sw
+    ON wb.worker_id = sw.id
+INNER JOIN bookings b
+    ON wb.booking_id = b.id
+INNER JOIN users u
+    ON b.user_id = u.id
+INNER JOIN services s
+    ON b.service_id = s.id
+INNER JOIN service_categories sc
+    ON s.category_id = sc.id
+INNER JOIN users coordinator
+    ON wb.assigned_by = coordinator.id
+ORDER BY wb.assigned_date DESC;

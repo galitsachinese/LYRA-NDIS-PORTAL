@@ -74,6 +74,25 @@ CREATE TABLE bookings (
 );
 Go
 
+CREATE TABLE worker_bookings (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    worker_id INT NOT NULL,
+    booking_id INT NOT NULL,
+    assigned_date DATETIME NOT NULL DEFAULT GETDATE(),
+    modified_date DATETIME NOT NULL DEFAULT GETDATE(),
+    assigned_by INT NOT NULL,
+
+    CONSTRAINT FK_worker_bookings_worker
+    FOREIGN KEY (worker_id) REFERENCES support_workers(id),
+    CONSTRAINT FK_worker_bookings_booking
+    FOREIGN KEY (booking_id) REFERENCES bookings(id),
+    CONSTRAINT FK_worker_bookings_assigned_by
+    FOREIGN KEY (assigned_by) REFERENCES users(id),
+    CONSTRAINT UQ_worker_bookings_booking
+    UNIQUE (booking_id)
+);
+Go
+
 
 
 

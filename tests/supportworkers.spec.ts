@@ -132,4 +132,51 @@ test.describe('Coordinator Dashboard', () => {
 
   });
 
+
+
+test('Coordinator can filter support workers by Active and Inactive status', async ({ page }) => {
+
+  await page.getByRole('link', { name: 'Support Workers' }).click();
+
+  const statusDropdown = page.getByLabel('StatusAllActiveInactive');
+
+  // =========================
+  // TEST ACTIVE FILTER
+  // =========================
+  await statusDropdown.selectOption('active');
+
+  await page.waitForTimeout(2000);
+
+  let rows = page.locator('table tbody tr');
+
+  await expect(rows.first()).toBeVisible();
+
+  let rowCount = await rows.count();
+
+  for (let i = 0; i < rowCount; i++) {
+    const rowText = await rows.nth(i).textContent();
+
+    expect(rowText).toContain('Active');
+    expect(rowText).not.toContain('Inactive');
+  }
+
+  // =========================
+  // TEST INACTIVE FILTER
+  // =========================
+  await page.getByRole('link', { name: 'Support Workers' }).click();
+
+  await page.getByLabel('StatusAllActiveInactive')
+    .selectOption('inactive');
+
+  await expect(
+    page.getByText('No matching support workers')
+  ).toBeVisible();
+
+  await expect(
+    page.getByText('Adjust the filters or search term to see more results.')
+  ).toBeVisible();
+
+});
+
+
 });

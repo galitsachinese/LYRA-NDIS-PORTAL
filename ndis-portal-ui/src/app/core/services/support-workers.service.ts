@@ -10,6 +10,7 @@ export interface SupportWorker {
   phone: string;
   assignedServiceId: number;
   assignedServiceName?: string | null;
+  status?: string | null;
 }
 
 export interface SupportWorkerPayload {
@@ -91,6 +92,7 @@ export class SupportWorkersService {
       ),
       assignedServiceName:
         worker?.assignedServiceName ?? worker?.AssignedServiceName ?? worker?.serviceName ?? worker?.ServiceName ?? null,
+      status: worker?.status ?? worker?.Status ?? null,
     };
   }
 

@@ -14,6 +14,10 @@
 
         public string? ParticipantName { get; set; }
 
+        public int? AssignedWorkerId { get; set; }
+
+        public string? AssignedWorkerName { get; set; }
+
         public DateTime PreferredDate { get; set; }
 
         public string? Notes { get; set; }

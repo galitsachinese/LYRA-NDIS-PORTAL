@@ -69,6 +69,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 .Include(b => b.Service)
                     .ThenInclude(s => s.ServiceCategory)
                 .Include(b => b.User)
+                .Include(b => b.SupportWorker)
                 .AsQueryable();
 
             if (normalizedRole.Equals("Participant", StringComparison.OrdinalIgnoreCase))
@@ -105,6 +106,10 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                             ? b.User.FirstName + " " + b.User.LastName
                             : string.Empty
                         : null,
+                    AssignedWorkerId = b.SupportWorkerId,
+                    AssignedWorkerName = b.SupportWorker != null
+                        ? b.SupportWorker.FirstName + " " + b.SupportWorker.LastName
+                        : null,
                     PreferredDate = b.BookingDate,
                     Notes = b.Notes,
                     Status = StatusToString(b.Status),
@@ -122,6 +127,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 .Include(b => b.Service)
                     .ThenInclude(s => s.ServiceCategory)
                 .Include(b => b.User)
+                .Include(b => b.SupportWorker)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (booking == null)
@@ -141,6 +147,10 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 ParticipantName = booking.User != null
                     ? booking.User.FirstName + " " + booking.User.LastName
                     : string.Empty,
+                AssignedWorkerId = booking.SupportWorkerId,
+                AssignedWorkerName = booking.SupportWorker != null
+                    ? booking.SupportWorker.FirstName + " " + booking.SupportWorker.LastName
+                    : null,
                 PreferredDate = booking.BookingDate,
                 Notes = booking.Notes,
                 Status = StatusToString(booking.Status),
@@ -200,6 +210,8 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 ServiceName = service.Name,
                 ServiceCategory = service.ServiceCategory != null ? service.ServiceCategory.Name : string.Empty,
                 ParticipantName = user.FirstName + " " + user.LastName,
+                AssignedWorkerId = booking.SupportWorkerId,
+                AssignedWorkerName = null,
                 PreferredDate = booking.BookingDate,
                 Notes = booking.Notes,
                 Status = StatusToString(booking.Status),
@@ -214,6 +226,7 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 .Include(b => b.Service)
                     .ThenInclude(s => s.ServiceCategory)
                 .Include(b => b.User)
+                .Include(b => b.SupportWorker)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (booking == null)
@@ -245,12 +258,80 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 ParticipantName = booking.User != null
                     ? booking.User.FirstName + " " + booking.User.LastName
                     : string.Empty,
+                AssignedWorkerId = booking.SupportWorkerId,
+                AssignedWorkerName = booking.SupportWorker != null
+                    ? booking.SupportWorker.FirstName + " " + booking.SupportWorker.LastName
+                    : null,
                 PreferredDate = booking.BookingDate,
                 Notes = booking.Notes,
                 Status = StatusToString(booking.Status),
                 CreatedDate = booking.CreatedDate,
                 ModifiedDate = booking.ModifiedDate
             };
+        }
+
+        public async Task<BookingResponseDto?> AssignWorkerAsync(int id, BookingWorkerAssignmentDto assignmentDto)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Service)
+                    .ThenInclude(s => s.ServiceCategory)
+                .Include(b => b.User)
+                .Include(b => b.SupportWorker)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null)
+            {
+                return null;
+            }
+
+            if (booking.Status != 1)
+            {
+                throw new ArgumentException("Only Approved bookings can be assigned a worker.");
+            }
+
+            var worker = await _context.SupportWorker
+                .FirstOrDefaultAsync(w => w.Id == assignmentDto.SupportWorkerId);
+
+            if (worker == null)
+            {
+                throw new ArgumentException("Support worker not found.");
+            }
+
+            if (worker.ServiceId != booking.ServiceId)
+            {
+                throw new ArgumentException("Support worker must be assigned to the same service as the booking.");
+            }
+
+            booking.SupportWorkerId = worker.Id;
+            booking.SupportWorker = worker;
+            booking.ModifiedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return ToResponseDto(booking);
+        }
+
+        public async Task<BookingResponseDto?> UnassignWorkerAsync(int id)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Service)
+                    .ThenInclude(s => s.ServiceCategory)
+                .Include(b => b.User)
+                .Include(b => b.SupportWorker)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null)
+            {
+                return null;
+            }
+
+            booking.SupportWorkerId = null;
+            booking.SupportWorker = null;
+            booking.ModifiedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return ToResponseDto(booking);
         }
 
         public async Task<bool> DeleteBookingAsync(int id, int userId)
@@ -291,6 +372,32 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 Pending = bookings.Count(b => b.Status == 0),
                 Approved = bookings.Count(b => b.Status == 1),
                 Cancelled = bookings.Count(b => b.Status == 2)
+            };
+        }
+
+        private static BookingResponseDto ToResponseDto(Booking booking)
+        {
+            return new BookingResponseDto
+            {
+                Id = booking.Id,
+                UserId = booking.UserId,
+                ServiceId = booking.ServiceId,
+                ServiceName = booking.Service != null ? booking.Service.Name : string.Empty,
+                ServiceCategory = booking.Service != null && booking.Service.ServiceCategory != null
+                    ? booking.Service.ServiceCategory.Name
+                    : string.Empty,
+                ParticipantName = booking.User != null
+                    ? booking.User.FirstName + " " + booking.User.LastName
+                    : string.Empty,
+                AssignedWorkerId = booking.SupportWorkerId,
+                AssignedWorkerName = booking.SupportWorker != null
+                    ? booking.SupportWorker.FirstName + " " + booking.SupportWorker.LastName
+                    : null,
+                PreferredDate = booking.BookingDate,
+                Notes = booking.Notes,
+                Status = StatusToString(booking.Status),
+                CreatedDate = booking.CreatedDate,
+                ModifiedDate = booking.ModifiedDate
             };
         }
     }

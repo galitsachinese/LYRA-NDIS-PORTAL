@@ -33,8 +33,8 @@ export class AllBookingTable implements OnChanges {
    */
   private baseColumns: TableColumn[] = [
     // Add type: 'text' (or whatever your default switch case is)
-    { key: 'name', label: 'Name', type: 'text' },
-    { key: 'service', label: 'Service', type: 'text' },
+    { key: 'name', label: 'Name', type: 'name' },
+    { key: 'service', label: 'Service', type: 'service' },
     { key: 'category', label: 'Category', type: 'category' },
     { key: 'date', label: 'Date', type: 'date' }, // Changed to 'date' to match your table.ui logic
     { key: 'view', label: 'Note', type: 'view' },

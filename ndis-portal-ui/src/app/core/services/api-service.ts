@@ -660,6 +660,34 @@ export class ApiService {
 
   }
 
+  assignWorkerToBooking(bookingId: number, supportWorkerId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+
+    return this.http
+      .put<any>(
+        `${this.bookingsApiUrl}/${bookingId}/assign-worker`,
+        { supportWorkerId },
+        { headers },
+      )
+      .pipe(
+        catchError((error: any) => {
+          return throwError(() => new Error('Failed to assign worker to booking.'));
+        }),
+      );
+  }
+
+  unassignWorkerFromBooking(bookingId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+
+    return this.http
+      .delete<any>(`${this.bookingsApiUrl}/${bookingId}/assign-worker`, { headers })
+      .pipe(
+        catchError((error: any) => {
+          return throwError(() => new Error('Failed to remove assigned worker.'));
+        }),
+      );
+  }
+
 
 
 

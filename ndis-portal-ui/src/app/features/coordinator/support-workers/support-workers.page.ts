@@ -9,6 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
 interface ServiceOption {
   id: number;
   name: string;
+  category: string;
 }
 
 interface WorkerForm {
@@ -27,6 +28,10 @@ interface WorkerForm {
 export class SupportWorkersComponent implements OnInit {
   workers: SupportWorker[] = [];
   services: ServiceOption[] = [];
+
+  statusFilter = 'all';
+  serviceFilter = 'all';
+  searchTerm = '';
 
   isLoading = true;
   isSaving = false;
@@ -62,6 +67,22 @@ export class SupportWorkersComponent implements OnInit {
     this.loadWorkers();
   }
 
+  get filteredWorkers(): SupportWorker[] {
+    const query = this.searchTerm.trim().toLowerCase();
+
+    return this.workers.filter((worker) => {
+      const status = this.getWorkerStatus(worker).toLowerCase();
+      const serviceId = String(worker.assignedServiceId || '');
+      const searchable = `${worker.fullName || ''} ${worker.email || ''}`.toLowerCase();
+
+      return (
+        (this.statusFilter === 'all' || status === this.statusFilter) &&
+        (this.serviceFilter === 'all' || serviceId === this.serviceFilter) &&
+        (!query || searchable.includes(query))
+      );
+    });
+  }
+
   loadWorkers(): void {
     this.isLoading = true;
     this.error = null;
@@ -93,6 +114,14 @@ export class SupportWorkersComponent implements OnInit {
           .map((service: any) => ({
             id: Number(service?.id ?? service?.Id ?? 0),
             name: service?.name ?? service?.Name ?? service?.title ?? service?.Title ?? 'Untitled Service',
+            category:
+              service?.category ??
+              service?.Category ??
+              service?.categoryName ??
+              service?.CategoryName ??
+              service?.serviceCategory ??
+              service?.ServiceCategory ??
+              'Uncategorized',
           }))
           .filter((service: ServiceOption) => service.id > 0);
       },
@@ -222,6 +251,48 @@ export class SupportWorkersComponent implements OnInit {
     );
   }
 
+  getServiceCategory(worker: SupportWorker | null): string {
+    if (!worker) {
+      return 'Uncategorized';
+    }
+
+    return (
+      this.services.find((service) => service.id === worker.assignedServiceId)?.category ||
+      'Uncategorized'
+    );
+  }
+
+  getWorkerStatus(worker: SupportWorker): string {
+    return worker.status?.trim() || 'Active';
+  }
+
+  getWorkerStatusClass(worker: SupportWorker): string {
+    switch (this.getWorkerStatus(worker).toLowerCase()) {
+      case 'active':
+        return 'bg-green-100 text-green-700';
+      case 'inactive':
+        return 'bg-slate-100 text-slate-600';
+      case 'on leave':
+        return 'bg-orange-100 text-orange-700';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  }
+
+  get hasActiveFilters(): boolean {
+    return (
+      this.statusFilter !== 'all' ||
+      this.serviceFilter !== 'all' ||
+      this.searchTerm.trim().length > 0
+    );
+  }
+
+  clearFilters(): void {
+    this.statusFilter = 'all';
+    this.serviceFilter = 'all';
+    this.searchTerm = '';
+  }
+
   getInitials(name: string): string {
     return name
       .split(' ')
@@ -230,6 +301,18 @@ export class SupportWorkersComponent implements OnInit {
       .join('')
       .substring(0, 2)
       .toUpperCase();
+  }
+
+  formatName(value: string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    return value
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
   private resetForm(): void {
@@ -270,4 +353,5 @@ export class SupportWorkersComponent implements OnInit {
 
     return Object.keys(this.formErrors).length === 0;
   }
+
 }

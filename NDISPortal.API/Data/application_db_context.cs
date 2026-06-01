@@ -132,6 +132,8 @@ namespace NDISPortal.API.Data
 
                 entity.Property(b => b.ServiceId).HasColumnName("service_id");
 
+                entity.Property(b => b.SupportWorkerId).HasColumnName("support_worker_id");
+
                 entity.Property(b => b.BookingDate).HasColumnName("booking_date");
 
                 entity.Property(b => b.Notes).HasColumnName("notes");
@@ -165,6 +167,16 @@ namespace NDISPortal.API.Data
                     .HasConstraintName("FK_Bookings_Services")
 
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(b => b.SupportWorker)
+
+                    .WithMany()
+
+                    .HasForeignKey(b => b.SupportWorkerId)
+
+                    .HasConstraintName("FK_Bookings_SupportWorkers")
+
+                    .OnDelete(DeleteBehavior.SetNull);
 
 
 

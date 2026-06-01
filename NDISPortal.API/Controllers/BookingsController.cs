@@ -179,6 +179,55 @@ namespace NdisPortal.BookingsApi.Controllers
             }
         }
 
+        // PUT /api/bookings/{id}/assign-worker
+        // Coordinator only
+        // Body: { "supportWorkerId": 1 }
+        [HttpPut("{id}/assign-worker")]
+        [Authorize(Roles = "Coordinator")]
+        public async Task<IActionResult> AssignWorker(int id, [FromBody] BookingWorkerAssignmentDto dto)
+        {
+            try
+            {
+                var updated = await _service.AssignWorkerAsync(id, dto);
+
+                if (updated == null)
+                {
+                    return NotFound(new
+                    {
+                        message = "Booking not found."
+                    });
+                }
+
+                return Ok(updated);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+        // DELETE /api/bookings/{id}/assign-worker
+        // Coordinator only
+        [HttpDelete("{id}/assign-worker")]
+        [Authorize(Roles = "Coordinator")]
+        public async Task<IActionResult> UnassignWorker(int id)
+        {
+            var updated = await _service.UnassignWorkerAsync(id);
+
+            if (updated == null)
+            {
+                return NotFound(new
+                {
+                    message = "Booking not found."
+                });
+            }
+
+            return Ok(updated);
+        }
+
         // DELETE /api/bookings/{id}
         // Participant only
         // Participant can only delete their own Pending booking

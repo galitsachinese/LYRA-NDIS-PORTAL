@@ -22,6 +22,40 @@
         <h2 class="m-0 text-sm font-bold text-slate-950">Support Worker Registry</h2>
       </div>
 
+      <div *ngIf="workers.length > 0" class="grid gap-3 border-b border-slate-100 px-5 py-4 sm:grid-cols-2 lg:grid-cols-[160px_220px_minmax(240px,1fr)_auto] lg:items-end">
+        <label class="block">
+          <span class="mb-1 block text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Status</span>
+          <select class="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [(ngModel)]="statusFilter">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1 block text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Service</span>
+          <select class="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [(ngModel)]="serviceFilter">
+            <option value="all">All</option>
+            <option *ngFor="let service of services" [value]="service.id">{{ service.name }}</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1 block text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Search</span>
+          <div class="relative">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path stroke-linecap="round" d="m20 20-3.5-3.5" />
+            </svg>
+            <input type="search" class="h-10 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [(ngModel)]="searchTerm" placeholder="Worker name or email" />
+          </div>
+        </label>
+
+        <button type="button" class="h-10 rounded-md border border-slate-200 px-4 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50" [disabled]="!hasActiveFilters" (click)="clearFilters()">
+          Clear
+        </button>
+      </div>
+
       <div *ngIf="workers.length === 0" class="flex min-h-[260px] flex-col items-center justify-center px-5 py-12 text-center">
         <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-violet-50 text-[#6B3293]">
           <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -33,35 +67,56 @@
         <p class="mt-2 text-sm text-slate-500">Add your first support worker to assign staff to services.</p>
       </div>
 
-      <div *ngIf="workers.length > 0" class="overflow-x-auto" data-testid="support-workers-table">
-        <table class="w-full min-w-[980px] table-fixed border-collapse">
+      <div *ngIf="workers.length > 0 && filteredWorkers.length === 0" class="flex min-h-[220px] flex-col items-center justify-center px-5 py-12 text-center">
+        <h3 class="m-0 text-base font-bold text-slate-800">No matching support workers</h3>
+        <p class="mt-2 text-sm text-slate-500">Adjust the filters or search term to see more results.</p>
+      </div>
+
+      <div *ngIf="filteredWorkers.length > 0" class="overflow-x-auto" data-testid="support-workers-table">
+        <table class="w-full min-w-[1080px] table-fixed border-collapse">
           <thead class="bg-slate-50">
             <tr>
-              <th class="w-[24%] px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Full Name</th>
-              <th class="w-[24%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Email</th>
-              <th class="w-[18%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Phone</th>
-              <th class="w-[22%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</th>
-              <th class="w-[12%] px-5 py-3 text-right text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Actions</th>
+              <th class="w-[22%] px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Full Name</th>
+              <th class="w-[22%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Email</th>
+              <th class="w-[15%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Phone</th>
+              <th class="w-[21%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</th>
+              <th class="w-[10%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Status</th>
+              <th class="w-[10%] px-5 py-3 text-right text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngFor="let worker of workers" class="border-t border-slate-100">
+            <tr *ngFor="let worker of filteredWorkers" class="border-t border-slate-100">
               <td class="px-5 py-4 align-middle">
                 <div class="flex items-center gap-3">
                   <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-[#6B3293]">
                     {{ getInitials(worker.fullName) }}
                   </div>
-                  <strong class="text-sm font-bold text-[#0057a8]">{{ worker.fullName }}</strong>
+                  <span class="text-sm font-medium text-slate-800">{{ formatName(worker.fullName) }}</span>
                 </div>
               </td>
 
-              <td class="px-4 py-4 align-middle text-sm text-slate-600">{{ worker.email }}</td>
+              <td class="px-4 py-4 align-middle text-sm text-slate-600">
+                <a class="transition hover:text-[#0057a8] hover:underline" [href]="'mailto:' + worker.email">
+                  {{ worker.email }}
+                </a>
+              </td>
               <td class="px-4 py-4 align-middle text-sm text-slate-600">{{ worker.phone || 'N/A' }}</td>
 
               <td class="px-4 py-4 align-middle">
-                <span class="inline-flex max-w-full items-center truncate rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                  {{ getServiceName(worker) }}
+                <div class="min-w-0">
+                  <span class="block truncate text-sm font-medium text-slate-800">
+                    {{ getServiceName(worker) }}
+                  </span>
+                  <span class="mt-0.5 block truncate text-xs text-slate-500">
+                    {{ getServiceCategory(worker) }}
+                  </span>
+                </div>
+              </td>
+
+              <td class="px-4 py-4 align-middle">
+                <span class="inline-flex min-w-[76px] justify-center rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="getWorkerStatusClass(worker)">
+                  {{ getWorkerStatus(worker) }}
                 </span>
               </td>
 
@@ -90,7 +145,7 @@
         </table>
 
         <div class="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p class="m-0 text-sm text-slate-500">Showing {{ workers.length }} of {{ workers.length }} Support Workers</p>
+          <p class="m-0 text-sm text-slate-500">Showing {{ filteredWorkers.length }} of {{ workers.length }} Support Workers</p>
           <div class="flex gap-1">
             <button type="button" class="h-8 w-8 rounded-md bg-slate-100 text-sm font-semibold text-slate-400" disabled aria-label="Previous page">&#8249;</button>
             <button type="button" class="h-8 w-8 rounded-md bg-[#0057a8] text-sm font-semibold text-white">1</button>
@@ -161,7 +216,7 @@
       <div class="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-[#6B3293] text-2xl font-bold text-white">
         {{ getInitials(selectedWorker.fullName) }}
       </div>
-      <h3 class="m-0 text-lg font-bold text-slate-900">{{ selectedWorker.fullName }}</h3>
+      <h3 class="m-0 text-lg font-medium text-slate-800">{{ formatName(selectedWorker.fullName) }}</h3>
 
       <div class="mt-6 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
         <div>
@@ -175,6 +230,7 @@
         <div class="sm:col-span-2">
           <p class="m-0 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</p>
           <p class="mt-1 text-sm font-semibold text-slate-700">{{ getServiceName(selectedWorker) }}</p>
+          <p class="mt-0.5 text-xs text-slate-500">{{ getServiceCategory(selectedWorker) }}</p>
         </div>
       </div>
 

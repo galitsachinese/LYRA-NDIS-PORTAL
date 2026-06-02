@@ -143,3 +143,68 @@ VALUES
 (3, 6, '2026-04-23 01:00:00', 'Speech session', 2);
 Go
 
+
+-- ============================================================
+-- MIGRATION SCRIPTS (idempotent — safe to run on existing DBs)
+-- ============================================================
+
+-- Add 'status' column to support_workers if missing
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'support_workers' AND COLUMN_NAME = 'status'
+)
+BEGIN
+    ALTER TABLE support_workers ADD status NVARCHAR(20) NOT NULL DEFAULT 'Active';
+    ALTER TABLE support_workers ADD CONSTRAINT CHK_support_workers_status
+        CHECK (status IN ('Active', 'Inactive', 'On Leave'));
+END
+Go
+
+-- Add 'employment_type' column to support_workers if missing
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'support_workers' AND COLUMN_NAME = 'employment_type'
+)
+BEGIN
+    ALTER TABLE support_workers ADD employment_type NVARCHAR(50) NOT NULL DEFAULT 'Casual';
+    ALTER TABLE support_workers ADD CONSTRAINT CHK_support_workers_employment_type
+        CHECK (employment_type IN ('Full Time', 'Part Time', 'Casual', 'Contractor', 'Permanent'));
+END
+Go
+
+-- Add 'wwcc_expiry_date' column to support_workers if missing
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'support_workers' AND COLUMN_NAME = 'wwcc_expiry_date'
+)
+BEGIN
+    ALTER TABLE support_workers ADD wwcc_expiry_date DATETIME NULL;
+END
+Go
+
+-- Create 'worker_bookings' table if missing
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_NAME = 'worker_bookings'
+)
+BEGIN
+    CREATE TABLE worker_bookings (
+        id INT PRIMARY KEY IDENTITY(1,1),
+        worker_id INT NOT NULL,
+        booking_id INT NOT NULL,
+        assigned_date DATETIME NOT NULL DEFAULT GETDATE(),
+        modified_date DATETIME NOT NULL DEFAULT GETDATE(),
+        assigned_by INT NOT NULL,
+
+        CONSTRAINT FK_worker_bookings_worker
+            FOREIGN KEY (worker_id) REFERENCES support_workers(id),
+        CONSTRAINT FK_worker_bookings_booking
+            FOREIGN KEY (booking_id) REFERENCES bookings(id),
+        CONSTRAINT FK_worker_bookings_assigned_by
+            FOREIGN KEY (assigned_by) REFERENCES users(id),
+        CONSTRAINT UQ_worker_bookings_booking
+            UNIQUE (booking_id)
+    );
+END
+Go
+

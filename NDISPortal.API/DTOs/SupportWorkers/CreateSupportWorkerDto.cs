@@ -19,10 +19,5 @@ namespace NDISPortal.API.DTOs.SupportWorkers
 
         [Range(1, int.MaxValue)]
         public int AssignedServiceId { get; set; }
-
-        [StringLength(50)]
-        public string? EmploymentType { get; set; }
-
-        public DateTime? WwccExpiryDate { get; set; }
     }
 }

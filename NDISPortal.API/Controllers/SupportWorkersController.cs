@@ -142,8 +142,6 @@ namespace NDISPortal.API.Controllers
                 Email = input.Email,
                 Phone = input.Phone,
                 Status = "Active",
-                EmploymentType = input.EmploymentType ?? "Casual",
-                WwccExpiryDate = request.WwccExpiryDate,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow
             };
@@ -190,8 +188,6 @@ namespace NDISPortal.API.Controllers
             worker.LastName = input.LastName;
             worker.Email = input.Email;
             worker.Phone = input.Phone;
-            worker.EmploymentType = input.EmploymentType ?? worker.EmploymentType;
-            worker.WwccExpiryDate = request.WwccExpiryDate;
             worker.ModifiedDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -261,38 +257,38 @@ namespace NDISPortal.API.Controllers
             return NoContent();
         }
 
-        private async Task<(IActionResult? Error, string FirstName, string LastName, string Email, string Phone, string? EmploymentType)> ValidateWorkerInputAsync(
+        private async Task<(IActionResult? Error, string FirstName, string LastName, string Email, string Phone)> ValidateWorkerInputAsync(
             CreateSupportWorkerDto request,
             int? existingWorkerId = null)
         {
             var cleanedFullName = (request.FullName ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(cleanedFullName))
             {
-                return (BadRequest(new { message = "Full name is required." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
+                return (BadRequest(new { message = "Full name is required." }), string.Empty, string.Empty, string.Empty, string.Empty);
             }
 
             var (firstName, lastName) = SplitFullName(cleanedFullName);
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
             {
-                return (BadRequest(new { message = "Full name must include first name and last name." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
+                return (BadRequest(new { message = "Full name must include first name and last name." }), string.Empty, string.Empty, string.Empty, string.Empty);
             }
 
             var normalizedEmail = (request.Email ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(normalizedEmail))
             {
-                return (BadRequest(new { message = "Email is required." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
+                return (BadRequest(new { message = "Email is required." }), string.Empty, string.Empty, string.Empty, string.Empty);
             }
 
             var phone = (request.Phone ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(phone))
             {
-                return (BadRequest(new { message = "Phone is required." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
+                return (BadRequest(new { message = "Phone is required." }), string.Empty, string.Empty, string.Empty, string.Empty);
             }
 
             var serviceExists = await _context.Services.AnyAsync(s => s.Id == request.AssignedServiceId);
             if (!serviceExists)
             {
-                return (BadRequest(new { message = $"Service with ID {request.AssignedServiceId} does not exist." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
+                return (BadRequest(new { message = $"Service with ID {request.AssignedServiceId} does not exist." }), string.Empty, string.Empty, string.Empty, string.Empty);
             }
 
             var emailExists = await _context.SupportWorker
@@ -300,16 +296,10 @@ namespace NDISPortal.API.Controllers
 
             if (emailExists)
             {
-                return (BadRequest(new { message = "A support worker with this email already exists." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
+                return (BadRequest(new { message = "A support worker with this email already exists." }), string.Empty, string.Empty, string.Empty, string.Empty);
             }
 
-            var employmentType = NormalizeEmploymentType(request.EmploymentType);
-            if (!string.IsNullOrWhiteSpace(request.EmploymentType) && employmentType == null)
-            {
-                return (BadRequest(new { message = "Invalid employment type value." }), string.Empty, string.Empty, string.Empty, string.Empty, null);
-            }
-
-            return (null, firstName, lastName, normalizedEmail, phone, employmentType);
+            return (null, firstName, lastName, normalizedEmail, phone);
         }
 
         private async Task<SupportWorkers?> FindWorkerWithDetailsAsync(int id)

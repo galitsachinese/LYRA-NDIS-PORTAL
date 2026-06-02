@@ -3,8 +3,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AddButtonComponent } from '../../../../shared/components/button/add-button/add-button.component';
 import { ApiService } from '../../../core/services/api-service';
-import { SupportWorker, SupportWorkerPayload, SupportWorkersService } from '../../../core/services/support-workers.service';
+import { SupportWorker, SupportWorkerPayload, SupportWorkerStatus, SupportWorkersService } from '../../../core/services/support-workers.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { DialogUi } from '../../../../shared/ui/dialog/dialog.ui';
 
 interface ServiceOption {
   id: number;
@@ -22,7 +23,7 @@ interface WorkerForm {
 @Component({
   selector: 'app-support-workers',
   standalone: true,
-  imports: [CommonModule, FormsModule, AddButtonComponent],
+  imports: [CommonModule, FormsModule, AddButtonComponent, DialogUi],
   templateUrl: './support-workers.page.html',
 })
 export class SupportWorkersComponent implements OnInit {
@@ -40,11 +41,16 @@ export class SupportWorkersComponent implements OnInit {
   showModal = false;
   showViewModal = false;
   showDeleteConfirm = false;
+  showStatusConfirm = false;
   isEditMode = false;
+  isUpdatingStatus = false;
 
   selectedWorker: SupportWorker | null = null;
   workerToDelete: SupportWorker | null = null;
+  workerToChangeStatus: SupportWorker | null = null;
   editingWorkerId: number | null = null;
+  selectedStatus: SupportWorkerStatus = 'Active';
+  bookings: any[] = [];
 
   formErrors: Record<string, string> = {};
 
@@ -65,6 +71,7 @@ export class SupportWorkersComponent implements OnInit {
   ngOnInit(): void {
     this.loadServices();
     this.loadWorkers();
+    this.loadBookings();
   }
 
   get filteredWorkers(): SupportWorker[] {
@@ -131,6 +138,17 @@ export class SupportWorkersComponent implements OnInit {
     });
   }
 
+  loadBookings(): void {
+    this.api.getBookings().subscribe({
+      next: (bookings) => {
+        this.bookings = Array.isArray(bookings) ? bookings : [];
+      },
+      error: () => {
+        this.bookings = [];
+      },
+    });
+  }
+
   openModal(): void {
     this.isEditMode = false;
     this.editingWorkerId = null;
@@ -175,6 +193,49 @@ export class SupportWorkersComponent implements OnInit {
   confirmDelete(worker: SupportWorker): void {
     this.workerToDelete = worker;
     this.showDeleteConfirm = true;
+  }
+
+  openStatusConfirmation(worker: SupportWorker): void {
+    this.workerToChangeStatus = worker;
+    this.selectedStatus =
+      this.getWorkerStatus(worker).toLowerCase() === 'inactive'
+        ? 'Inactive'
+        : 'Active';
+    this.showStatusConfirm = true;
+  }
+
+  closeStatusConfirmation(): void {
+    if (this.isUpdatingStatus) {
+      return;
+    }
+
+    this.showStatusConfirm = false;
+    this.workerToChangeStatus = null;
+    this.selectedStatus = 'Active';
+  }
+
+  confirmStatusChange(): void {
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    const worker = this.workerToChangeStatus;
+    this.isUpdatingStatus = true;
+
+    this.supportWorkersService.updateSupportWorkerStatus(worker.id, this.selectedStatus).subscribe({
+      next: (updatedWorker) => {
+        this.workers = this.workers.map((item) =>
+          item.id === worker.id ? { ...item, status: updatedWorker.status || this.selectedStatus } : item
+        );
+        this.isUpdatingStatus = false;
+        this.closeStatusConfirmation();
+        this.toast.show('Support worker status updated successfully.', 'success');
+      },
+      error: (error) => {
+        this.isUpdatingStatus = false;
+        this.toast.show(error?.message || 'Could not update support worker status.', 'error');
+      },
+    });
   }
 
   cancelDelete(): void {
@@ -271,12 +332,50 @@ export class SupportWorkersComponent implements OnInit {
       case 'active':
         return 'bg-green-100 text-green-700';
       case 'inactive':
-        return 'bg-slate-100 text-slate-600';
+        return 'bg-red-50 text-red-600';
       case 'on leave':
         return 'bg-orange-100 text-orange-700';
       default:
         return 'bg-slate-100 text-slate-600';
     }
+  }
+
+  get upcomingAssignedBookingCount(): number {
+    if (!this.workerToChangeStatus) {
+      return 0;
+    }
+
+    const workerId = this.workerToChangeStatus.id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.bookings.filter((booking) => {
+      const assignedWorkerId = Number(
+        booking?.assignedWorkerId ??
+          booking?.AssignedWorkerId ??
+          booking?.supportWorkerId ??
+          booking?.SupportWorkerId ??
+          0
+      );
+      const preferredDate = new Date(
+        booking?.preferredDate ??
+          booking?.PreferredDate ??
+          booking?.bookingDate ??
+          booking?.BookingDate ??
+          ''
+      );
+
+      return (
+        assignedWorkerId === workerId &&
+        !Number.isNaN(preferredDate.getTime()) &&
+        preferredDate >= today &&
+        String(booking?.status ?? booking?.Status ?? '').toLowerCase() !== 'cancelled'
+      );
+    }).length;
+  }
+
+  get statusChangeButtonText(): string {
+    return this.isUpdatingStatus ? 'Updating...' : 'Confirm Status';
   }
 
   get hasActiveFilters(): boolean {

@@ -30,6 +30,9 @@ namespace NDISPortal.API.Models
         [Column("service_id")]
         public int ServiceId { get; set; }
 
+        [Column("status")]
+        public string Status { get; set; } = "Active";
+
         [ForeignKey("ServiceId")]
         public ServiceItem? AssignedService { get; set; }
 

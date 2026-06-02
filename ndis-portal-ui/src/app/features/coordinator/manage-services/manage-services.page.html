@@ -24,6 +24,10 @@
 
     </div>
 
+    <div *ngIf="errorMessage" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        {{ errorMessage }}
+    </div>
+
     <!-- Loading state -->
     <div *ngIf="isLoading" class="flex flex-col items-center justify-center h-[60vh] gap-4">
         <div class="w-12 h-12 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
@@ -31,7 +35,7 @@
     </div>
 
     <!-- Services table -->
-    <div *ngIf="!isLoading" data-testid="services-table">
+    <div *ngIf="!isLoading && !errorMessage" data-testid="services-table">
         <app-manage-services-table [bookings]="services"
           (toggleStatus)="toggleServiceStatus($event)">
         </app-manage-services-table>

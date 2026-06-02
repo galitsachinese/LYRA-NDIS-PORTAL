@@ -286,7 +286,9 @@ export class HeaderComponent {
   }
 
   get userRoleLabel(): string {
-    return this.userRole === 'coordinator' ? 'Coordinator' : 'Participant';
+    return this.userRole?.toLowerCase() === 'coordinator'
+      ? 'Coordinator'
+      : 'Participant';
   }
 
   getInitials(): string {

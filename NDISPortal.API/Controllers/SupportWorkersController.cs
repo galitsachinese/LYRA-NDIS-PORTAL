@@ -34,7 +34,8 @@ namespace NDISPortal.API.Controllers
                     email = sw.Email,
                     phone = sw.Phone,
                     assignedServiceId = sw.ServiceId,
-                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null
+                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null,
+                    status = sw.Status
                 })
                 .ToListAsync();
 
@@ -113,6 +114,7 @@ namespace NDISPortal.API.Controllers
                 LastName = lastName,
                 Email = normalizedEmail,
                 Phone = (request.Phone ?? string.Empty).Trim(),
+                Status = "Active",
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow
             };
@@ -130,7 +132,8 @@ namespace NDISPortal.API.Controllers
                     email = sw.Email,
                     phone = sw.Phone,
                     assignedServiceId = sw.ServiceId,
-                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null
+                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null,
+                    status = sw.Status
                 })
                 .FirstAsync();
 
@@ -223,7 +226,51 @@ namespace NDISPortal.API.Controllers
                     email = sw.Email,
                     phone = sw.Phone,
                     assignedServiceId = sw.ServiceId,
-                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null
+                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null,
+                    status = sw.Status
+                })
+                .FirstAsync();
+
+            return Ok(updatedWorker);
+        }
+
+        // PUT /api/support-workers/{id}/status
+        // Coordinator only
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateSupportWorkerStatus(int id, [FromBody] UpdateSupportWorkerStatusRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            var worker = await _context.SupportWorker.FindAsync(id);
+            if (worker == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Support worker with ID {id} was not found."
+                });
+            }
+
+            worker.Status = request.Status;
+            worker.ModifiedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var updatedWorker = await _context.SupportWorker
+                .Include(sw => sw.AssignedService)
+                .Where(sw => sw.Id == worker.Id)
+                .Select(sw => new
+                {
+                    id = sw.Id,
+                    fullName = ((sw.FirstName ?? "") + " " + (sw.LastName ?? "")).Trim(),
+                    email = sw.Email,
+                    phone = sw.Phone,
+                    assignedServiceId = sw.ServiceId,
+                    assignedServiceName = sw.AssignedService != null ? sw.AssignedService.Name : null,
+                    status = sw.Status
                 })
                 .FirstAsync();
 
@@ -280,6 +327,13 @@ namespace NDISPortal.API.Controllers
 
             [Range(1, int.MaxValue)]
             public int AssignedServiceId { get; set; }
+        }
+
+        public class UpdateSupportWorkerStatusRequest
+        {
+            [Required]
+            [RegularExpression("^(Active|Inactive)$", ErrorMessage = "Status must be Active or Inactive.")]
+            public string Status { get; set; } = "Active";
         }
     }
 }

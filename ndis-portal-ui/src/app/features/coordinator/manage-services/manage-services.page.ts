@@ -32,6 +32,7 @@ export class ManageServicesComponent implements OnInit {
 
   // Loading state
   isLoading = true;
+  errorMessage = '';
 
   // Controls modal visibility
   isModalOpen = false;
@@ -52,12 +53,19 @@ export class ManageServicesComponent implements OnInit {
     if (showLoading) {
       this.isLoading = true;
     }
+    this.errorMessage = '';
 
     this.api.getCoordinatorServices().subscribe({
       next: (res: any) => {
         console.log('API Response:', res); // Debug log
 
-        const data = Array.isArray(res?.Data) ? res.Data : [];
+        const data = Array.isArray(res?.Data)
+          ? res.Data
+          : Array.isArray(res?.data)
+            ? res.data
+            : Array.isArray(res)
+              ? res
+              : [];
 
         // Map API response to match table component expectations
         this.allServices = data.map((service: any) => ({
@@ -86,9 +94,11 @@ export class ManageServicesComponent implements OnInit {
 
         this.services = [];
         this.allServices = [];
+        this.errorMessage =
+          err?.message || 'Could not load services. Please try again.';
         this.isLoading = false;
 
-        this.toast.show('Could not load services.', 'error');
+        this.toast.show(this.errorMessage, 'error');
       },
     });
   }

@@ -198,15 +198,11 @@ export class ApiService {
 
       map((response: any) => {
 
-        if (response && Array.isArray(response.Data)) {
+        const data = this.unwrapApiResponse(response, []);
 
-          return response;
+        if (Array.isArray(data)) {
 
-        }
-
-        if (Array.isArray(response)) {
-
-          return { Data: response };
+          return { Data: data };
 
         }
 
@@ -396,6 +392,18 @@ export class ApiService {
 
   }
 
+  private unwrapApiResponse<T>(response: any, fallback: T): T {
+    if (response?.Data !== undefined) {
+      return response.Data;
+    }
+
+    if (response?.data !== undefined) {
+      return response.data;
+    }
+
+    return response ?? fallback;
+  }
+
 
 
 
@@ -560,6 +568,8 @@ export class ApiService {
 
     return this.http.get<any>(`${this.bookingsApiUrl}/stats`, { headers }).pipe(
 
+      map((response: any) => this.unwrapApiResponse(response, {})),
+
 
 
       catchError((error: any) => {
@@ -590,7 +600,7 @@ export class ApiService {
 
 
 
-  getBookings(): Observable<any> {
+  getBookings(): Observable<any[]> {
 
 
 
@@ -600,13 +610,25 @@ export class ApiService {
 
     return this.http.get<any>(this.bookingsApiUrl, { headers }).pipe(
 
+      map((response: any) => {
+        const data = this.unwrapApiResponse(response, []);
+        return Array.isArray(data) ? data : [];
+      }),
+
 
 
       catchError((error: any) => {
 
 
 
-        return throwError(() => new Error('Failed to load bookings.'));
+        const detail =
+          error?.error?.message ||
+          error?.error?.Message ||
+          error?.error?.errors?.[0] ||
+          error?.message ||
+          '';
+
+        return throwError(() => new Error(detail || 'Failed to load bookings.'));
 
 
 
@@ -671,7 +693,12 @@ export class ApiService {
       )
       .pipe(
         catchError((error: any) => {
-          return throwError(() => new Error('Failed to assign worker to booking.'));
+          const message =
+            error?.error?.message ||
+            error?.error?.Message ||
+            error?.message ||
+            'Failed to assign worker to booking.';
+          return throwError(() => new Error(message));
         }),
       );
   }
@@ -683,7 +710,12 @@ export class ApiService {
       .delete<any>(`${this.bookingsApiUrl}/${bookingId}/assign-worker`, { headers })
       .pipe(
         catchError((error: any) => {
-          return throwError(() => new Error('Failed to remove assigned worker.'));
+          const message =
+            error?.error?.message ||
+            error?.error?.Message ||
+            error?.message ||
+            'Failed to remove assigned worker.';
+          return throwError(() => new Error(message));
         }),
       );
   }
@@ -763,6 +795,3 @@ export class ApiService {
 
 
 }
-
-
-

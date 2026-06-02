@@ -124,7 +124,7 @@ export class AllBookingsComponent implements OnInit {
       error: (error) => {
         console.error('Error assigning worker:', error);
         this.isAssigningWorker = false;
-        this.toast.show('Failed to assign worker. Please try again.', 'error');
+        this.toast.show(error?.message || 'Failed to assign worker. Please try again.', 'error');
       },
     });
   }
@@ -158,7 +158,7 @@ export class AllBookingsComponent implements OnInit {
       error: (error) => {
         console.error('Error removing assigned worker:', error);
         this.isAssigningWorker = false;
-        this.toast.show('Failed to remove assigned worker. Please try again.', 'error');
+        this.toast.show(error?.message || 'Failed to remove assigned worker. Please try again.', 'error');
       },
     });
   }

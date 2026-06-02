@@ -3,6 +3,7 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { ApiService } from '../../../app/core/services/api-service';
 import { CommonModule } from '@angular/common';
+import { DialogUi } from '../../ui/dialog/dialog.ui';
 
 // Reactive Forms imports (VERY IMPORTANT)
 import {
@@ -17,6 +18,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    DialogUi,
     ReactiveFormsModule, // Needed for FormGroup to work
   ],
   templateUrl: './service-form-modal.component.html',

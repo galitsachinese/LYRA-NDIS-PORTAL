@@ -19,6 +19,13 @@
     </div>
   </section>
 
+  <div
+    *ngIf="bookingLoadError"
+    class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 2xl:px-6 2xl:py-4 2xl:text-lg"
+  >
+    {{ bookingLoadError }}
+  </div>
+
   <app-booking-queue-table
     [bookings]="filteredBookings"
     [pagedBookings]="pagedBookings"
@@ -58,7 +65,7 @@
         type="button"
         (click)="closeActionConfirmation()"
         [disabled]="isUpdatingBooking"
-        class="order-2 rounded-md border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-500 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-60 sm:order-1 2xl:text-xl"
+        class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60 sm:order-1 2xl:text-xl"
       >
         Dismiss
       </button>
@@ -67,8 +74,7 @@
         type="button"
         (click)="confirmBookingAction()"
         [disabled]="isUpdatingBooking"
-        class="order-1 rounded-lg px-6 py-2 text-xs font-bold text-white shadow-md transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
-        [ngClass]="pendingAction === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
+        class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
       >
         {{ confirmationButtonText }}
       </button>

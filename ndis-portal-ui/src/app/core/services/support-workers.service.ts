@@ -20,6 +20,8 @@ export interface SupportWorkerPayload {
   assignedServiceId: number;
 }
 
+export type SupportWorkerStatus = 'Active' | 'Inactive';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -46,6 +48,13 @@ export class SupportWorkersService {
     return this.http.put<any>(`${this.apiUrl}/${id}`, payload, { headers: this.getAuthHeaders() }).pipe(
       map((response) => this.normalizeWorker(response)),
       catchError((error) => throwError(() => this.toError(error, 'Failed to update support worker.')))
+    );
+  }
+
+  updateSupportWorkerStatus(id: number, status: SupportWorkerStatus): Observable<SupportWorker> {
+    return this.http.put<any>(`${this.apiUrl}/${id}/status`, { status }, { headers: this.getAuthHeaders() }).pipe(
+      map((response) => this.normalizeWorker(response)),
+      catchError((error) => throwError(() => this.toError(error, 'Failed to update support worker status.')))
     );
   }
 

@@ -297,6 +297,11 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                 throw new ArgumentException("Support worker not found.");
             }
 
+            if (!string.Equals(worker.Status, "Active", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Only active support workers can be assigned to bookings.");
+            }
+
             if (worker.ServiceId != booking.ServiceId)
             {
                 throw new ArgumentException("Support worker must be assigned to the same service as the booking.");

@@ -6,12 +6,12 @@
 
   <div actions class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
     <button (click)="closed.emit()"
-      class="order-2 sm:order-1 px-4 py-2 text-[11px] sm:text-xs 2xl:text-xl border rounded-md font-semibold text-slate-500 hover:text-slate-700">
+      class="order-2 rounded-md border border-violet-200 px-4 py-2 text-[11px] font-semibold text-violet-700 transition hover:bg-violet-50 sm:order-1 sm:text-xs 2xl:text-xl">
       Dismiss
     </button>
 
     <button (click)="confirmed.emit()"
-      class="order-1 sm:order-2 px-6 py-2 bg-rose-600 text-white rounded-lg font-bold text-[11px] sm:text-xs 2xl:text-xl 4xl:text-3xl hover:bg-rose-700 shadow-md transition-all active:scale-95">
+      class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-[11px] font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 sm:order-2 sm:text-xs 2xl:text-xl 4xl:text-3xl">
       {{ confirmText }}
     </button>
   </div>

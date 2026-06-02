@@ -51,6 +51,7 @@ export class DashboardComponent implements OnInit {
   pagedBookings: any[] = [];
   isLoading = true;
   isLoadingBookings = true;
+  bookingLoadError = '';
 
   selectedFilter = 'All';
   currentPage = 1;
@@ -97,6 +98,7 @@ export class DashboardComponent implements OnInit {
 
   loadBookings(): void {
     this.isLoadingBookings = true;
+    this.bookingLoadError = '';
     this.api.getBookings().subscribe({
       next: (res: any) => {
         const data = res.Data || res;
@@ -107,6 +109,12 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading bookings:', err);
+        this.bookings = [];
+        this.filteredBookings = [];
+        this.pagedBookings = [];
+        this.bookingLoadError =
+          err?.message || 'Unable to load bookings. Please try again.';
+        this.toast.show(this.bookingLoadError, 'error');
         this.isLoadingBookings = false;
       },
     });

@@ -192,9 +192,10 @@ namespace NdisPortal.BookingsApi.Controllers
             }
         }
 
-        // POST /api/bookings/{id}/assign-worker
+        // POST or PUT /api/bookings/{id}/assign-worker
         // Coordinator only
         [HttpPost("{id:int}/assign-worker")]
+        [HttpPut("{id:int}/assign-worker")]
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> AssignWorker(int id, [FromBody] AssignWorkerDto dto)
         {

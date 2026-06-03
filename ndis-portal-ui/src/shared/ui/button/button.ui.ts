@@ -12,7 +12,7 @@ export class ButtonUiComponent {
   @Input() type: 'button' | 'submit' = 'button';
   @Input() fullWidth: boolean = false;
   // 1. Added 'ghost' to the type
-  @Input() variant: 'solid' | 'outline' | 'none' | 'ghost' = 'solid';
+  @Input() variant: 'solid' | 'outline' | 'none' | 'ghost' | 'greenGhost' = 'solid';
   @Input() disabled: boolean = false;
 
   @Output() onClick = new EventEmitter<MouseEvent>();
@@ -29,5 +29,8 @@ export class ButtonUiComponent {
     // 2. New Dynamic Variant: Fits content, minimal padding, no fixed width
     ghost:
       'bg-[#6B3293] hover:bg-[#5a2a7b] text-white rounded-lg px-3 py-2 text-sm md:text-base font-medium whitespace-nowrap',
+
+    greenGhost:
+      'bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 py-2 text-sm md:text-base font-medium whitespace-nowrap',
   };
 }

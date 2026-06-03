@@ -10,6 +10,7 @@ export interface SupportWorker {
   phone: string;
   assignedServiceId: number;
   assignedServiceName?: string | null;
+  status?: string | null;
 }
 
 export interface SupportWorkerPayload {
@@ -18,6 +19,8 @@ export interface SupportWorkerPayload {
   phone: string;
   assignedServiceId: number;
 }
+
+export type SupportWorkerStatus = 'Active' | 'Inactive';
 
 @Injectable({
   providedIn: 'root',
@@ -45,6 +48,20 @@ export class SupportWorkersService {
     return this.http.put<any>(`${this.apiUrl}/${id}`, payload, { headers: this.getAuthHeaders() }).pipe(
       map((response) => this.normalizeWorker(response)),
       catchError((error) => throwError(() => this.toError(error, 'Failed to update support worker.')))
+    );
+  }
+
+  updateSupportWorkerStatus(id: number, status: SupportWorkerStatus): Observable<SupportWorker> {
+    return this.http.put<any>(`${this.apiUrl}/${id}/status`, { status }, { headers: this.getAuthHeaders() }).pipe(
+      map((response) => this.normalizeWorker(response)),
+      catchError((error) => throwError(() => this.toError(error, 'Failed to update support worker status.')))
+    );
+  }
+
+  getUpcomingBookingCount(id: number): Observable<number> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/upcoming-bookings/count`, { headers: this.getAuthHeaders() }).pipe(
+      map((response) => Number(response?.count ?? response?.Count ?? response?.data?.count ?? response?.Data?.Count ?? 0)),
+      catchError((error) => throwError(() => this.toError(error, 'Failed to load assigned booking count.')))
     );
   }
 
@@ -91,6 +108,7 @@ export class SupportWorkersService {
       ),
       assignedServiceName:
         worker?.assignedServiceName ?? worker?.AssignedServiceName ?? worker?.serviceName ?? worker?.ServiceName ?? null,
+      status: worker?.status ?? worker?.Status ?? null,
     };
   }
 

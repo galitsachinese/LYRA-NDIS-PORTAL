@@ -4,11 +4,14 @@ import { StatusCardComponent } from '../../../../shared/components/card/status-c
 import { BookingQueueTableComponent } from '../../../../shared/components/table/booking-queue/booking-queue-table.component';
 import { ApiService } from '../../../core/services/api-service';
 import { ToastService } from '../../../core/services/toast.service';
+import { DialogUi } from '../../../../shared/ui/dialog/dialog.ui';
+
+type BookingAction = 'approve' | 'cancel';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, StatusCardComponent, BookingQueueTableComponent],
+  imports: [CommonModule, StatusCardComponent, BookingQueueTableComponent, DialogUi],
   templateUrl: './dashboard.page.html',
 })
 export class DashboardComponent implements OnInit {
@@ -48,10 +51,14 @@ export class DashboardComponent implements OnInit {
   pagedBookings: any[] = [];
   isLoading = true;
   isLoadingBookings = true;
+  bookingLoadError = '';
 
   selectedFilter = 'All';
   currentPage = 1;
   readonly pageSize = 5;
+  pendingAction: BookingAction | null = null;
+  selectedActionBooking: any | null = null;
+  isUpdatingBooking = false;
 
   readonly statusOptions = [
     { label: 'All', value: 'All' },
@@ -91,6 +98,7 @@ export class DashboardComponent implements OnInit {
 
   loadBookings(): void {
     this.isLoadingBookings = true;
+    this.bookingLoadError = '';
     this.api.getBookings().subscribe({
       next: (res: any) => {
         const data = res.Data || res;
@@ -101,21 +109,84 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading bookings:', err);
+        this.bookings = [];
+        this.filteredBookings = [];
+        this.pagedBookings = [];
+        this.bookingLoadError =
+          err?.message || 'Unable to load bookings. Please try again.';
+        this.toast.show(this.bookingLoadError, 'error');
         this.isLoadingBookings = false;
       },
     });
   }
 
-  approveBooking(booking: any): void {
+  requestApproveBooking(booking: any): void {
+    this.openActionConfirmation('approve', booking);
+  }
+
+  requestCancelBooking(booking: any): void {
+    this.openActionConfirmation('cancel', booking);
+  }
+
+  closeActionConfirmation(): void {
+    if (this.isUpdatingBooking) {
+      return;
+    }
+
+    this.pendingAction = null;
+    this.selectedActionBooking = null;
+  }
+
+  confirmBookingAction(): void {
+    if (!this.pendingAction || !this.selectedActionBooking) {
+      return;
+    }
+
+    if (this.pendingAction === 'approve') {
+      this.approveBooking(this.selectedActionBooking);
+      return;
+    }
+
+    this.cancelBooking(this.selectedActionBooking);
+  }
+
+  get confirmationTitle(): string {
+    return this.pendingAction === 'approve'
+      ? 'Approve this booking?'
+      : 'Cancel this booking?';
+  }
+
+  get confirmationMessage(): string {
+    const name = this.getBookingParticipantName(this.selectedActionBooking);
+    const service = this.selectedActionBooking?.serviceName || 'this service';
+
+    return this.pendingAction === 'approve'
+      ? `This will approve ${name}'s booking for ${service}.`
+      : `This will cancel ${name}'s booking for ${service}.`;
+  }
+
+  get confirmationButtonText(): string {
+    if (this.isUpdatingBooking) {
+      return this.pendingAction === 'approve' ? 'Approving...' : 'Cancelling...';
+    }
+
+    return this.pendingAction === 'approve' ? 'Approve Booking' : 'Cancel Booking';
+  }
+
+  private approveBooking(booking: any): void {
+    this.isUpdatingBooking = true;
+
     this.api.updateBookingStatus(booking.id, 'Approved').subscribe({
       next: () => {
         booking.status = 'Approved';
         this.applyCurrentFilter(false);
         this.loadStats();
+        this.resetActionConfirmation();
         this.toast.show('Booking approved successfully!', 'success');
       },
       error: (err) => {
         console.error('Error approving booking:', err);
+        this.isUpdatingBooking = false;
         this.toast.show(
           'Failed to approve booking. Please try again.',
           'error',
@@ -124,16 +195,20 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  cancelBooking(booking: any): void {
+  private cancelBooking(booking: any): void {
+    this.isUpdatingBooking = true;
+
     this.api.updateBookingStatus(booking.id, 'Cancelled').subscribe({
       next: () => {
         booking.status = 'Cancelled';
         this.applyCurrentFilter(false);
         this.loadStats();
+        this.resetActionConfirmation();
         this.toast.show('Booking cancelled successfully!', 'success');
       },
       error: (err) => {
         console.error('Error cancelling booking:', err);
+        this.isUpdatingBooking = false;
         this.toast.show('Failed to cancel booking. Please try again.', 'error');
       },
     });
@@ -220,5 +295,26 @@ export class DashboardComponent implements OnInit {
       startIndex,
       startIndex + this.pageSize,
     );
+  }
+
+  private openActionConfirmation(action: BookingAction, booking: any): void {
+    this.pendingAction = action;
+    this.selectedActionBooking = booking;
+  }
+
+  private resetActionConfirmation(): void {
+    this.pendingAction = null;
+    this.selectedActionBooking = null;
+    this.isUpdatingBooking = false;
+  }
+
+  private getBookingParticipantName(booking: any): string {
+    const name = booking?.participantName || booking?.name || `User ${booking?.userId || ''}`;
+
+    return String(name)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 }

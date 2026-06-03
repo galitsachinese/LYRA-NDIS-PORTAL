@@ -147,7 +147,7 @@
                 <circle cx="5" cy="5" r="5" />
               </svg>
 
-              {{ getValue(row, col.key) }}
+              {{ formatName(getValue(row, col.key)) }}
 
             </div>
 
@@ -157,7 +157,7 @@
 
             <span *ngSwitchCase="'category'"
               class="block text-sm font-medium leading-5 text-slate-600">
-              {{ getValue(row, col.key) }}
+              {{ formatName(getValue(row, col.key)) }}
             </span>
 
             <!-- ===========================
@@ -212,7 +212,7 @@
                  NAME
                  =========================== -->
 
-            <span *ngSwitchCase="'name'" class="text-slate-900 font-semibold truncate block">
+            <span *ngSwitchCase="'name'" class="text-slate-800 font-medium truncate block">
               {{ getValue(row, col.key) }}
             </span>
 
@@ -220,7 +220,7 @@
                  SERVICE
                  =========================== -->
 
-            <span *ngSwitchCase="'service'" class="text-slate-900 font-semibold truncate block">
+            <span *ngSwitchCase="'service'" class="text-slate-900 font-normal truncate block">
               {{ getValue(row, col.key) }}
             </span>
 
@@ -289,12 +289,12 @@
           <ng-container [ngSwitch]="col.type">
 
             <!-- Name -->
-            <span *ngSwitchCase="'name'" class="text-slate-900 font-semibold block truncate">
+            <span *ngSwitchCase="'name'" class="text-slate-800 font-medium block truncate">
               {{ getValue(row, col.key) }}
             </span>
 
             <!-- Service -->
-            <span *ngSwitchCase="'service'" class="text-slate-900 font-semibold block truncate">
+            <span *ngSwitchCase="'service'" class="text-slate-900 font-normal block truncate">
               {{ getValue(row, col.key) }}
             </span>
 

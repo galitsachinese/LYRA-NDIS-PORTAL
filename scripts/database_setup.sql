@@ -66,6 +66,7 @@ CREATE TABLE bookings (
     id INT PRIMARY KEY IDENTITY(1,1),
     user_id INT NOT NULL,
     service_id INT NOT NULL,
+    support_worker_id INT NULL,
     booking_date DATETIME NOT NULL,
     notes NVARCHAR(500) NULL,
     status TINYINT NOT NULL DEFAULT 0, -- 0=Pending, 1=Approved, 2=Cancelled
@@ -76,6 +77,9 @@ CREATE TABLE bookings (
     FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT FK_bookings_service 
     FOREIGN KEY (service_id) REFERENCES services(id),
+    CONSTRAINT FK_bookings_support_worker
+    FOREIGN KEY (support_worker_id) REFERENCES support_workers(id)
+    ON DELETE SET NULL,
     CONSTRAINT CHK_booking_status 
     CHECK (status IN (0,1,2))
 );
@@ -89,17 +93,15 @@ CREATE TABLE worker_bookings (
     modified_date DATETIME NOT NULL DEFAULT GETDATE(),
     assigned_by INT NOT NULL,
 
+    CONSTRAINT UQ_worker_bookings_booking UNIQUE (booking_id),
     CONSTRAINT FK_worker_bookings_worker
     FOREIGN KEY (worker_id) REFERENCES support_workers(id),
     CONSTRAINT FK_worker_bookings_booking
     FOREIGN KEY (booking_id) REFERENCES bookings(id),
     CONSTRAINT FK_worker_bookings_assigned_by
-    FOREIGN KEY (assigned_by) REFERENCES users(id),
-    CONSTRAINT UQ_worker_bookings_booking
-    UNIQUE (booking_id)
+    FOREIGN KEY (assigned_by) REFERENCES users(id)
 );
 Go
-
 
 
 
@@ -196,15 +198,14 @@ BEGIN
         modified_date DATETIME NOT NULL DEFAULT GETDATE(),
         assigned_by INT NOT NULL,
 
+        CONSTRAINT UQ_worker_bookings_booking
+            UNIQUE (booking_id),
         CONSTRAINT FK_worker_bookings_worker
             FOREIGN KEY (worker_id) REFERENCES support_workers(id),
         CONSTRAINT FK_worker_bookings_booking
             FOREIGN KEY (booking_id) REFERENCES bookings(id),
         CONSTRAINT FK_worker_bookings_assigned_by
-            FOREIGN KEY (assigned_by) REFERENCES users(id),
-        CONSTRAINT UQ_worker_bookings_booking
-            UNIQUE (booking_id)
+            FOREIGN KEY (assigned_by) REFERENCES users(id)
     );
 END
 Go
-

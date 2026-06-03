@@ -6,5 +6,11 @@ namespace NdisPortal.BookingsApi.DTOs
     {
         [Range(1, int.MaxValue)]
         public int WorkerId { get; set; }
+
+        public int SupportWorkerId
+        {
+            get => WorkerId;
+            set => WorkerId = value;
+        }
     }
 }

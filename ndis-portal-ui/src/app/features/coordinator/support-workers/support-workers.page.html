@@ -3,9 +3,10 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <h1 class="m-0 text-2xl font-bold leading-tight text-slate-950 md:text-[28px]">Support Workers</h1>
+        <p class="mt-1 text-sm text-slate-500">Manage staff assigned to participant support services.</p>
       </div>
 
-      <app-add-button label="Add Support Worker" data-testid="add-worker-btn" (onClick)="openModal()"></app-add-button>
+      <app-add-button label="Add Support Worker" variant="greenGhost" data-testid="add-worker-btn" (onClick)="openModal()"></app-add-button>
     </div>
 
     <div *ngIf="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
@@ -22,6 +23,52 @@
         <h2 class="m-0 text-sm font-bold text-slate-950">Support Worker Registry</h2>
       </div>
 
+      <div *ngIf="workers.length > 0" class="grid gap-3 border-b border-slate-100 px-5 py-4 sm:grid-cols-2 lg:grid-cols-[160px_220px_minmax(240px,1fr)_auto] lg:items-end">
+        <label class="block">
+          <span class="mb-1 block text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Status</span>
+          <select class="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [(ngModel)]="statusFilter">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1 block text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Service</span>
+          <select class="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [(ngModel)]="serviceFilter">
+            <option value="all">All</option>
+            <option *ngFor="let service of services" [value]="service.id">{{ service.name }}</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1 block text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Search</span>
+          <div class="relative">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path stroke-linecap="round" d="m20 20-3.5-3.5" />
+            </svg>
+            <input type="search" class="h-10 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [(ngModel)]="searchTerm" placeholder="Worker name or email" />
+          </div>
+        </label>
+
+        <button
+          type="button"
+          class="h-10 rounded-md border px-4 text-sm font-medium transition disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-white disabled:text-slate-400"
+          [class.border-red-200]="hasActiveFilters"
+          [class.bg-red-50]="hasActiveFilters"
+          [class.text-red-600]="hasActiveFilters"
+          [class.hover:bg-red-100]="hasActiveFilters"
+          [class.border-slate-200]="!hasActiveFilters"
+          [class.text-slate-600]="!hasActiveFilters"
+          [class.hover:bg-slate-50]="!hasActiveFilters"
+          [disabled]="!hasActiveFilters"
+          (click)="clearFilters()"
+        >
+          Clear
+        </button>
+      </div>
+
       <div *ngIf="workers.length === 0" class="flex min-h-[260px] flex-col items-center justify-center px-5 py-12 text-center">
         <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-violet-50 text-[#6B3293]">
           <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -33,36 +80,63 @@
         <p class="mt-2 text-sm text-slate-500">Add your first support worker to assign staff to services.</p>
       </div>
 
-      <div *ngIf="workers.length > 0" class="overflow-x-auto" data-testid="support-workers-table">
-        <table class="w-full min-w-[980px] table-fixed border-collapse">
+      <div *ngIf="workers.length > 0 && filteredWorkers.length === 0" class="flex min-h-[220px] flex-col items-center justify-center px-5 py-12 text-center">
+        <h3 class="m-0 text-base font-bold text-slate-800">No matching support workers</h3>
+        <p class="mt-2 text-sm text-slate-500">Adjust the filters or search term to see more results.</p>
+      </div>
+
+      <div *ngIf="filteredWorkers.length > 0" class="overflow-x-auto" data-testid="support-workers-table">
+        <table class="w-full min-w-[1080px] table-fixed border-collapse">
           <thead class="bg-slate-50">
             <tr>
-              <th class="w-[24%] px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Full Name</th>
-              <th class="w-[24%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Email</th>
-              <th class="w-[18%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Phone</th>
-              <th class="w-[22%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</th>
-              <th class="w-[12%] px-5 py-3 text-right text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Actions</th>
+              <th class="w-[22%] px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Full Name</th>
+              <th class="w-[22%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Email</th>
+              <th class="w-[15%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Phone</th>
+              <th class="w-[21%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</th>
+              <th class="w-[10%] px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Status</th>
+              <th class="w-[10%] px-5 py-3 text-right text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngFor="let worker of workers" class="border-t border-slate-100">
+            <tr *ngFor="let worker of filteredWorkers" class="border-t border-slate-100">
               <td class="px-5 py-4 align-middle">
                 <div class="flex items-center gap-3">
                   <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-bold text-[#6B3293]">
                     {{ getInitials(worker.fullName) }}
                   </div>
-                  <strong class="text-sm font-bold text-[#0057a8]">{{ worker.fullName }}</strong>
+                  <span class="text-sm font-medium text-slate-800">{{ formatName(worker.fullName) }}</span>
                 </div>
               </td>
 
-              <td class="px-4 py-4 align-middle text-sm text-slate-600">{{ worker.email }}</td>
+              <td class="px-4 py-4 align-middle text-sm text-slate-600">
+                <a class="transition hover:text-[#0057a8] hover:underline" [href]="'mailto:' + worker.email">
+                  {{ worker.email }}
+                </a>
+              </td>
               <td class="px-4 py-4 align-middle text-sm text-slate-600">{{ worker.phone || 'N/A' }}</td>
 
               <td class="px-4 py-4 align-middle">
-                <span class="inline-flex max-w-full items-center truncate rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                  {{ getServiceName(worker) }}
-                </span>
+                <div class="min-w-0">
+                  <span class="block truncate text-sm font-medium text-slate-800">
+                    {{ getServiceName(worker) }}
+                  </span>
+                  <span class="mt-0.5 block truncate text-xs text-slate-500">
+                    {{ getServiceCategory(worker) }}
+                  </span>
+                </div>
+              </td>
+
+              <td class="px-4 py-4 align-middle">
+                <button
+                  type="button"
+                  class="inline-flex min-w-[76px] justify-center rounded-full px-3 py-1 text-xs font-semibold transition hover:ring-2 hover:ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[#6B3293]"
+                  [ngClass]="getWorkerStatusClass(worker)"
+                  title="Change worker status"
+                  (click)="openStatusConfirmation(worker)"
+                >
+                  {{ getWorkerStatus(worker) }}
+                </button>
               </td>
 
               <td class="px-5 py-4 text-right align-middle">
@@ -90,7 +164,7 @@
         </table>
 
         <div class="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p class="m-0 text-sm text-slate-500">Showing {{ workers.length }} of {{ workers.length }} Support Workers</p>
+          <p class="m-0 text-sm text-slate-500">Showing {{ filteredWorkers.length }} of {{ workers.length }} Support Workers</p>
           <div class="flex gap-1">
             <button type="button" class="h-8 w-8 rounded-md bg-slate-100 text-sm font-semibold text-slate-400" disabled aria-label="Previous page">&#8249;</button>
             <button type="button" class="h-8 w-8 rounded-md bg-[#0057a8] text-sm font-semibold text-white">1</button>
@@ -102,17 +176,16 @@
   </div>
 </div>
 
-<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="closeModal()">
-  <div class="w-full max-w-[480px] rounded-2xl bg-white shadow-2xl" data-testid="worker-modal" (click)="$event.stopPropagation()">
-    <div class="relative px-6 pt-6">
-      <h2 class="m-0 text-xl font-bold text-slate-900">{{ isEditMode ? 'Edit Support Worker' : 'Add Support Worker' }}</h2>
-      <p class="mt-1 text-sm text-slate-500">
-        {{ isEditMode ? 'Update support worker details and assigned service.' : 'Register a new support worker and assign them to a service.' }}
-      </p>
-      <button type="button" class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md text-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700" (click)="closeModal()">x</button>
-    </div>
+<app-dialog-ui
+  [isOpen]="showModal"
+  [label]="isEditMode ? 'Edit Support Worker' : 'Add Support Worker'"
+  (close)="closeModal()"
+>
+  <div body class="space-y-4" data-testid="worker-modal">
+    <p class="m-0 text-sm text-slate-500">
+      {{ isEditMode ? 'Update support worker details and assigned service.' : 'Register a new support worker and assign them to a service.' }}
+    </p>
 
-    <div class="space-y-4 px-6 py-5">
       <label class="block">
         <span class="text-xs font-bold text-slate-700">Full Name <span class="text-red-500">*</span></span>
         <input type="text" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100" [class.border-red-400]="formErrors['fullName']" [class.border-slate-300]="!formErrors['fullName']" [(ngModel)]="workerForm.fullName" placeholder="e.g. John Smith" />
@@ -139,29 +212,116 @@
         </select>
         <small *ngIf="formErrors['assignedServiceId']" class="mt-1 block text-xs text-red-500">{{ formErrors['assignedServiceId'] }}</small>
       </label>
-    </div>
+  </div>
 
-    <div class="flex gap-3 px-6 pb-6">
-      <button type="button" class="flex-1 rounded-lg bg-[#0057a8] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#004a8f] disabled:cursor-not-allowed disabled:opacity-60" data-testid="save-worker-btn" [disabled]="isSaving" (click)="saveWorker()">
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+      <button type="button" class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60 sm:order-1 2xl:text-xl" [disabled]="isSaving" (click)="closeModal()">Cancel</button>
+      <button type="button" class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl" data-testid="save-worker-btn" [disabled]="isSaving" (click)="saveWorker()">
         {{ isSaving ? 'Saving...' : isEditMode ? 'Update Support Worker' : 'Add Support Worker' }}
       </button>
-      <button type="button" class="flex-1 rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200" [disabled]="isSaving" (click)="closeModal()">Cancel</button>
-    </div>
   </div>
-</div>
+</app-dialog-ui>
 
-<div *ngIf="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="closeViewModal()">
-  <div class="w-full max-w-[430px] rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
-    <div class="relative">
-      <h2 class="m-0 text-xl font-bold text-slate-900">Support Worker Details</h2>
-      <button type="button" class="absolute right-0 top-0 flex h-8 w-8 items-center justify-center rounded-md text-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700" (click)="closeViewModal()">x</button>
+<app-dialog-ui
+  [isOpen]="showStatusConfirm"
+  label="Change Worker Status"
+  (close)="closeStatusConfirmation()"
+>
+  <div body class="space-y-4">
+    <div *ngIf="workerToChangeStatus" class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-3">
+      <p class="m-0 text-xs font-bold uppercase tracking-[0.06em] text-slate-500">Worker</p>
+      <p class="m-0 mt-1 text-sm font-semibold text-slate-800">
+        {{ formatName(workerToChangeStatus.fullName) }}
+      </p>
+      <p class="m-0 mt-2 text-xs text-slate-500">
+        Current status: <span class="font-semibold text-slate-700">{{ getWorkerStatus(workerToChangeStatus) }}</span>
+      </p>
     </div>
 
-    <div *ngIf="selectedWorker" class="pt-6 text-center">
+    <label class="block">
+      <span class="mb-1 block text-xs font-bold text-slate-600 2xl:text-lg">New status</span>
+      <select
+        class="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100 2xl:h-14 2xl:text-xl"
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="onSelectedStatusChange($event)"
+      >
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    </label>
+
+    <p *ngIf="isLoadingUpcomingBookings" class="m-0 text-sm text-slate-500 2xl:text-lg">
+      Checking assigned bookings...
+    </p>
+  </div>
+
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+    <button
+      type="button"
+      class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60 sm:order-1 2xl:text-xl"
+      [disabled]="isUpdatingStatus"
+      (click)="closeStatusConfirmation()"
+    >
+      Dismiss
+    </button>
+    <button
+      type="button"
+      class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
+      [disabled]="isUpdatingStatus || isLoadingUpcomingBookings || !workerToChangeStatus"
+      (click)="confirmStatusChange()"
+    >
+      {{ isUpdatingStatus ? 'Updating...' : 'Confirm' }}
+    </button>
+  </div>
+</app-dialog-ui>
+
+<app-dialog-ui
+  [isOpen]="showInactiveBookingWarning"
+  label="Worker Has Upcoming Bookings"
+  (close)="cancelInactiveBookingWarning()"
+>
+  <div body class="px-2 py-2 text-center">
+    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-orange-500">
+      <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z" />
+      </svg>
+    </div>
+    <p class="mx-auto max-w-sm text-sm leading-6 text-slate-600 2xl:text-lg">
+      This worker has {{ upcomingBookingsLabel }}. Changing their status will not automatically reassign those bookings.
+    </p>
+  </div>
+
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+    <button
+      type="button"
+      class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60 sm:order-1 2xl:text-xl"
+      [disabled]="isUpdatingStatus"
+      (click)="cancelInactiveBookingWarning()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
+      [disabled]="isUpdatingStatus || !workerToChangeStatus"
+      (click)="confirmInactiveBookingWarning()"
+    >
+      {{ isUpdatingStatus ? 'Updating...' : 'Confirm' }}
+    </button>
+  </div>
+</app-dialog-ui>
+
+<app-dialog-ui
+  [isOpen]="showViewModal"
+  label="Support Worker Details"
+  (close)="closeViewModal()"
+>
+  <div body>
+    <div *ngIf="selectedWorker" class="text-center">
       <div class="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-[#6B3293] text-2xl font-bold text-white">
         {{ getInitials(selectedWorker.fullName) }}
       </div>
-      <h3 class="m-0 text-lg font-bold text-slate-900">{{ selectedWorker.fullName }}</h3>
+      <h3 class="m-0 text-lg font-medium text-slate-800">{{ formatName(selectedWorker.fullName) }}</h3>
 
       <div class="mt-6 grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
         <div>
@@ -175,28 +335,35 @@
         <div class="sm:col-span-2">
           <p class="m-0 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">Assigned Service</p>
           <p class="mt-1 text-sm font-semibold text-slate-700">{{ getServiceName(selectedWorker) }}</p>
+          <p class="mt-0.5 text-xs text-slate-500">{{ getServiceCategory(selectedWorker) }}</p>
         </div>
       </div>
-
-      <button type="button" class="mt-6 w-full rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200" (click)="closeViewModal()">Close</button>
     </div>
   </div>
-</div>
 
-<div *ngIf="showDeleteConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" (click)="cancelDelete()">
-  <div class="w-full max-w-[400px] rounded-2xl bg-white p-6 text-center shadow-2xl" (click)="$event.stopPropagation()">
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+    <button type="button" class="rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 2xl:text-xl" (click)="closeViewModal()">Close</button>
+  </div>
+</app-dialog-ui>
+
+<app-dialog-ui
+  [isOpen]="showDeleteConfirm"
+  label="Delete Support Worker"
+  (close)="cancelDelete()"
+>
+  <div body class="text-center">
     <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500">
       <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z" />
       </svg>
     </div>
-    <h2 class="m-0 text-xl font-bold text-slate-900">Delete Support Worker</h2>
     <p class="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-600">
       Are you sure you want to delete <strong class="text-slate-900">{{ workerToDelete?.fullName }}</strong>? This action cannot be undone.
     </p>
-    <div class="mt-6 flex gap-3">
-      <button type="button" class="flex-1 rounded-lg bg-red-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-red-600" (click)="deleteWorker()">Delete</button>
-      <button type="button" class="flex-1 rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200" (click)="cancelDelete()">Cancel</button>
-    </div>
   </div>
-</div>
+
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+    <button type="button" class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 sm:order-1 2xl:text-xl" (click)="cancelDelete()">Cancel</button>
+    <button type="button" class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 sm:order-2 2xl:text-xl" (click)="deleteWorker()">Delete</button>
+  </div>
+</app-dialog-ui>

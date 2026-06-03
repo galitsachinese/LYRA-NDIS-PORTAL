@@ -10,5 +10,6 @@ import { PlusIconComponent } from '../../icons/svg-icons/plus-icon'
 })
 export class AddButtonComponent {
   @Input() label = 'New Service';
+  @Input() variant: 'ghost' | 'greenGhost' = 'ghost';
   @Output() onClick = new EventEmitter<MouseEvent>();
 }

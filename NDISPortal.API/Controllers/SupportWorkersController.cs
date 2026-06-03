@@ -118,6 +118,31 @@ namespace NDISPortal.API.Controllers
             return Ok(ToResponseDto(worker));
         }
 
+        // GET /api/support-workers/{id}/upcoming-bookings/count
+        // Coordinator only
+        [HttpGet("{id:int}/upcoming-bookings/count")]
+        public async Task<IActionResult> GetUpcomingBookingCount(int id)
+        {
+            var workerExists = await _context.SupportWorker.AnyAsync(sw => sw.Id == id);
+            if (!workerExists)
+            {
+                return NotFound(new
+                {
+                    message = $"Support worker with ID {id} was not found."
+                });
+            }
+
+            var today = DateTime.UtcNow.Date;
+            var count = await _context.WorkerBookings
+                .Where(wb =>
+                    wb.WorkerId == id &&
+                    wb.Booking.BookingDate >= today &&
+                    wb.Booking.Status != 2)
+                .CountAsync();
+
+            return Ok(new { count });
+        }
+
         // POST /api/support-workers
         // Coordinator only
         [HttpPost]
@@ -197,9 +222,10 @@ namespace NDISPortal.API.Controllers
             return Ok(ToResponseDto(updatedWorker!));
         }
 
-        // PATCH /api/support-workers/{id}/status
+        // PATCH or PUT /api/support-workers/{id}/status
         // Coordinator only
         [HttpPatch("{id:int}/status")]
+        [HttpPut("{id:int}/status")]
         public async Task<IActionResult> UpdateSupportWorkerStatus(int id, [FromBody] UpdateWorkerStatusDto request)
         {
             if (!ModelState.IsValid)

@@ -666,6 +666,46 @@ export class ApiService {
 
 
 
+  assignWorkerToBooking(bookingId: number, supportWorkerId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+
+    return this.http.put<any>(
+      `${this.bookingsApiUrl}/${bookingId}/assign-worker`,
+      { workerId: supportWorkerId, supportWorkerId },
+      { headers }
+    ).pipe(
+      catchError((error: any) => {
+        const message =
+          error?.error?.message ||
+          error?.error?.Message ||
+          error?.message ||
+          'Failed to assign worker to booking.';
+
+        return throwError(() => new Error(message));
+      })
+    );
+  }
+
+  unassignWorkerFromBooking(bookingId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+
+    return this.http.delete<any>(`${this.bookingsApiUrl}/${bookingId}/assign-worker`, { headers }).pipe(
+      catchError((error: any) => {
+        const message =
+          error?.error?.message ||
+          error?.error?.Message ||
+          error?.message ||
+          'Failed to remove assigned worker.';
+
+        return throwError(() => new Error(message));
+      })
+    );
+  }
+
+
+
+
+
   // Update service status - Activate or Deactivate (coordinator only)
 
 
@@ -735,6 +775,4 @@ export class ApiService {
 
 
 }
-
-
 

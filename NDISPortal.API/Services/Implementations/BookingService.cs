@@ -105,6 +105,14 @@ namespace NdisPortal.BookingsApi.Services.Implementations
                             ? b.User.FirstName + " " + b.User.LastName
                             : string.Empty
                         : null,
+                    AssignedWorkerId = _context.WorkerBookings
+                        .Where(wb => wb.BookingId == b.Id)
+                        .Select(wb => (int?)wb.WorkerId)
+                        .FirstOrDefault(),
+                    AssignedWorkerName = _context.WorkerBookings
+                        .Where(wb => wb.BookingId == b.Id)
+                        .Select(wb => wb.Worker.FirstName + " " + wb.Worker.LastName)
+                        .FirstOrDefault(),
                     PreferredDate = b.BookingDate,
                     Notes = b.Notes,
                     Status = StatusToString(b.Status),

@@ -201,6 +201,18 @@ export class TableComponent {
     return row ? row[key] : '';
   }
 
+  formatName(value: any): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    return String(value)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+  }
+
   /* Check if action column exists */
   get hasActionColumn(): boolean {
     return this.columns.some((col) => col.type === 'action');

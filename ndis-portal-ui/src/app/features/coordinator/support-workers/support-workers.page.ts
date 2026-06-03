@@ -3,12 +3,14 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AddButtonComponent } from '../../../../shared/components/button/add-button/add-button.component';
 import { ApiService } from '../../../core/services/api-service';
-import { SupportWorker, SupportWorkerPayload, SupportWorkersService } from '../../../core/services/support-workers.service';
+import { SupportWorker, SupportWorkerPayload, SupportWorkerStatus, SupportWorkersService } from '../../../core/services/support-workers.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { DialogUi } from '../../../../shared/ui/dialog/dialog.ui';
 
 interface ServiceOption {
   id: number;
   name: string;
+  category: string;
 }
 
 interface WorkerForm {
@@ -21,12 +23,16 @@ interface WorkerForm {
 @Component({
   selector: 'app-support-workers',
   standalone: true,
-  imports: [CommonModule, FormsModule, AddButtonComponent],
+  imports: [CommonModule, FormsModule, AddButtonComponent, DialogUi],
   templateUrl: './support-workers.page.html',
 })
 export class SupportWorkersComponent implements OnInit {
   workers: SupportWorker[] = [];
   services: ServiceOption[] = [];
+
+  statusFilter = 'all';
+  serviceFilter = 'all';
+  searchTerm = '';
 
   isLoading = true;
   isSaving = false;
@@ -35,11 +41,19 @@ export class SupportWorkersComponent implements OnInit {
   showModal = false;
   showViewModal = false;
   showDeleteConfirm = false;
+  showStatusConfirm = false;
+  showInactiveBookingWarning = false;
   isEditMode = false;
+  isUpdatingStatus = false;
+  isLoadingUpcomingBookings = false;
 
   selectedWorker: SupportWorker | null = null;
   workerToDelete: SupportWorker | null = null;
+  workerToChangeStatus: SupportWorker | null = null;
   editingWorkerId: number | null = null;
+  selectedStatus: SupportWorkerStatus = 'Active';
+  upcomingAssignedBookingCount = 0;
+  bookings: any[] = [];
 
   formErrors: Record<string, string> = {};
 
@@ -60,6 +74,23 @@ export class SupportWorkersComponent implements OnInit {
   ngOnInit(): void {
     this.loadServices();
     this.loadWorkers();
+    this.loadBookings();
+  }
+
+  get filteredWorkers(): SupportWorker[] {
+    const query = this.searchTerm.trim().toLowerCase();
+
+    return this.workers.filter((worker) => {
+      const status = this.getWorkerStatus(worker).toLowerCase();
+      const serviceId = String(worker.assignedServiceId || '');
+      const searchable = `${worker.fullName || ''} ${worker.email || ''}`.toLowerCase();
+
+      return (
+        (this.statusFilter === 'all' || status === this.statusFilter) &&
+        (this.serviceFilter === 'all' || serviceId === this.serviceFilter) &&
+        (!query || searchable.includes(query))
+      );
+    });
   }
 
   loadWorkers(): void {
@@ -93,11 +124,30 @@ export class SupportWorkersComponent implements OnInit {
           .map((service: any) => ({
             id: Number(service?.id ?? service?.Id ?? 0),
             name: service?.name ?? service?.Name ?? service?.title ?? service?.Title ?? 'Untitled Service',
+            category:
+              service?.category ??
+              service?.Category ??
+              service?.categoryName ??
+              service?.CategoryName ??
+              service?.serviceCategory ??
+              service?.ServiceCategory ??
+              'Uncategorized',
           }))
           .filter((service: ServiceOption) => service.id > 0);
       },
       error: () => {
         this.services = [];
+      },
+    });
+  }
+
+  loadBookings(): void {
+    this.api.getBookings().subscribe({
+      next: (response) => {
+        this.bookings = this.unwrapBookings(response);
+      },
+      error: () => {
+        this.bookings = [];
       },
     });
   }
@@ -146,6 +196,104 @@ export class SupportWorkersComponent implements OnInit {
   confirmDelete(worker: SupportWorker): void {
     this.workerToDelete = worker;
     this.showDeleteConfirm = true;
+  }
+
+  openStatusConfirmation(worker: SupportWorker): void {
+    this.workerToChangeStatus = worker;
+    this.selectedStatus =
+      this.getWorkerStatus(worker).toLowerCase() === 'inactive'
+        ? 'Active'
+        : 'Inactive';
+    this.upcomingAssignedBookingCount = 0;
+    this.showStatusConfirm = true;
+
+    if (this.selectedStatus === 'Inactive') {
+      this.loadUpcomingBookingCount(worker.id);
+    }
+  }
+
+  closeStatusConfirmation(): void {
+    if (this.isUpdatingStatus) {
+      return;
+    }
+
+    this.showStatusConfirm = false;
+    this.workerToChangeStatus = null;
+    this.selectedStatus = 'Active';
+    this.upcomingAssignedBookingCount = 0;
+    this.showInactiveBookingWarning = false;
+  }
+
+  confirmStatusChange(): void {
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    if (this.selectedStatus === 'Inactive' && this.upcomingAssignedBookingCount > 0) {
+      this.showStatusConfirm = false;
+      this.showInactiveBookingWarning = true;
+      return;
+    }
+
+    this.applyStatusChange();
+  }
+
+  onSelectedStatusChange(status: SupportWorkerStatus): void {
+    this.selectedStatus = status;
+
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    if (status === 'Inactive') {
+      this.loadUpcomingBookingCount(this.workerToChangeStatus.id);
+      return;
+    }
+
+    this.upcomingAssignedBookingCount = 0;
+    this.isLoadingUpcomingBookings = false;
+  }
+
+  cancelInactiveBookingWarning(): void {
+    if (this.isUpdatingStatus) {
+      return;
+    }
+
+    this.showInactiveBookingWarning = false;
+    this.showStatusConfirm = true;
+  }
+
+  confirmInactiveBookingWarning(): void {
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    this.applyStatusChange();
+  }
+
+  private applyStatusChange(): void {
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    const worker = this.workerToChangeStatus;
+    this.isUpdatingStatus = true;
+
+    this.supportWorkersService.updateSupportWorkerStatus(worker.id, this.selectedStatus).subscribe({
+      next: (updatedWorker) => {
+        this.workers = this.workers.map((item) =>
+          item.id === worker.id ? { ...item, status: updatedWorker.status || this.selectedStatus } : item
+        );
+        this.isUpdatingStatus = false;
+        this.showInactiveBookingWarning = false;
+        this.closeStatusConfirmation();
+        this.toast.show('Support worker status updated successfully.', 'success');
+      },
+      error: (error) => {
+        this.isUpdatingStatus = false;
+        this.toast.show(error?.message || 'Could not update support worker status.', 'error');
+      },
+    });
   }
 
   cancelDelete(): void {
@@ -222,6 +370,107 @@ export class SupportWorkersComponent implements OnInit {
     );
   }
 
+  getServiceCategory(worker: SupportWorker | null): string {
+    if (!worker) {
+      return 'Uncategorized';
+    }
+
+    return (
+      this.services.find((service) => service.id === worker.assignedServiceId)?.category ||
+      'Uncategorized'
+    );
+  }
+
+  getWorkerStatus(worker: SupportWorker): string {
+    return worker.status?.trim() || 'Active';
+  }
+
+  getWorkerStatusClass(worker: SupportWorker): string {
+    switch (this.getWorkerStatus(worker).toLowerCase()) {
+      case 'active':
+        return 'bg-green-100 text-green-700';
+      case 'inactive':
+        return 'bg-red-50 text-red-600';
+      case 'on leave':
+        return 'bg-orange-100 text-orange-700';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  }
+
+  getLocalUpcomingAssignedBookingCount(): number {
+    if (!this.workerToChangeStatus || this.selectedStatus !== 'Inactive') {
+      return 0;
+    }
+
+    const workerId = this.workerToChangeStatus.id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.bookings.filter((booking) => {
+      const assignedWorkerId = Number(
+        booking?.assignedWorkerId ??
+          booking?.AssignedWorkerId ??
+          booking?.supportWorkerId ??
+          booking?.SupportWorkerId ??
+          0
+      );
+      const preferredDate = new Date(
+        booking?.preferredDate ??
+          booking?.PreferredDate ??
+          booking?.bookingDate ??
+          booking?.BookingDate ??
+          ''
+      );
+
+      return (
+        assignedWorkerId === workerId &&
+        !Number.isNaN(preferredDate.getTime()) &&
+        preferredDate >= today &&
+        String(booking?.status ?? booking?.Status ?? '').toLowerCase() !== 'cancelled'
+      );
+    }).length;
+  }
+
+  private loadUpcomingBookingCount(workerId: number): void {
+    this.isLoadingUpcomingBookings = true;
+
+    this.supportWorkersService.getUpcomingBookingCount(workerId).subscribe({
+      next: (count) => {
+        this.upcomingAssignedBookingCount = count;
+        this.isLoadingUpcomingBookings = false;
+      },
+      error: () => {
+        this.upcomingAssignedBookingCount = this.getLocalUpcomingAssignedBookingCount();
+        this.isLoadingUpcomingBookings = false;
+      },
+    });
+  }
+
+  get statusChangeButtonText(): string {
+    return this.isUpdatingStatus ? 'Updating...' : 'Confirm Status';
+  }
+
+  get upcomingBookingsLabel(): string {
+    return this.upcomingAssignedBookingCount === 1
+      ? '1 upcoming booking'
+      : `${this.upcomingAssignedBookingCount} upcoming bookings`;
+  }
+
+  get hasActiveFilters(): boolean {
+    return (
+      this.statusFilter !== 'all' ||
+      this.serviceFilter !== 'all' ||
+      this.searchTerm.trim().length > 0
+    );
+  }
+
+  clearFilters(): void {
+    this.statusFilter = 'all';
+    this.serviceFilter = 'all';
+    this.searchTerm = '';
+  }
+
   getInitials(name: string): string {
     return name
       .split(' ')
@@ -232,6 +481,18 @@ export class SupportWorkersComponent implements OnInit {
       .toUpperCase();
   }
 
+  formatName(value: string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    return value
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+  }
+
   private resetForm(): void {
     this.workerForm = {
       fullName: '',
@@ -240,6 +501,22 @@ export class SupportWorkersComponent implements OnInit {
       assignedServiceId: '',
     };
     this.formErrors = {};
+  }
+
+  private unwrapBookings(response: any): any[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (Array.isArray(response?.data)) {
+      return response.data;
+    }
+
+    if (Array.isArray(response?.Data)) {
+      return response.Data;
+    }
+
+    return [];
   }
 
   private validateForm(): boolean {
@@ -270,4 +547,5 @@ export class SupportWorkersComponent implements OnInit {
 
     return Object.keys(this.formErrors).length === 0;
   }
+
 }

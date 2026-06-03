@@ -34,7 +34,7 @@
 
 <div *ngIf="bookings.length > 0" class="space-y-4 md:hidden">
   <article
-    *ngFor="let service of bookings"
+    *ngFor="let service of visibleServices"
     class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
   >
     <div class="flex items-center gap-3 p-4">
@@ -42,8 +42,8 @@
         {{ getInitials(service.name) }}
       </div>
       <div class="min-w-0 flex-1">
-        <p class="break-words text-sm font-semibold leading-5 text-blue-900">
-          {{ service.name }}
+        <p class="break-words text-sm font-normal leading-5 text-slate-800">
+          {{ formatName(service.name) }}
         </p>
         <p class="text-xs text-blue-600">
           ID: {{ service.id }}
@@ -68,6 +68,49 @@
       <ng-container *ngTemplateOutlet="toggleControl; context: { service: service }"></ng-container>
     </div>
   </article>
+
+  <div class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-slate-500">
+      Showing {{ showingStart }}-{{ showingEnd }} of {{ bookings.length }} services
+    </p>
+
+    <div class="flex items-center gap-1">
+      <button
+        type="button"
+        (click)="goToPage(currentPage - 1)"
+        [disabled]="currentPage === 1"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+        title="Previous page"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
+        </svg>
+      </button>
+      <button
+        *ngFor="let page of pageNumbers"
+        type="button"
+        (click)="goToPage(page)"
+        class="inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm font-semibold transition-colors"
+        [ngClass]="{
+          'bg-[#2446C0] text-white': currentPage === page,
+          'bg-slate-50 text-slate-500 hover:bg-slate-100': currentPage !== page
+        }"
+      >
+        {{ page }}
+      </button>
+      <button
+        type="button"
+        (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+        title="Next page"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>
 
 <div *ngIf="bookings.length > 0" class="hidden rounded-xl border border-slate-200 bg-white shadow-sm md:block">
@@ -98,15 +141,15 @@
       </thead>
 
       <tbody class="divide-y divide-slate-100">
-        <tr *ngFor="let service of bookings" class="transition-colors hover:bg-slate-50/80">
+        <tr *ngFor="let service of visibleServices" class="transition-colors hover:bg-slate-50/80">
           <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
             <div class="flex items-center gap-3">
               <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-semibold text-sm 2xl:h-12 2xl:w-12 2xl:text-base min-[3840px]:h-16 min-[3840px]:w-16 min-[3840px]:text-2xl">
                 {{ getInitials(service.name) }}
               </div>
               <div class="min-w-0 flex-1">
-                <span class="block truncate font-semibold text-blue-900">
-                  {{ service.name }}
+                <span class="block truncate font-normal text-slate-800">
+                  {{ formatName(service.name) }}
                 </span>
                 <span class="block truncate text-xs text-blue-600 2xl:text-sm min-[3840px]:text-lg">
                   ID: {{ service.id }}
@@ -128,5 +171,48 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="flex flex-col gap-3 border-t border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+    <p class="text-sm text-slate-500 2xl:text-base min-[3840px]:text-2xl">
+      Showing {{ showingStart }}-{{ showingEnd }} of {{ bookings.length }} services
+    </p>
+
+    <div class="flex items-center gap-1 2xl:gap-2 min-[3840px]:gap-4">
+      <button
+        type="button"
+        (click)="goToPage(currentPage - 1)"
+        [disabled]="currentPage === 1"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 2xl:h-10 2xl:w-10 min-[3840px]:h-14 min-[3840px]:w-14"
+        title="Previous page"
+      >
+        <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
+        </svg>
+      </button>
+      <button
+        *ngFor="let page of pageNumbers"
+        type="button"
+        (click)="goToPage(page)"
+        class="inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm font-semibold transition-colors 2xl:h-10 2xl:min-w-10 2xl:text-base min-[3840px]:h-14 min-[3840px]:min-w-14 min-[3840px]:text-2xl"
+        [ngClass]="{
+          'bg-[#2446C0] text-white': currentPage === page,
+          'bg-slate-50 text-slate-500 hover:bg-slate-100': currentPage !== page
+        }"
+      >
+        {{ page }}
+      </button>
+      <button
+        type="button"
+        (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 2xl:h-10 2xl:w-10 min-[3840px]:h-14 min-[3840px]:w-14"
+        title="Next page"
+      >
+        <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
+        </svg>
+      </button>
+    </div>
   </div>
 </div>

@@ -24,6 +24,7 @@ export class BookingQueueTableComponent {
   @Input() totalPages = 1;
   @Input() pageNumbers: number[] = [];
   @Input() showingEnd = 0;
+  @Input() showWorkerAssignment = false;
 
   @Output() refresh = new EventEmitter<void>();
   @Output() statusChange = new EventEmitter<string>();
@@ -32,6 +33,8 @@ export class BookingQueueTableComponent {
   @Output() pageChange = new EventEmitter<number>();
   @Output() approve = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
+  @Output() assignWorker = new EventEmitter<any>();
+  @Output() unassignWorker = new EventEmitter<any>();
 
   activeMenuId: number | null = null;
   isFilterDropdownOpen = false;
@@ -70,6 +73,18 @@ export class BookingQueueTableComponent {
       .join('');
   }
 
+  formatName(value: any): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    return String(value)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+  }
+
   getAvatarClass(booking: any): string {
     const colors = [
       'bg-rose-100 text-rose-600',
@@ -97,6 +112,33 @@ export class BookingQueueTableComponent {
 
   isPending(booking: any): boolean {
     return booking.status === 'Pending';
+  }
+
+  isApproved(booking: any): boolean {
+    return booking.status === 'Approved';
+  }
+
+  getAssignedWorkerName(booking: any): string {
+    const name =
+      booking?.assignedWorkerName ??
+      booking?.AssignedWorkerName ??
+      booking?.supportWorkerName ??
+      booking?.SupportWorkerName ??
+      booking?.workerName ??
+      booking?.WorkerName ??
+      '';
+
+    return this.formatName(name);
+  }
+
+  hasAssignedWorker(booking: any): boolean {
+    return Boolean(
+      booking?.assignedWorkerId ??
+        booking?.AssignedWorkerId ??
+        booking?.supportWorkerId ??
+        booking?.SupportWorkerId ??
+        this.getAssignedWorkerName(booking),
+    );
   }
 
   @HostListener('document:click', ['$event'])

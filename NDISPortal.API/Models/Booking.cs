@@ -1,6 +1,5 @@
 ﻿using Register.API.Models;
 using Service.API.Model;
-using NDISPortal.API.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,11 +21,6 @@ public class Booking
     public int ServiceId { get; set; }
 
     public ServiceItem Service { get; set; }
-
-    [Column("support_worker_id")]
-    public int? SupportWorkerId { get; set; }
-
-    public SupportWorkers? SupportWorker { get; set; }
 
     [Column("booking_date")]
     public DateTime BookingDate { get; set; }

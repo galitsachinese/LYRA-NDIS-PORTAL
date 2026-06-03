@@ -27,11 +27,19 @@ namespace NDISPortal.API.Models
         [Column("phone")]
         public string Phone { get; set; } = string.Empty;
 
-        [Column("service_id")]
-        public int ServiceId { get; set; }
-
+        [Required]
         [Column("status")]
         public string Status { get; set; } = "Active";
+
+        [Required]
+        [Column("employment_type")]
+        public string EmploymentType { get; set; } = "Casual";
+
+        [Column("wwcc_expiry_date")]
+        public DateTime? WwccExpiryDate { get; set; }
+
+        [Column("service_id")]
+        public int ServiceId { get; set; }
 
         [ForeignKey("ServiceId")]
         public ServiceItem? AssignedService { get; set; }

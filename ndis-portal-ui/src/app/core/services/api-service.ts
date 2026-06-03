@@ -198,11 +198,15 @@ export class ApiService {
 
       map((response: any) => {
 
-        const data = this.unwrapApiResponse(response, []);
+        if (response && Array.isArray(response.Data)) {
 
-        if (Array.isArray(data)) {
+          return response;
 
-          return { Data: data };
+        }
+
+        if (Array.isArray(response)) {
+
+          return { Data: response };
 
         }
 
@@ -392,18 +396,6 @@ export class ApiService {
 
   }
 
-  private unwrapApiResponse<T>(response: any, fallback: T): T {
-    if (response?.Data !== undefined) {
-      return response.Data;
-    }
-
-    if (response?.data !== undefined) {
-      return response.data;
-    }
-
-    return response ?? fallback;
-  }
-
 
 
 
@@ -568,8 +560,6 @@ export class ApiService {
 
     return this.http.get<any>(`${this.bookingsApiUrl}/stats`, { headers }).pipe(
 
-      map((response: any) => this.unwrapApiResponse(response, {})),
-
 
 
       catchError((error: any) => {
@@ -600,7 +590,7 @@ export class ApiService {
 
 
 
-  getBookings(): Observable<any[]> {
+  getBookings(): Observable<any> {
 
 
 
@@ -610,25 +600,13 @@ export class ApiService {
 
     return this.http.get<any>(this.bookingsApiUrl, { headers }).pipe(
 
-      map((response: any) => {
-        const data = this.unwrapApiResponse(response, []);
-        return Array.isArray(data) ? data : [];
-      }),
-
 
 
       catchError((error: any) => {
 
 
 
-        const detail =
-          error?.error?.message ||
-          error?.error?.Message ||
-          error?.error?.errors?.[0] ||
-          error?.message ||
-          '';
-
-        return throwError(() => new Error(detail || 'Failed to load bookings.'));
+        return throwError(() => new Error('Failed to load bookings.'));
 
 
 
@@ -682,45 +660,47 @@ export class ApiService {
 
   }
 
+
+
+
+
+
+
   assignWorkerToBooking(bookingId: number, supportWorkerId: number): Observable<any> {
     const headers = this.getAuthHeaders();
 
-    return this.http
-      .put<any>(
-        `${this.bookingsApiUrl}/${bookingId}/assign-worker`,
-        { supportWorkerId },
-        { headers },
-      )
-      .pipe(
-        catchError((error: any) => {
-          const message =
-            error?.error?.message ||
-            error?.error?.Message ||
-            error?.message ||
-            'Failed to assign worker to booking.';
-          return throwError(() => new Error(message));
-        }),
-      );
+    return this.http.put<any>(
+      `${this.bookingsApiUrl}/${bookingId}/assign-worker`,
+      { workerId: supportWorkerId, supportWorkerId },
+      { headers }
+    ).pipe(
+      catchError((error: any) => {
+        const message =
+          error?.error?.message ||
+          error?.error?.Message ||
+          error?.message ||
+          'Failed to assign worker to booking.';
+
+        return throwError(() => new Error(message));
+      })
+    );
   }
 
   unassignWorkerFromBooking(bookingId: number): Observable<any> {
     const headers = this.getAuthHeaders();
 
-    return this.http
-      .delete<any>(`${this.bookingsApiUrl}/${bookingId}/assign-worker`, { headers })
-      .pipe(
-        catchError((error: any) => {
-          const message =
-            error?.error?.message ||
-            error?.error?.Message ||
-            error?.message ||
-            'Failed to remove assigned worker.';
-          return throwError(() => new Error(message));
-        }),
-      );
+    return this.http.delete<any>(`${this.bookingsApiUrl}/${bookingId}/assign-worker`, { headers }).pipe(
+      catchError((error: any) => {
+        const message =
+          error?.error?.message ||
+          error?.error?.Message ||
+          error?.message ||
+          'Failed to remove assigned worker.';
+
+        return throwError(() => new Error(message));
+      })
+    );
   }
-
-
 
 
 
@@ -795,3 +775,4 @@ export class ApiService {
 
 
 }
+

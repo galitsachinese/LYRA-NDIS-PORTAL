@@ -1,23 +1,22 @@
 USE ndis_portal_db;
 GO
 
-IF COL_LENGTH('bookings', 'support_worker_id') IS NULL
+IF OBJECT_ID('worker_bookings', 'U') IS NULL
 BEGIN
-    ALTER TABLE bookings
-    ADD support_worker_id INT NULL;
-END
-GO
-
-IF NOT EXISTS (
-    SELECT 1
-    FROM sys.foreign_keys
-    WHERE name = 'FK_bookings_support_worker'
-)
-BEGIN
-    ALTER TABLE bookings
-    ADD CONSTRAINT FK_bookings_support_worker
-    FOREIGN KEY (support_worker_id)
-    REFERENCES support_workers(id)
-    ON DELETE SET NULL;
+    CREATE TABLE worker_bookings (
+        id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        worker_id INT NOT NULL,
+        booking_id INT NOT NULL,
+        assigned_date DATETIME NOT NULL CONSTRAINT DF_worker_bookings_assigned_date DEFAULT GETDATE(),
+        modified_date DATETIME NOT NULL CONSTRAINT DF_worker_bookings_modified_date DEFAULT GETDATE(),
+        assigned_by INT NOT NULL,
+        CONSTRAINT UQ_worker_bookings_booking UNIQUE (booking_id),
+        CONSTRAINT FK_worker_bookings_worker
+            FOREIGN KEY (worker_id) REFERENCES support_workers(id),
+        CONSTRAINT FK_worker_bookings_booking
+            FOREIGN KEY (booking_id) REFERENCES bookings(id),
+        CONSTRAINT FK_worker_bookings_assigned_by
+            FOREIGN KEY (assigned_by) REFERENCES users(id)
+    );
 END
 GO

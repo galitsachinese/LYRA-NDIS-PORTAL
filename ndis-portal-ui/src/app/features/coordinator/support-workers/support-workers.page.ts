@@ -42,14 +42,17 @@ export class SupportWorkersComponent implements OnInit {
   showViewModal = false;
   showDeleteConfirm = false;
   showStatusConfirm = false;
+  showInactiveBookingWarning = false;
   isEditMode = false;
   isUpdatingStatus = false;
+  isLoadingUpcomingBookings = false;
 
   selectedWorker: SupportWorker | null = null;
   workerToDelete: SupportWorker | null = null;
   workerToChangeStatus: SupportWorker | null = null;
   editingWorkerId: number | null = null;
   selectedStatus: SupportWorkerStatus = 'Active';
+  upcomingAssignedBookingCount = 0;
   bookings: any[] = [];
 
   formErrors: Record<string, string> = {};
@@ -140,8 +143,8 @@ export class SupportWorkersComponent implements OnInit {
 
   loadBookings(): void {
     this.api.getBookings().subscribe({
-      next: (bookings) => {
-        this.bookings = Array.isArray(bookings) ? bookings : [];
+      next: (response) => {
+        this.bookings = this.unwrapBookings(response);
       },
       error: () => {
         this.bookings = [];
@@ -199,9 +202,14 @@ export class SupportWorkersComponent implements OnInit {
     this.workerToChangeStatus = worker;
     this.selectedStatus =
       this.getWorkerStatus(worker).toLowerCase() === 'inactive'
-        ? 'Inactive'
-        : 'Active';
+        ? 'Active'
+        : 'Inactive';
+    this.upcomingAssignedBookingCount = 0;
     this.showStatusConfirm = true;
+
+    if (this.selectedStatus === 'Inactive') {
+      this.loadUpcomingBookingCount(worker.id);
+    }
   }
 
   closeStatusConfirmation(): void {
@@ -212,9 +220,58 @@ export class SupportWorkersComponent implements OnInit {
     this.showStatusConfirm = false;
     this.workerToChangeStatus = null;
     this.selectedStatus = 'Active';
+    this.upcomingAssignedBookingCount = 0;
+    this.showInactiveBookingWarning = false;
   }
 
   confirmStatusChange(): void {
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    if (this.selectedStatus === 'Inactive' && this.upcomingAssignedBookingCount > 0) {
+      this.showStatusConfirm = false;
+      this.showInactiveBookingWarning = true;
+      return;
+    }
+
+    this.applyStatusChange();
+  }
+
+  onSelectedStatusChange(status: SupportWorkerStatus): void {
+    this.selectedStatus = status;
+
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    if (status === 'Inactive') {
+      this.loadUpcomingBookingCount(this.workerToChangeStatus.id);
+      return;
+    }
+
+    this.upcomingAssignedBookingCount = 0;
+    this.isLoadingUpcomingBookings = false;
+  }
+
+  cancelInactiveBookingWarning(): void {
+    if (this.isUpdatingStatus) {
+      return;
+    }
+
+    this.showInactiveBookingWarning = false;
+    this.showStatusConfirm = true;
+  }
+
+  confirmInactiveBookingWarning(): void {
+    if (!this.workerToChangeStatus) {
+      return;
+    }
+
+    this.applyStatusChange();
+  }
+
+  private applyStatusChange(): void {
     if (!this.workerToChangeStatus) {
       return;
     }
@@ -228,6 +285,7 @@ export class SupportWorkersComponent implements OnInit {
           item.id === worker.id ? { ...item, status: updatedWorker.status || this.selectedStatus } : item
         );
         this.isUpdatingStatus = false;
+        this.showInactiveBookingWarning = false;
         this.closeStatusConfirmation();
         this.toast.show('Support worker status updated successfully.', 'success');
       },
@@ -340,8 +398,8 @@ export class SupportWorkersComponent implements OnInit {
     }
   }
 
-  get upcomingAssignedBookingCount(): number {
-    if (!this.workerToChangeStatus) {
+  getLocalUpcomingAssignedBookingCount(): number {
+    if (!this.workerToChangeStatus || this.selectedStatus !== 'Inactive') {
       return 0;
     }
 
@@ -374,8 +432,29 @@ export class SupportWorkersComponent implements OnInit {
     }).length;
   }
 
+  private loadUpcomingBookingCount(workerId: number): void {
+    this.isLoadingUpcomingBookings = true;
+
+    this.supportWorkersService.getUpcomingBookingCount(workerId).subscribe({
+      next: (count) => {
+        this.upcomingAssignedBookingCount = count;
+        this.isLoadingUpcomingBookings = false;
+      },
+      error: () => {
+        this.upcomingAssignedBookingCount = this.getLocalUpcomingAssignedBookingCount();
+        this.isLoadingUpcomingBookings = false;
+      },
+    });
+  }
+
   get statusChangeButtonText(): string {
     return this.isUpdatingStatus ? 'Updating...' : 'Confirm Status';
+  }
+
+  get upcomingBookingsLabel(): string {
+    return this.upcomingAssignedBookingCount === 1
+      ? '1 upcoming booking'
+      : `${this.upcomingAssignedBookingCount} upcoming bookings`;
   }
 
   get hasActiveFilters(): boolean {
@@ -422,6 +501,22 @@ export class SupportWorkersComponent implements OnInit {
       assignedServiceId: '',
     };
     this.formErrors = {};
+  }
+
+  private unwrapBookings(response: any): any[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (Array.isArray(response?.data)) {
+      return response.data;
+    }
+
+    if (Array.isArray(response?.Data)) {
+      return response.Data;
+    }
+
+    return [];
   }
 
   private validateForm(): boolean {

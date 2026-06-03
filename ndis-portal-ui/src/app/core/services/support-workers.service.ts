@@ -58,6 +58,13 @@ export class SupportWorkersService {
     );
   }
 
+  getUpcomingBookingCount(id: number): Observable<number> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/upcoming-bookings/count`, { headers: this.getAuthHeaders() }).pipe(
+      map((response) => Number(response?.count ?? response?.Count ?? response?.data?.count ?? response?.Data?.Count ?? 0)),
+      catchError((error) => throwError(() => this.toError(error, 'Failed to load assigned booking count.')))
+    );
+  }
+
   deleteSupportWorker(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() }).pipe(
       catchError((error) => throwError(() => this.toError(error, 'Failed to delete support worker.')))

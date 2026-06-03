@@ -3,6 +3,7 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <h1 class="m-0 text-2xl font-bold leading-tight text-slate-950 md:text-[28px]">Support Workers</h1>
+        <p class="mt-1 text-sm text-slate-500">Manage staff assigned to participant support services.</p>
       </div>
 
       <app-add-button label="Add Support Worker" variant="greenGhost" data-testid="add-worker-btn" (onClick)="openModal()"></app-add-button>
@@ -51,7 +52,19 @@
           </div>
         </label>
 
-        <button type="button" class="h-10 rounded-md border border-slate-200 px-4 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50" [disabled]="!hasActiveFilters" (click)="clearFilters()">
+        <button
+          type="button"
+          class="h-10 rounded-md border px-4 text-sm font-medium transition disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-white disabled:text-slate-400"
+          [class.border-red-200]="hasActiveFilters"
+          [class.bg-red-50]="hasActiveFilters"
+          [class.text-red-600]="hasActiveFilters"
+          [class.hover:bg-red-100]="hasActiveFilters"
+          [class.border-slate-200]="!hasActiveFilters"
+          [class.text-slate-600]="!hasActiveFilters"
+          [class.hover:bg-slate-50]="!hasActiveFilters"
+          [disabled]="!hasActiveFilters"
+          (click)="clearFilters()"
+        >
           Clear
         </button>
       </div>
@@ -230,17 +243,15 @@
       <select
         class="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100 2xl:h-14 2xl:text-xl"
         [(ngModel)]="selectedStatus"
+        (ngModelChange)="onSelectedStatusChange($event)"
       >
         <option value="Active">Active</option>
         <option value="Inactive">Inactive</option>
       </select>
     </label>
 
-    <p
-      *ngIf="upcomingAssignedBookingCount > 0 && (selectedStatus === 'Inactive' || selectedStatus === 'Active')"
-      class="m-0 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 2xl:text-lg"
-    >
-      This worker has {{ upcomingAssignedBookingCount }} upcoming bookings. Changing their status will not automatically reassign those bookings.
+    <p *ngIf="isLoadingUpcomingBookings" class="m-0 text-sm text-slate-500 2xl:text-lg">
+      Checking assigned bookings...
     </p>
   </div>
 
@@ -256,10 +267,46 @@
     <button
       type="button"
       class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
-      [disabled]="isUpdatingStatus || !workerToChangeStatus"
+      [disabled]="isUpdatingStatus || isLoadingUpcomingBookings || !workerToChangeStatus"
       (click)="confirmStatusChange()"
     >
-      {{ statusChangeButtonText }}
+      {{ isUpdatingStatus ? 'Updating...' : 'Confirm' }}
+    </button>
+  </div>
+</app-dialog-ui>
+
+<app-dialog-ui
+  [isOpen]="showInactiveBookingWarning"
+  label="Worker Has Upcoming Bookings"
+  (close)="cancelInactiveBookingWarning()"
+>
+  <div body class="px-2 py-2 text-center">
+    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-orange-500">
+      <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z" />
+      </svg>
+    </div>
+    <p class="mx-auto max-w-sm text-sm leading-6 text-slate-600 2xl:text-lg">
+      This worker has {{ upcomingBookingsLabel }}. Changing their status will not automatically reassign those bookings.
+    </p>
+  </div>
+
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+    <button
+      type="button"
+      class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60 sm:order-1 2xl:text-xl"
+      [disabled]="isUpdatingStatus"
+      (click)="cancelInactiveBookingWarning()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
+      [disabled]="isUpdatingStatus || !workerToChangeStatus"
+      (click)="confirmInactiveBookingWarning()"
+    >
+      {{ isUpdatingStatus ? 'Updating...' : 'Confirm' }}
     </button>
   </div>
 </app-dialog-ui>

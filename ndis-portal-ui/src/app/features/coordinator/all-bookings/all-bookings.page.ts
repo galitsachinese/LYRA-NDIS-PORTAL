@@ -115,8 +115,8 @@ export class AllBookingsComponent implements OnInit {
 
     this.isAssigningWorker = true;
     this.api.assignWorkerToBooking(this.selectedAssignBooking.id, workerId).subscribe({
-      next: () => {
-        this.applyAssignedWorker(this.selectedAssignBooking, worker);
+      next: (response) => {
+        this.applyAssignedWorker(this.selectedAssignBooking, worker, response);
         this.isAssigningWorker = false;
         this.closeAssignWorker();
         this.toast.show('Worker assigned successfully. Participant will be notified.', 'success');
@@ -404,13 +404,24 @@ export class AllBookingsComponent implements OnInit {
       .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
-  private applyAssignedWorker(booking: any, worker?: SupportWorker): void {
-    if (!worker) {
+  private applyAssignedWorker(booking: any, worker?: SupportWorker, response?: any): void {
+    if (!worker && !response) {
       return;
     }
 
-    booking.assignedWorkerId = worker.id;
-    booking.assignedWorkerName = worker.fullName;
+    const workerId = response?.workerId ?? response?.WorkerId ?? worker?.id;
+    const workerName = response?.workerName ?? response?.WorkerName ?? worker?.fullName;
+
+    booking.assignedWorkerId = workerId;
+    booking.AssignedWorkerId = workerId;
+    booking.supportWorkerId = workerId;
+    booking.SupportWorkerId = workerId;
+    booking.assignedWorkerName = workerName;
+    booking.AssignedWorkerName = workerName;
+    booking.supportWorkerName = workerName;
+    booking.SupportWorkerName = workerName;
+    booking.workerName = workerName;
+    booking.WorkerName = workerName;
   }
 
   private clearAssignedWorker(booking: any): void {

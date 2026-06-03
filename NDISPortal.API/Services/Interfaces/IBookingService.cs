@@ -12,10 +12,6 @@ namespace NdisPortal.BookingsApi.Services.Interfaces
 
         Task<BookingResponseDto?> UpdateBookingStatusAsync(int id, BookingStatusUpdateDto updateDto);
 
-        Task<BookingResponseDto?> AssignWorkerAsync(int id, BookingWorkerAssignmentDto assignmentDto);
-
-        Task<BookingResponseDto?> UnassignWorkerAsync(int id);
-
         Task<bool> DeleteBookingAsync(int id, int userId);
 
         Task<BookingStatsDto> GetBookingStatsAsync();

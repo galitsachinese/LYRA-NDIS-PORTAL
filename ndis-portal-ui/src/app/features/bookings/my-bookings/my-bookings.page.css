@@ -69,6 +69,15 @@
   margin-left: auto;
 }
 
+/* Worker Info Card */
+.worker-info-card {
+  transition: box-shadow 0.2s ease;
+}
+
+.worker-info-card:hover {
+  box-shadow: 0 2px 8px rgba(107, 50, 147, 0.08);
+}
+
 @media (max-width: 767px) {
   :host ::ng-deep .bookings-filter app-dropdown-ui > div {
     width: 100%;

@@ -39,6 +39,12 @@ export class BookingTableComponent implements OnChanges {
     { key: 'notes', label: 'Notes', type: 'notes' },
     { key: 'status', label: 'Status', type: 'status' },
     {
+      key: 'view',
+      label: 'Who Is My Worker?',
+      type: 'view',
+      actionLabel: 'View',
+    },
+    {
       key: 'action',
       label: 'Actions',
       type: 'action',

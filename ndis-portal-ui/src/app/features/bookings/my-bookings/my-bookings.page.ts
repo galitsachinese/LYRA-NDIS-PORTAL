@@ -1,27 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
-
 import { HttpClient } from '@angular/common/http';
-
-import { Observable, of } from 'rxjs';
-
+import { Observable, of, forkJoin } from 'rxjs';
 import { timeout, map, catchError } from 'rxjs/operators';
-
 import { environment } from '../../../../environments/environment';
-
 import { BookingTableComponent } from '../../../../shared/components/table/booking-table.component';
-
 import { StatusDropdownComponent } from '../../../../shared/components/dropdown/status/status-dropdown.component';
-
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
-
 import { BookingService } from '../../../core/services/booking.service';
-
-import { Booking, BookingViewModel } from '../../../core/models/booking.model';
-
+import { Booking, BookingViewModel, WorkerInfo } from '../../../core/models/booking.model';
 import { Router } from '@angular/router';
-
 import { CancelDialogComponent } from '../../../../shared/components/dialog/cancel-dialog.component';
 
 @Component({
@@ -74,6 +62,8 @@ export class MyBookingsComponent implements OnInit {
   selectedBookingForCancel: BookingViewModel | null = null;
 
   selectedNotesBooking: BookingViewModel | null = null;
+
+  isLoadingWorker = false;
 
   constructor(
     private bookingService: BookingService,
@@ -242,6 +232,9 @@ export class MyBookingsComponent implements OnInit {
             this.totalItems = bookings.length;
 
             this.totalPages = Math.ceil(this.totalItems / this.pageSize) || 1;
+
+            // Fetch worker info for approved bookings
+            this.fetchWorkerInfoForApprovedBookings();
           },
 
           error: (error: Error) => {
@@ -473,10 +466,57 @@ export class MyBookingsComponent implements OnInit {
 
   handleView(booking: BookingViewModel) {
     this.selectedNotesBooking = booking;
+
+    // If approved booking and worker info not yet loaded, fetch it
+    if (this.isApproved(booking) && !booking.workerInfo) {
+      this.isLoadingWorker = true;
+      this.bookingService.getBookingWorker(booking.rawData.id).subscribe({
+        next: (workerInfo) => {
+          if (workerInfo) {
+            booking.workerInfo = workerInfo;
+          }
+          this.isLoadingWorker = false;
+        },
+        error: () => {
+          this.isLoadingWorker = false;
+        },
+      });
+    }
   }
 
   closeNotes() {
     this.selectedNotesBooking = null;
+  }
+
+  /**
+   * Checks if a booking status is "Approved"
+   */
+  isApproved(booking: BookingViewModel): boolean {
+    return booking.status?.toLowerCase() === 'approved';
+  }
+
+  /**
+   * Fetches worker info for all approved bookings that don't already have it
+   */
+  private fetchWorkerInfoForApprovedBookings() {
+    const approvedBookings = this.bookings.filter(
+      (b) => this.isApproved(b) && !b.workerInfo,
+    );
+
+    if (approvedBookings.length === 0) return;
+
+    approvedBookings.forEach((booking) => {
+      this.bookingService.getBookingWorker(booking.rawData.id).subscribe({
+        next: (workerInfo) => {
+          if (workerInfo) {
+            booking.workerInfo = workerInfo;
+          }
+        },
+        error: () => {
+          // Silently ignore — worker info is optional
+        },
+      });
+    });
   }
 
   // --- Mapping & Data Logic ---

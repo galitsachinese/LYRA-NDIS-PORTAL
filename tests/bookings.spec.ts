@@ -105,7 +105,7 @@ test.describe('Bookings - Participant', () => {
     await page.getByRole('link', { name: 'My Bookings' }).click();
 
     // Open kebab menu
-    await page.getByRole('row', { name: 'Personal Hygiene Assistance' }).getByRole('button').click();
+    await page.getByRole('row', { name: 'Personal Hygiene Assistance Daily Personal Activities Jun 16, 2026 No notes' }).getByRole('button').click();
 
     // Cancel
     const cancelBtn = page.getByRole('button', { name: 'Cancel' });
@@ -126,7 +126,7 @@ test.describe('Bookings - Participant', () => {
     await page.getByRole('link', { name: 'My Bookings' }).click();
 
     // Open kebab menu
-     await page.getByRole('row', { name: 'Personal Hygiene Assistance' }).getByRole('button').click();
+     await page.getByRole('row', { name: 'Personal Hygiene Assistance Daily Personal Activities Jun 16, 2026 No notes' }).getByRole('button').click();
 
     // Cancel
     const cancelBtn = page.getByRole('button', { name: 'Cancel' });

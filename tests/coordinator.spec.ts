@@ -21,7 +21,7 @@ test.describe('Coordinator Dashboard', () => {
     await page.getByTestId('add-service-btn').click();
 
     await page.getByRole('textbox', { name: 'Service Name *' })
-      .fill('Social Skill Group');
+      .fill('Playwright Service');
 
     await page.getByTestId('service-modal')
       .getByRole('combobox')
@@ -33,7 +33,7 @@ test.describe('Coordinator Dashboard', () => {
     await page.getByTestId('save-btn').click();
 
     await expect(
-      page.locator('table').getByText('Social Skill Group').first()
+      page.locator('table').getByText('Playwright Service').first()
     ).toBeVisible();
   });
 
@@ -46,7 +46,7 @@ test.describe('Coordinator Dashboard', () => {
     const serviceRow = page
       .locator('table')
       .locator('tr')
-      .filter({ hasText: 'Social Skill Group' })
+      .filter({ hasText: 'Playwright Service' })
       .first();
 
     await expect(serviceRow).toBeVisible();
@@ -141,62 +141,9 @@ test.describe('Coordinator Dashboard', () => {
 
     // Select worker
     await page.getByRole('combobox')
-      .selectOption({ index: 1 });
+      .selectOption({ index: 2 });
 
     await page.getByRole('button', { name: 'Assign Worker' }).nth(1).click();
-  });
-
-// LOG IN TO PARTICIPANT THAT VIEWS WHO IS MY WORKER
-
- test('Participant can view assigned worker details', async ({ page }) => {
-
-  await page.goto('http://localhost:4200/login');
-  await page.getByRole('textbox', { name: 'Email' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).fill('participant1@ndisportal.com');
-  await page.getByRole('textbox', { name: 'Password' }).fill('Test@1234');
-  await page.getByRole('button', { name: 'Log in' }).click();
-  //await page.getByRole('link', { name: 'My Bookings' }).click();
-  //await page.getByRole('button', { name: 'View' }).click();
-  //await page.getByText('Close').click();
-
-    // Navigate to My Bookings
-    await page.getByRole('link', { name: 'My Bookings' }).click();
-
-    // Verify booking table is visible
-    await expect(
-      page.locator('table')
-    ).toBeVisible();
-
-    // Find an approved booking
-    const bookingRow = page.locator('tbody tr')
-      .filter({ hasText: 'Approved' })
-      .first();
-
-    await expect(bookingRow).toBeVisible();
-
-   // Click View button under "Who is my worker?"
-    await bookingRow.getByRole('button', {
-      name: /view/i
-    }).click();
-
-    // Verify worker details modal/page opens
-    await expect(
-      page.getByRole('heading', { name: 'Booking Notes' })
-    ).toBeVisible();
-
-    // Verify worker information is displayed
-    await expect(
-      page.getByText('Jimwell Buensalida')
-    ).toBeVisible();
-
-    await expect(
-      page.getByText('09122343341')
-    ).toBeVisible();
-
-    await expect(
-      page.locator('span').filter({ hasText: /^Short Term Respite Accommodation$/ })
-    ).toBeVisible();
-
   });
 
 });

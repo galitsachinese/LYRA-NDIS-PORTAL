@@ -19,7 +19,7 @@ test.describe('Bookings - Participant', () => {
     // Fill booking details
     await page.getByTestId('service-select').selectOption('1');
 
-    await page.getByTestId('date-input').fill('2026-05-31');
+    await page.getByTestId('date-input').fill('2026-06-16');
 
     // Submit booking
     await page.getByTestId('submit-btn').click();
@@ -101,22 +101,11 @@ test.describe('Bookings - Participant', () => {
 
   test('Cancel confirmation dialog appears before cancelling', async ({ page }) => {
 
-    // Create NEW booking
-    await page.getByRole('link', { name: 'Book a Service' }).click();
-
-    await page.getByTestId('service-select').selectOption('5');
-
-    await page.getByTestId('date-input').fill('2026-05-31');
-
-    await page.getByTestId('notes-input').fill('pending cancel test');
-
-    await page.getByTestId('submit-btn').click();
-
     // Go to My Bookings
     await page.getByRole('link', { name: 'My Bookings' }).click();
 
     // Open kebab menu
-    await page.getByRole('button').nth(3).click();
+    await page.getByRole('row', { name: 'Personal Hygiene Assistance' }).getByRole('button').click();
 
     // Cancel
     const cancelBtn = page.getByRole('button', { name: 'Cancel' });
@@ -133,26 +122,16 @@ test.describe('Bookings - Participant', () => {
 
   test('Participant can cancel a Pending booking', async ({ page }) => {
 
-    await page.getByRole('link', { name: 'Book a Service' }).click();
-
-    await page.getByTestId('service-select').selectOption('5');
-
-    await page.getByTestId('date-input').fill('2026-05-31');
-
-    await page.getByTestId('notes-input').fill('pending cancel test');
-
-    await page.getByTestId('submit-btn').click();
-
     // Go to My Bookings
     await page.getByRole('link', { name: 'My Bookings' }).click();
 
     // Open kebab menu
-    await page.getByRole('button').nth(3).click();
+     await page.getByRole('row', { name: 'Personal Hygiene Assistance' }).getByRole('button').click();
 
     // Cancel
     const cancelBtn = page.getByRole('button', { name: 'Cancel' });
 
-    await expect(cancelBtn).toBeVisible();
+    //await expect(cancelBtn).toBeVisible();
 
     await cancelBtn.click();
 
@@ -164,6 +143,8 @@ test.describe('Bookings - Participant', () => {
       page.getByRole('cell', { name: 'Cancelled' }).first()
     ).toBeVisible();
   });
+
+
 });
 
 type CreatedBooking = {

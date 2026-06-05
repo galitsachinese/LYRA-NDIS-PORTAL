@@ -63,7 +63,7 @@ test('Coordinator sees Add Service button', async ({ page }) => {
     await page.goto('/dashboard/services');
 
     await expect(
-      page.getByRole('heading', { name: 'Manage Services' })
+      page.getByRole('link', { name: 'Manage Services' })
     ).toBeVisible();
 
     await expect(
@@ -80,7 +80,7 @@ test('Coordinator sees Add Service button', async ({ page }) => {
 
     // Slow typing
     await page
-      .getByPlaceholder('Enter service name')
+      .getByRole('textbox', { name: 'Service Name *' })
       .pressSequentially(serviceName, { delay: 80 });
 
     const categorySelect = page.locator(
@@ -96,7 +96,7 @@ test('Coordinator sees Add Service button', async ({ page }) => {
     await categorySelect.selectOption({ index: 1 });
 
     await page
-      .getByPlaceholder('Enter service description')
+      .getByRole('textbox', { name: 'Description' })
       .pressSequentially(
         'This service was created by a Playwright end-to-end test.',
         { delay: 50 }

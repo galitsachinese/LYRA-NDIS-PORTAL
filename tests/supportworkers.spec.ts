@@ -135,7 +135,7 @@ test('Coordinator can confirm worker status change', async ({ page }) => {
   await page.getByRole('link', { name: 'Support Workers' }).click();
 
   // Open status modal
-  await page.getByRole('button', { name: 'Active' }).nth(2).click();
+  await page.getByRole('button', { name: 'Active' }).nth(1).click();
 
   // Change status
   await page.getByLabel('New statusActiveInactive')
@@ -239,5 +239,79 @@ test('Coordinator can filter support workers by service', async ({ page }) => {
 
     expect(rowText).toContain('Personal Hygiene Assistance');
   }
+
+// =====================================
+  // SHORT TERM RESPITE ACCOMMODATION
+  // =====================================
+  await serviceDropdown.selectOption({
+    label: 'Short Term Respite Accommodation'
+  });
+
+  await page.waitForTimeout(2000);
+
+  rows = page.locator('table tbody tr');
+
+  await expect(rows.first()).toBeVisible();
+
+  rowCount = await rows.count();
+
+  for (let i = 0; i < rowCount; i++) {
+    const rowText = await rows.nth(i).textContent();
+
+    expect(rowText).toContain('Short Term Respite Accommodation');
+  }
+  
+}); 
+
+test('Participant can view assigned worker details', async ({ page }) => {
+
+  await page.goto('http://localhost:4200/login');
+  await page.getByRole('textbox', { name: 'Email' }).click();
+  await page.getByRole('textbox', { name: 'Email' }).fill('participant1@ndisportal.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('Test@1234');
+  await page.getByRole('button', { name: 'Log in' }).click();
+  //await page.getByRole('link', { name: 'My Bookings' }).click();
+  //await page.getByRole('button', { name: 'View' }).click();
+  //await page.getByText('Close').click();
+
+    // Navigate to My Bookings
+    await page.getByRole('link', { name: 'My Bookings' }).click();
+
+    // Verify booking table is visible
+    await expect(
+      page.locator('table')
+    ).toBeVisible();
+
+    // Find an approved booking
+    const bookingRow = page.locator('tbody tr')
+      .filter({ hasText: 'Approved' })
+      .first();
+
+    await expect(bookingRow).toBeVisible();
+
+   // Click View button under "Who is my worker?"
+    await bookingRow.getByRole('button', {
+      name: /view/i
+    }).click();
+
+    // Verify worker details modal/page opens
+    await expect(
+      page.getByRole('heading', { name: 'Booking Notes' })
+    ).toBeVisible();
+
+    // Verify worker information is displayed
+    await expect(
+      page.getByText('Jimwell Buensalida')
+    ).toBeVisible();
+
+    await expect(
+      page.getByText('09234535631')
+    ).toBeVisible();
+
+    await expect(
+      page.locator('span').filter({ hasText: /^Personal Hygiene Assistance$/ })
+    ).toBeVisible();
+
 });
+
 });

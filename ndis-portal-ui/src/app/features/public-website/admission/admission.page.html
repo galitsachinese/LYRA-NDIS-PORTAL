@@ -1,0 +1,52 @@
+<main class="max-w-7xl mx-auto px-4 md:px-12 py-24 space-y-20">
+
+    <header class="space-y-4 max-w-4xl text-left">
+        <h1 class="text-3xl md:text-5xl font-medium text-gray-900 tracking-tight leading-tight">
+            {{ pageTitle }}
+        </h1>
+        <p class="text-gray-600 text-sm md:text-base leading-relaxed">
+            {{ pageSubtitle }}
+        </p>
+    </header>
+
+    <section class="relative max-w-4xl pl-2 md:pl-6">
+        <div class="space-y-12 md:space-y-16">
+            <div *ngFor="let step of steps; let isLast = last" class="relative flex gap-6 md:gap-8 items-start group">
+
+                <div
+                    class="flex-shrink-0 w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#6F2C91] text-white flex items-center justify-center text-xs md:text-sm font-medium shadow-xs z-10 transition-transform group-hover:scale-105 duration-200">
+                    {{ step.number }}
+                </div>
+
+                <div class="space-y-3 pt-1 md:pt-1.5 max-w-3xl">
+                    <h2 class="text-xl md:text-2xl font-semibold text-gray-900 tracking-tight">
+                        {{ step.title }}
+                    </h2>
+
+                    <p class="text-gray-600 text-sm md:text-base leading-relaxed text-justify md:text-left">
+                        {{ step.desc }}
+                    </p>
+
+                    <div *ngIf="step.ctaText" class="pt-2">
+                        <button (click)="onCtaClick(step)"
+                            class="bg-[#6F2C91] text-white px-5 py-2 rounded-full text-xs font-semibold hover:bg-[#5a2375] transition-all shadow-xs focus:outline-none">
+                            {{ step.ctaText }}
+                        </button>
+                    </div>
+
+                    <div *ngIf="step.subText" class="pt-1">
+                        <a [href]="step.subTextLink" target="_blank" rel="noopener"
+                            class="text-xs md:text-sm font-medium text-[#6F2C91] hover:underline hover:opacity-90 transition-opacity inline-flex items-center gap-1">
+                            {{ step.subText }}
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+    <app-faq-section></app-faq-section>
+
+</main>

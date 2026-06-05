@@ -1,0 +1,62 @@
+<nav class="fixed top-0 left-0 w-full z-50 h-16 px-4 md:px-12 flex items-center justify-between transition-all duration-300"
+    [ngClass]="(isScrolled || isMobileMenuOpen || !isHomePage) ? 'bg-[#6F2C91] shadow-md text-white' : 'bg-transparent text-white'">
+
+    <div class="flex items-center gap-3">
+        <!-- Mobile Trigger -->
+        <button (click)="toggleMobileMenu()"
+            class="block md:hidden p-2"
+            aria-label="Toggle Navigation Menu">
+            <svg *ngIf="!isMobileMenuOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg *ngIf="isMobileMenuOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Logo/Home Link -->
+        <div routerLink="/"
+            class="flex items-center gap-2 cursor-pointer select-none hover:opacity-90 transition-opacity">
+            <div class="hidden md:block w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm">
+                <span class="text-[#6F2C91] text-[10px]">NDIS</span>
+            </div>
+            <span class="text-base md:text-lg font-medium tracking-wider">NDIS Portal</span>
+        </div>
+    </div>
+
+    <!-- Desktop Nav Links -->
+    <div class="hidden md:flex items-center gap-10 font-base text-sm">
+        <a routerLink="/about" routerLinkActive="opacity-100">About Us</a>
+        <a routerLink="/services" routerLinkActive="opacity-100">Services</a>
+        <a routerLink="/admission" routerLinkActive="opacity-100">Admission</a>
+        <a routerLink="/contact" routerLinkActive="opacity-100">Contact Us</a>
+    </div>
+
+    <!-- Login Button -->
+    <div class="hidden md:block">
+        <a routerLink="/login"
+            class="rounded-full border-2 px-6 py-2 text-xs uppercase tracking-wider transition-all duration-300"
+            [ngClass]="(isScrolled || !isHomePage) ? 'bg-white text-[#6F2C91] font-semibold border-white hover:bg-purple-50' : 'bg-transparent text-white border-white/40 hover:bg-white/10'">
+            Login
+        </a>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="absolute top-16 left-0 w-full bg-[#6F2C91] border-t border-purple-800/40 shadow-xl transition-all duration-300 ease-in-out overflow-hidden md:hidden"
+        [ngClass]="isMobileMenuOpen ? 'max-h-screen opacity-100 visible' : 'max-h-0 opacity-0 invisible'">
+        <div class="px-6 py-6 flex flex-col gap-5 font-base text-sm">
+            <a routerLink="/about" (click)="toggleMobileMenu()"
+                class="py-1 hover:text-purple-200">About Us</a>
+            <a routerLink="/services" (click)="toggleMobileMenu()"
+                class="py-1 hover:text-purple-200">Services</a>
+            <a routerLink="/admission" (click)="toggleMobileMenu()"
+                class="py-1 hover:text-purple-200">Admission</a>
+            <a routerLink="/contact" (click)="toggleMobileMenu()"
+                class="py-1 hover:text-purple-200">Contact Us</a>
+            <a routerLink="/login" (click)="toggleMobileMenu()"
+                class="mt-4 w-full text-center bg-white text-[#6F2C91] py-2.5 rounded-full text-sm shadow-sm">
+                Login
+            </a>
+        </div>
+    </div>
+</nav>

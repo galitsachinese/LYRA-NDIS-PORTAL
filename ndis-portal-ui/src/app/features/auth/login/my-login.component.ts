@@ -204,4 +204,16 @@ export class MyLoginComponent {
     // Fallback to error message if available
     return error.message || 'Invalid email or password.';
   }
+
+  // After login/register successful API response
+  onSuccess() {
+    const pendingId = sessionStorage.getItem('pending_booking_id');
+
+    if (pendingId) {
+      sessionStorage.removeItem('pending_booking_id');
+      this.router.navigate(['/services', pendingId, 'book']);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
+  }
 }

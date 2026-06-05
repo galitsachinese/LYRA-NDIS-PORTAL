@@ -35,57 +35,81 @@ import { SupportWorkersComponent } from './features/coordinator/support-workers/
 
 
 import  { ForbiddenComponent } from '../shared/components/error/forbidden/forbidden.component'
-
-
+import { PublicLayoutComponent } from './core/layouts/public-layout/public-layout.component';
 
 export const routes: Routes = [
+  {
+    path: '',
+    component: PublicLayoutComponent,
+    children: [
+      {
+        path: '',
+        // Lazy loaded Home Page
+        loadComponent: () =>
+          import('./features/public-website/home/home.page').then(
+            (m) => m.HomePageComponent,
+          ),
+      },
+      {
+        path: 'about',
+        // Lazy loaded About Page
+        loadComponent: () =>
+          import('./features/public-website/about/about.page').then(
+            (m) => m.AboutPageComponent,
+          ),
+      },
+      {
+        path: 'admission',
+        // Lazy loaded Admission Page
+        loadComponent: () =>
+          import('./features/public-website/admission/admission.page').then(
+            (m) => m.AdmissionPageComponent,
+          ),
+      },
 
+      {
+        path: 'contact',
+        // Lazy loaded Contact Page
+        loadComponent: () =>
+          import('../shared/components/contact-section/contact-section.component').then(
+            (m) => m.ContactSectionComponent,
+          ),
+      },
+    ],
+  },
   // AUTH BRANCH: Clean Layout
 
   {
-
     path: '',
 
     component: AuthLayoutComponent,
 
     children: [
-
       {
-
         path: 'signup',
 
         component: MySignupComponent,
-
       },
 
       {
-
         path: 'login',
 
         component: MyLoginComponent,
-
       },
 
       {
-
         path: '',
 
         redirectTo: '/login',
 
         pathMatch: 'full',
-
       },
-
     ],
-
   },
-
-
 
   // PROTECTED BRANCH: Uses the Dashboard layout with Sidebar/Navbar
 
   {
-
     path: '',
 
     component: MainLayoutComponent,
@@ -93,123 +117,89 @@ export const routes: Routes = [
     canActivateChild: [AuthGuard], // Secures all dashboard children
 
     children: [
-
       // Coordinator
 
       {
-
         path: 'dashboard',
 
         component: DashboardComponent,
 
         data: { role: 'coordinator' },
-
       },
 
-
-
       {
-
         path: 'dashboard/services',
 
         component: ManageServicesComponent,
 
         data: { role: 'coordinator' },
-
       },
 
-
-
       {
-
         path: 'dashboard/bookings',
 
         component: AllBookingsComponent,
 
         data: { role: 'coordinator' },
-
       },
 
       {
-
         path: 'dashboard/support-workers',
 
         component: SupportWorkersComponent,
 
         data: { role: 'coordinator' },
-
       },
 
-
-
       {
-
         path: 'services',
 
         component: ServicesListComponent,
 
         data: { role: 'participant' },
-
       },
 
       {
-
         path: 'services/:id', // Dynamic route for details
 
         component: ServiceDetailComponent,
 
         data: { role: 'participant' },
-
       },
 
       {
-
         path: 'bookings',
 
         component: MyBookingsComponent,
 
         data: { role: 'participant' },
-
       },
 
       {
-
         path: 'book-new',
 
         component: BookServiceComponent,
 
         data: { role: 'participant' },
-
       },
 
       {
-
         path: 'participant/book-service',
 
         component: ParticipantBookServiceComponent,
 
         data: { role: 'participant' },
-
       },
-
     ],
-
   },
 
-
-
   {
-
     path: 'forbidden',
 
     component: ForbiddenComponent,
-
   },
-
-
 
   // Optional: Redirect unknown paths to a 404 or your 403
 
   { path: '**', redirectTo: 'forbidden' },
-
 ];

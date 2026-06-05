@@ -1,0 +1,61 @@
+<main class="max-w-7xl mx-auto px-4 md:px-12 py-16 md:py-20 space-y-20">
+
+    <!-- Dynamic Content Sections -->
+    <section *ngFor="let pillar of pillars; let i = index"
+        class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center text-center lg:text-left">
+
+        <!-- Text Column -->
+        <div [ngClass]="pillar.reverseLayout ? 'lg:order-2' : 'lg:order-1'">
+            <h2 class="text-3xl md:text-5xl font-medium text-gray-900 mb-6 tracking-tight">
+                {{ pillar.title }}
+            </h2>
+
+            <p class="text-gray-600 text-sm md:text-base leading-relaxed mb-3">
+                {{ pillar.desc }}
+            </p>
+
+            <!-- Expanded Content Logic -->
+            <div class="transition-all duration-300 ease-in-out overflow-hidden" [class.max-h-0]="!pillar.isExpanded"
+                [class.max-h-96]="pillar.isExpanded">
+                <p
+                    class="py-2 text-gray-500 text-sm md:text-base leading-relaxed  border-[#6F2C91]  mb-2">
+                    {{ pillar.extendedDesc }}
+                </p>
+            </div>
+
+            <button (click)="togglePillarExpansion(i)"
+                class="mt-1 inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-full text-xs font-semibold text-gray-800 hover:bg-purple-50 transition-all">
+                {{ pillar.isExpanded ? 'Show Less' : pillar.buttonLabel }}
+            </button>
+        </div>
+
+        <!-- Image Column -->
+        <div class="w-full flex items-center justify-center"
+            [ngClass]="pillar.reverseLayout ? 'lg:order-1' : 'lg:order-2'">
+            <div *ngIf="pillar.imageRight"
+                class="relative h-[340px] md:h-[550px] w-full max-w-lg mx-auto lg:max-w-none">
+                <img [src]="pillar.imageLeft"
+                    class="absolute top-0 left-0 w-[82%] h-[82%] rounded-3xl object-cover shadow-lg z-10"
+                    [alt]="pillar.title">
+                <img [src]="pillar.imageRight"
+                    class="absolute bottom-0 right-0 w-[72%] h-[68%] rounded-3xl object-cover shadow-2xl border-4 md:border-8 border-white z-20"
+                    [alt]="pillar.title">
+            </div>
+            <div *ngIf="!pillar.imageRight" class="h-[340px] md:h-[500px] w-full rounded-3xl overflow-hidden shadow-lg">
+                <img [src]="pillar.imageLeft" class="w-full h-full object-cover" [alt]="pillar.title">
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Grid -->
+    <section class="space-y-10 pt-10">
+        <h2 class="text-3xl md:text-4xl font-medium text-center text-gray-900">Our Core Values</h2>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div *ngFor="let item of values" [ngClass]="item.spanClass"
+                class="bg-white border border-gray-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all">
+                <h3 class="text-xl font-medium text-gray-800">{{ item.title }}</h3>
+                <p class="text-gray-500 text-sm mt-3 leading-relaxed">{{ item.desc }}</p>
+            </div>
+        </div>
+    </section>
+</main>

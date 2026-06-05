@@ -1,0 +1,96 @@
+<app-dialog-ui label="Add New Service" [isOpen]="true" (close)="onClose.emit()">
+  <form body [formGroup]="serviceForm" class="space-y-5" (ngSubmit)="submit()">
+    <p class="m-0 text-sm text-slate-500">
+      Fill in the details below to register a new service in the system.
+    </p>
+
+    <label class="block">
+      <span class="mb-2 block text-xs font-bold text-slate-700">
+        Service Name <span class="text-red-500">*</span>
+      </span>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="e.g. Community Access Assistance"
+        class="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100"
+      />
+      <small
+        *ngIf="serviceForm.controls.name.touched && serviceForm.controls.name.invalid"
+        class="mt-1 block text-xs text-red-500"
+      >
+        Service name is required
+      </small>
+    </label>
+
+    <label class="block">
+      <span class="mb-2 block text-xs font-bold text-slate-700">
+        Category <span class="text-red-500">*</span>
+      </span>
+      <select
+        formControlName="category"
+        class="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100"
+      >
+        <option value="" disabled>Select a service category</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">
+          {{ cat.name || cat.title }}
+        </option>
+      </select>
+      <small
+        *ngIf="serviceForm.controls.category.touched && serviceForm.controls.category.invalid"
+        class="mt-1 block text-xs text-red-500"
+      >
+        Category is required
+      </small>
+    </label>
+
+    <label class="block">
+      <span class="mb-2 block text-xs font-bold text-slate-700">Description</span>
+      <textarea
+        formControlName="description"
+        rows="4"
+        placeholder="Provide a detailed overview of the service scope, pricing limits, and reporting requirements."
+        class="w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100"
+      ></textarea>
+    </label>
+
+    <div class="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-3">
+      <div>
+        <p class="m-0 text-sm font-semibold text-slate-700">Active on creation</p>
+        <p class="m-0 mt-0.5 text-xs text-slate-500">Publish this service immediately</p>
+      </div>
+
+      <button
+        type="button"
+        (click)="toggleActiveCreation()"
+        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#6B3293] focus:ring-offset-2"
+        [ngClass]="isActiveOnCreation ? 'bg-[#6B3293]' : 'bg-slate-300'"
+      >
+        <span class="sr-only">Toggle active on creation</span>
+        <span
+          class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+          [ngClass]="isActiveOnCreation ? 'translate-x-6' : 'translate-x-1'"
+        ></span>
+      </button>
+    </div>
+  </form>
+
+  <div actions class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+    <button
+      type="button"
+      (click)="onClose.emit()"
+      class="order-2 rounded-md border border-violet-200 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 sm:order-1 2xl:text-xl"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="button"
+      data-testid="save-btn"
+      [disabled]="serviceForm.invalid"
+      (click)="submit()"
+      class="order-1 rounded-lg bg-[#6B3293] px-6 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-[#5a2a7b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:order-2 2xl:text-xl"
+    >
+      Save Service
+    </button>
+  </div>
+</app-dialog-ui>

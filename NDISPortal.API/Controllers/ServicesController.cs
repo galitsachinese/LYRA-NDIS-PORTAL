@@ -6,8 +6,6 @@ using NDISPortal.API.Services.Interfaces;
 
 using Service.API.DTOs.Service;
 
-
-
 namespace Service.API.Controllers
 
 {

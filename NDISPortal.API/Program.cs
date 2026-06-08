@@ -47,7 +47,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+// This explicitly sets the default policy to not require authentication 
+// unless an [Authorize] attribute is found on the controller/method
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = null;
+})builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = null;
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -65,7 +73,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://localhost:4200", "http://localhost:4200", "https://localhost:4201", "http://localhost:4201")
+        policy.SetIsOriginAllowed(_ => true) // <--- Allows any origin to rule out CORS issues
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();

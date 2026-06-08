@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 // Your shared components
 import { ManageServicesTableComponent } from '../../../../shared/components/table/manage-services/manage-services-table.component';
 import { AddButtonComponent } from '../../../../shared/components/button/add-button/add-button.component';
-import { ServiceFormModalComponent } from '../../../../shared/components/modals/service-form-modal.component';
+import { ServiceFormModalComponent } from '../../../../shared/components/modals/service-form/service-form-modal.component';
 
 // API Service
 import { ApiService } from '../../../core/services/api-service';
@@ -72,14 +72,11 @@ export class ManageServicesComponent implements OnInit {
           id: service.id ?? service.Id,
           name: service.name ?? service.Name,
           category:
-            service.categoryName ??
-            service.CategoryName ??
-            'Uncategorized',
+            service.categoryName ?? service.CategoryName ?? 'Uncategorized',
           categoryId: service.categoryId ?? service.CategoryId,
           description: service.description ?? service.Description ?? '',
-          status: (service.isActive ?? service.IsActive)
-            ? 'Active'
-            : 'Inactive',
+          status:
+            (service.isActive ?? service.IsActive) ? 'Active' : 'Inactive',
         }));
 
         // Apply filter
@@ -164,7 +161,7 @@ export class ManageServicesComponent implements OnInit {
 
         this.toast.show(
           'Failed to update service status. Please try again.',
-          'error'
+          'error',
         );
       },
     });
@@ -182,7 +179,7 @@ export class ManageServicesComponent implements OnInit {
       this.services = [...this.allServices];
     } else {
       this.services = this.allServices.filter(
-        (service) => service.status === this.selectedStatusFilter
+        (service) => service.status === this.selectedStatusFilter,
       );
     }
   }

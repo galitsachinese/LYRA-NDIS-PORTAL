@@ -1,28 +1,25 @@
-<!-- services-list.page.html -->
-<div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
-    <header class="w-full space-y-3 sm:flex sm:items-start sm:justify-between sm:space-y-0">
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <h1 class="text-xl font-bold text-slate-900">Our Services</h1>
-            <app-category-dropdown [services]="allServices" (categoryChange)="handleCategoryFilter($event)">
-            </app-category-dropdown>
-        </div>
-        <div class="flex items-center gap-3">
-            <button class="ai-recommendation-btn" (click)="openAiRecommendation()">
-                <span class="material-icons text-sm leading-none">lightbulb</span>
-                Service Recommendation
-            </button>
+<div class="p-4 md:p-8 space-y-8 max-w-[2560px] mx-auto">
+
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <h1 class="text-2xl font-bold text-slate-900">Our Services</h1>
+            <app-category-dropdown [services]="allServices"
+                (categoryChange)="handleCategoryFilter($event)"></app-category-dropdown>
         </div>
     </header>
 
+    <div *ngIf="isPublicView"
+        class="bg-purple-50 border border-purple-100 p-4 rounded-xl text-sm text-purple-800 text-center">
+        Browsing as guest. <a routerLink="/login" class="font-bold underline">Login</a> to book these services.
+    </div>
+
     <main>
-        <app-service-card-component [services]="filteredServices" 
+        <div *ngIf="isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div *ngFor="let i of [1,2,3]" class="h-64 bg-slate-100 animate-pulse rounded-2xl"></div>
+        </div>
+
+        <app-service-card-component *ngIf="!isLoading" [services]="filteredServices"
             (cardSelected)="onCardClick($event)">
         </app-service-card-component>
     </main>
-
-    <!-- Chat Container (for AI recommendation functionality) -->
-    <app-chatbot-container #chatContainer></app-chatbot-container>
-
-    <!-- Service Recommendation Modal -->
-    <app-service-recommendation-modal></app-service-recommendation-modal>
 </div>

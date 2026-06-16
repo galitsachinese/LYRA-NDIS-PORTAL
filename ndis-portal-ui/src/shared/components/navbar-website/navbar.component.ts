@@ -60,9 +60,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (role === 'coordinator') {
       this.navLinks = [
         { label: 'Dashboard', path: '/dashboard' },
-        { label: 'Manage Services', path: '/services/manage' },
-        { label: 'All Bookings', path: '/bookings' },
-        { label: 'Workers', path: '/workers' },
+        { label: 'Manage Services', path: '/dashboard/services' },
+        { label: 'All Bookings', path: '/dashboard/bookings' },
+        { label: 'Workers', path: '/dashboard/support-workers' },
       ];
     } else if (role === 'participant') {
       this.navLinks = [

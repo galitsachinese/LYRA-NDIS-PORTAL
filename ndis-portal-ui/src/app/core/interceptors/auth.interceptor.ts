@@ -13,6 +13,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
    * Backend decides access (public vs protected).
    */
   if (token) {
+      console.log('JWT attached:', token);
+
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,

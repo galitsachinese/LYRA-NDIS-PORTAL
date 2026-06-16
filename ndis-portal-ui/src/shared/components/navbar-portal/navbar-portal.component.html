@@ -1,0 +1,44 @@
+<nav class="fixed top-0 left-0 w-full z-50 h-16 px-4 md:px-12 flex items-center justify-between transition-all duration-300"
+    [ngClass]="(isScrolled || isMobileMenuOpen || isSolid) ? 'bg-[#6F2C91] shadow-md text-white' : 'bg-transparent text-white'">
+
+    <div class="flex items-center gap-3 w-1/4">
+        <button (click)="toggleMobileMenu()" class="block md:hidden p-2" aria-label="Toggle Menu">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16" />
+                <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <div routerLink="/"
+            class="flex items-center gap-2 cursor-pointer select-none hover:opacity-90 transition-opacity">
+            <div class="hidden md:block w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm">
+                <span class="text-[#6F2C91] text-[10px]">NDIS</span>
+            </div>
+            <span class="text-base md:text-lg font-medium tracking-wider">NDIS Portal</span>
+        </div>
+    </div>
+
+    <div class="hidden md:flex flex-1 justify-center items-center gap-10 font-base text-sm">
+        <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="font-bold border-b-2 border-white"
+            [routerLinkActiveOptions]="{exact: true}"
+            class="transition-all border-b-2 border-transparent py-1">
+            {{ link.label }}
+        </a>
+    </div>
+
+    <div class="hidden md:flex w-1/4 justify-end">
+        <ng-content select="[auth-slot]"></ng-content>
+    </div>
+
+    <div class="absolute top-16 left-0 w-full bg-[#6F2C91] border-t border-purple-800/40 shadow-xl transition-all duration-300 overflow-hidden md:hidden"
+        [ngClass]="isMobileMenuOpen ? 'max-h-screen opacity-100 visible' : 'max-h-0 opacity-0 invisible'">
+        <div class="px-6 py-6 flex flex-col gap-5 font-base text-sm">
+            <a *ngFor="let link of navLinks" [routerLink]="link.path" (click)="toggleMobileMenu()">{{ link.label }}</a>
+            <div class="mt-4 border-t border-purple-500 pt-4">
+                <ng-content select="[auth-slot]"></ng-content>
+            </div>
+        </div>
+    </div>
+</nav>

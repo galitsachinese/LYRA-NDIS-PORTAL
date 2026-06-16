@@ -1,119 +1,45 @@
 <div class="min-h-full bg-white px-5 py-8 text-[#18181b] md:px-7 md:py-10">
-  <header class="mb-8 flex items-start justify-between gap-6 max-md:flex-col max-md:items-stretch">
-    <div>
-      <h1 class="m-0 text-[28px] font-extrabold leading-tight">My Bookings</h1>
-    </div>
-
-    <aside
-      class="min-w-[146px] rounded-[14px] bg-white px-4 py-3.5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] max-md:w-full md:mt-[-2px]"
-      aria-label="Next session"
-    >
-      <span class="mb-2 block text-[9px] font-extrabold uppercase tracking-[1.4px] text-[#807789]">
-        Next Session
-      </span>
-      <strong class="block text-xs font-extrabold">{{ nextSessionLabel }}</strong>
-    </aside>
+  <header class="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+    <h1 class="m-0 text-[28px] font-extrabold">My Bookings</h1>
+    <app-status-dropdown class="w-full md:w-auto" [activeStatus]="activeFilter"
+      (statusChange)="handleStatusFilter($event)"></app-status-dropdown>
   </header>
 
-  <div *ngIf="errorMessage" class="mb-[18px] rounded-xl bg-white px-4 py-3.5 text-[#b91c1c]">
-    {{ errorMessage }}
-  </div>
+  <section class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] items-start">
 
-  <section class="mb-4 flex items-center justify-between gap-5 max-md:flex-col max-md:items-stretch">
-    <h2 class="m-0 text-base font-extrabold">Scheduled Care Plan</h2>
+    <!-- TABLE SECTION: always rendered, states toggle inside -->
+    <section class="relative min-h-[300px] rounded-[14px] bg-white overflow-hidden">
 
-    <app-status-dropdown
-      class="bookings-filter"
-      [activeStatus]="activeFilter"
-      (statusChange)="handleStatusFilter($event)"
-    >
-    </app-status-dropdown>
+      <!-- Loading overlay -->
+      <div *ngIf="isLoading"
+        class="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-[1px] font-extrabold text-[#6f2da8]">
+        Updating...
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!isLoading && bookings.length === 0"
+        class="flex h-[300px] flex-col items-center justify-center text-center text-slate-500">
+        <p class="text-lg font-medium text-slate-900">No bookings found</p>
+        <p class="mt-1 text-sm text-slate-400">Try changing your filter.</p>
+      </div>
+
+      <!-- Table: hidden during load/empty but section stays mounted -->
+      <div *ngIf="!isLoading && bookings.length > 0" class="w-full">
+        <app-booking-table [bookings]="bookings" [currentFilter]="activeFilter" (viewBooking)="handleView($event)"
+          (cancelBooking)="handleCancel($event)">
+        </app-booking-table>
+      </div>
+
+      <div class="border-t border-slate-100 px-4 py-3 bg-slate-50 text-xs text-slate-500 rounded-b-[14px]">
+        Showing {{ bookings.length }} of {{ totalItems }} bookings
+      </div>
+    </section>
+
+    <!-- SIDEBAR: no longer wrapped in the conditional, always visible -->
+    <aside class="hidden md:block w-[240px] border border-slate-200 rounded-[14px] bg-white px-4 py-4 shadow-sm">
+      <span class="mb-2 block text-[9px] font-extrabold uppercase text-[#807789]">Next Session</span>
+      <strong class="block text-xs font-extrabold text-slate-900">{{ nextSessionLabel || 'No sessions' }}</strong>
+    </aside>
+
   </section>
-
-  <div
-    *ngIf="!isLoading && !errorMessage && bookings.length === 0"
-    class="mb-[18px] rounded-xl border-2 border-dashed border-slate-200 bg-gray-50 px-4 py-12 text-center text-slate-500"
-  >
-    <p class="m-0 text-lg font-medium 2xl:text-2xl">No bookings found</p>
-    <p class="mt-2 text-sm text-slate-400 2xl:text-lg">Try changing your filter or book a new service.</p>
-  </div>
-
-  <section class="bookings-table-shell relative overflow-visible rounded-[14px] bg-white shadow-[0_16px_38px_rgba(15,23,42,0.08)]" *ngIf="bookings.length > 0">
-    <div
-      *ngIf="isLoading"
-      class="absolute inset-0 z-10 grid place-items-center rounded-[14px] bg-white/70 text-xs font-extrabold uppercase tracking-wider text-[#6f2da8]"
-    >
-      Updating...
-    </div>
-
-    <app-booking-table
-      [bookings]="bookings"
-      [currentFilter]="activeFilter"
-      (viewBooking)="handleView($event)"
-      (cancelBooking)="handleCancel($event)"
-    >
-    </app-booking-table>
-
-    <p class="m-0 border-t border-slate-100 px-4 py-2 text-xs text-[#25202b]">
-      Showing {{ bookings.length }} of {{ totalItems }} bookings
-    </p>
-  </section>
-
-  <div class="flex justify-center pt-4" *ngIf="totalPages > 1">
-    <app-pagination
-      [currentPage]="currentPage"
-      [totalPages]="totalPages"
-      (pageChange)="handlePageChange($event)"
-    >
-    </app-pagination>
-  </div>
-
-  <app-cancel-dialog
-    [isOpen]="isCancelDialogOpen"
-    label="Are you sure you want to cancel this booking?"
-    confirmText="Yes, Cancel Booking"
-    (closed)="closeCancelDialog()"
-    (confirmed)="confirmCancellation()"
-  >
-    <div body class="space-y-4">
-      <p class="text-sm font-semibold text-slate-900 2xl:text-2xl">
-        You will permanently cancel this scheduled booking.
-      </p>
-    </div>
-  </app-cancel-dialog>
-
-  <div
-    *ngIf="selectedNotesBooking"
-    class="fixed inset-0 z-[1000] flex items-center justify-center p-4"
-  >
-    <div class="relative w-full max-w-md overflow-hidden rounded-lg border border-slate-300 bg-white shadow-2xl ring-2 ring-slate-900/10">
-      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-        <h2 class="text-base font-semibold text-slate-900">Booking Notes</h2>
-
-        <button
-          type="button"
-          (click)="closeNotes()"
-          class="text-slate-400 hover:text-slate-600"
-        >
-          &times;
-        </button>
-      </div>
-
-      <div class="px-5 py-4">
-        <p class="whitespace-pre-wrap break-words text-sm text-slate-600">
-          {{ selectedNotesBooking.notes || 'No notes provided.' }}
-        </p>
-      </div>
-
-      <div class="flex justify-end border-t border-slate-200 px-5 py-4">
-        <button
-          type="button"
-          (click)="closeNotes()"
-          class="rounded-md bg-[#6B3293] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5a2a7b]"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

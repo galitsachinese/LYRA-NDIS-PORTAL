@@ -52,9 +52,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = null;
-})builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = null;
 });
 
 builder.Services.AddControllers();

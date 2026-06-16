@@ -42,7 +42,6 @@ import { CancelDialogComponent } from '../../../../shared/components/dialog/canc
   ],
 
   templateUrl: './my-bookings.page.html',
-  styleUrls: ['./my-bookings.page.css'],
 })
 export class MyBookingsComponent implements OnInit {
   // --- Data State ---

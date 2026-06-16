@@ -47,23 +47,30 @@ export class ApiService {
    * =========================
    */
   getServiceById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+    const token = localStorage.getItem('token');
+
+    const headers: any = {};
+
+    // SAFETY NET: always attach token if exists
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers }).pipe(
       map((response: any) => {
-        if (response && response.Data) {
-          return response;
-        }
-        return { Data: response };
+        return response?.Data ? response : { Data: response };
       }),
       catchError((error: any) => {
-        if (error.status === 404) {
-          return throwError(() => new Error('Service not found.'));
+        console.error('Service detail error:', error);
+
+        if (error.status === 403) {
+          console.log('403 → token invalid OR backend role restriction');
         }
 
         return throwError(() => new Error('Failed to load service.'));
       }),
     );
   }
-
   /**
    * =========================
    * PUBLIC CATEGORIES

@@ -9,7 +9,7 @@ import { FooterComponent } from '../../../../shared/components/footer/footer.com
   standalone: true,
   imports: [CommonModule, RouterModule, NavbarComponent, FooterComponent],
   template: `
-    <app-navbar-component></app-navbar-component>
+    <app-navbar></app-navbar>
 
     <div
       class="min-h-screen bg-linear-to-b from-white via-purple-50/10 to-white"

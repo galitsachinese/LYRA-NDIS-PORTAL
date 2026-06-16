@@ -6,7 +6,7 @@ import { NavbarComponent } from '../../../../shared/components/navbar-website/na
 import { ContactSectionComponent } from '../../../../shared/components/contact-section/contact-section.component';
 import { FaqSectionComponent } from '../../../../shared/components/faq-section/faq-section.component'; 
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
-import { CardComponent } from '../../../../shared/components/card/service-card/service-card.component';
+import { ServiceCardComponent } from '../../../../shared/components/card/service-card/service-card.component';
 
 
 @Component({
@@ -19,7 +19,7 @@ import { CardComponent } from '../../../../shared/components/card/service-card/s
     ContactSectionComponent,
     FaqSectionComponent,
     FooterComponent,
-    CardComponent,
+    ServiceCardComponent,
   ],
   templateUrl: './home.page.html',
 })

@@ -111,9 +111,9 @@ export class AuthService {
     return this.hasToken();
   }
 
-  getToken(): string | null {
-    if (!this.isBrowser()) return null;
-    return localStorage.getItem('token');
+  // Add this so the Interceptor can find the token
+  public getToken(): string | null {
+    return this.isBrowser() ? localStorage.getItem('token') : null;
   }
 
   getUserId(): string | null {

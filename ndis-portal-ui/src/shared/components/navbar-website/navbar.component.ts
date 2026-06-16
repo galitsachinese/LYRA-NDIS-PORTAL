@@ -1,67 +1,92 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd, RouterModule } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
+import { AuthService } from '../../../app/core/services/auth.service';
 
 @Component({
-  selector: 'app-navbar-component',
+  selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
 })
-export class NavbarComponent implements OnInit {
-  // Navigation states
+export class NavbarComponent implements OnInit, OnDestroy {
   isScrolled = false;
   isMobileMenuOpen = false;
-  isHomePage = true;
+  isHomePage = true; // Tracks if we are on the homepage
+  navLinks: { label: string; path: string }[] = [];
 
-  constructor(private router: Router) {
-    // 1. FORCE IMMEDIATE EVALUATION: Check current URL the instant the component is created
-    // This prevents the navbar from being transparent on sub-pages before the first navigation event
-    this.updateNavbarState(this.router.url);
-  }
+  private authSub = new Subscription();
+  private routerSub = new Subscription();
 
-  ngOnInit(): void {
-    // 2. LISTEN FOR NAVIGATION: Update state on every subsequent route change
-    this.router.events
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+  ) {
+    // Detect navigation changes to toggle transparency logic
+    this.routerSub = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.updateNavbarState(event.urlAfterRedirects || event.url);
+        this.isHomePage =
+          event.urlAfterRedirects === '/' || event.urlAfterRedirects === '';
       });
   }
 
-  /**
-   * Centralized state manager
-   */
-  private updateNavbarState(url: string): void {
-    this.isHomePage = url === '/' || url === '/home' || url.startsWith('/home');
-    this.evaluateScrollState();
+  ngOnInit() {
+    this.updateLinks();
+    this.authSub = this.authService.isAuthenticated$.subscribe(() => {
+      this.updateLinks();
+    });
   }
 
-  /**
-   * Scroll listener with SSR safety
-   */
+  ngOnDestroy() {
+    this.authSub.unsubscribe();
+    this.routerSub.unsubscribe();
+  }
+
+  // Determine background state
+  get useTransparentBg(): boolean {
+    return this.isHomePage && !this.isScrolled && !this.isMobileMenuOpen;
+  }
+
   @HostListener('window:scroll', [])
-  onWindowScroll(): void {
-    this.evaluateScrollState();
+  onWindowScroll() {
+    this.isScrolled = window.scrollY > 40;
   }
 
-  /**
-   * Business rule coordinator
-   * Forces solid state on non-home pages, otherwise follows scroll position
-   */
-  private evaluateScrollState(): void {
-    if (!this.isHomePage) {
-      // Sub-pages: Always solid colored background
-      this.isScrolled = true;
+  updateLinks() {
+    const role = (this.authService.getRole() || '').trim().toLowerCase();
+
+    if (role === 'coordinator') {
+      this.navLinks = [
+        { label: 'Dashboard', path: '/dashboard' },
+        { label: 'Manage Services', path: '/services/manage' },
+        { label: 'All Bookings', path: '/bookings' },
+        { label: 'Workers', path: '/workers' },
+      ];
+    } else if (role === 'participant') {
+      this.navLinks = [
+        { label: 'About Us', path: '/about' },
+        { label: 'Services', path: '/services' },
+        { label: 'Admission', path: '/admission' },
+        { label: 'My Bookings', path: '/bookings' },
+      ];
     } else {
-      // Home page: Dynamic transparency based on vertical scroll offset
-      const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-      this.isScrolled = scrollY > 40;
+      this.navLinks = [
+        { label: 'About Us', path: '/about' },
+        { label: 'Services', path: '/explore/services' },
+        { label: 'Admission', path: '/admission' },
+        { label: 'Contact Us', path: '/contact' },
+      ];
     }
   }
 
-  toggleMobileMenu(): void {
+  toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

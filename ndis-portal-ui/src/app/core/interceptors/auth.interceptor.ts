@@ -1,3 +1,4 @@
+// auth.interceptor.ts
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
@@ -7,17 +8,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.getToken();
 
   /**
-   * RULE:
-   * - Do NOT attach token for public endpoints
-   * - Attach ONLY for protected endpoints
-   *
-   * IMPORTANT:
-   * Services GET is public by requirement
+   * FIXED RULE:
+   * Always attach token IF it exists.
+   * Backend decides access (public vs protected).
    */
-  const isPublicRequest = req.url.includes('/services') && req.method === 'GET';
-
-  // If token exists AND request is NOT public → attach Authorization header
-  if (token && !isPublicRequest) {
+  if (token) {
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,

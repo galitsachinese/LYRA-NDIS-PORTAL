@@ -30,7 +30,6 @@ import { ToastService } from '../../../core/services/toast.service';
     BackButton,
   ],
   templateUrl: './book-service.page.html',
-  styleUrls: ['./book-service.page.css'],
 })
 export class BookServiceComponent implements OnInit, OnDestroy {
   bookingData = {

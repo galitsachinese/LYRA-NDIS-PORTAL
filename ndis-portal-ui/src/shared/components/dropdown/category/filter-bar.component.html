@@ -1,0 +1,9 @@
+<div class="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
+  <button *ngFor="let option of categoryOptions; trackBy: trackByValue" type="button"
+    (click)="handleSelect(option.value)" [class]="selectedValue === option.value 
+      ? 'bg-violet text-white font-semibold' 
+      : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'"
+    class="px-3 py-1.5 text-xs font-base border rounded-full transition-all duration-200 whitespace-nowrap">
+    {{ option.label }}
+  </button>
+</div>

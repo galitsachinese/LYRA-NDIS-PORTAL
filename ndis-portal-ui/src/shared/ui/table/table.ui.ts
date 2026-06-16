@@ -20,120 +20,96 @@ export class TableComponent {
   /* ===============================
      INPUTS
      =============================== */
-
-  // Columns definition
   @Input() columns: TableColumn[] = [];
-
-  // Table data
   @Input() data: any[] = [];
   @Input() fillFewRows = true;
 
   /* ===============================
      OUTPUT EVENTS
      =============================== */
-
-  // View action emitter
   @Output() viewAction = new EventEmitter<any>();
-
-  // Cancel / Multi-action emitter
   @Output() cancelAction = new EventEmitter<any>();
-
-  // Toggle action emitter for status toggle
   @Output() toggleAction = new EventEmitter<any>();
 
   /* ===============================
      LOCAL STATE
      =============================== */
-
-  // Currently opened action menu row
   activeMenuRow: any = null;
   replaceActionRow: any = null;
 
   constructor(private eRef: ElementRef) {}
 
   /* ==========================================================
-     🔥 FIX: SMART COLUMN WIDTH LOGIC
-     This allows table to auto-fit based on called columns
-     WITHOUT breaking existing components
+     COLUMN WIDTH SYSTEM
+     Each type gets a relative weight. Widths are calculated
+     as percentages of the total weight of active columns,
+     so any combination always fills 100% of the table.
      ========================================================== */
 
-  /**
-   * Tailwind-based column sizing
-   * NO px used
-   */
-  /**
-   * Balanced Tailwind sizing
-   * Allows shrinking before scrolling
-   */
+  private readonly columnWeights: Record<string, number> = {
+    action: 1,
+    toggle: 2,
+    status: 2,
+    view: 2,
+    date: 2.5,
+    category: 3,
+    name: 3.5,
+    service: 3.5,
+    notes: 5,
+  };
+
+  private readonly columnMinWidths: Record<string, string> = {
+    action: '48px',
+    toggle: '100px',
+    status: '90px',
+    view: '72px',
+    date: '110px',
+    category: '120px',
+    name: '140px',
+    service: '140px',
+    notes: '180px',
+  };
+
+  getColumnStyle(col: TableColumn): { [key: string]: string } {
+    const totalWeight = this.columns.reduce((sum, c) => {
+      return (
+        sum + (this.columnWeights[c.type] ?? this.columnWeights[c.key] ?? 3)
+      );
+    }, 0);
+
+    const weight =
+      this.columnWeights[col.type] ?? this.columnWeights[col.key] ?? 3;
+    const pct =
+      totalWeight > 0
+        ? `${((weight / totalWeight) * 100).toFixed(2)}%`
+        : 'auto';
+    const minW = this.columnMinWidths[col.type] ?? '80px';
+
+    return { width: pct, minWidth: minW };
+  }
+
   getColumnClass(col: TableColumn): string {
-    switch (col.type) {
-      // Smallest column
-      case 'action':
-        return 'w-[7%] min-w-14 text-center';
-
-      // Status column
-      case 'status':
-        return 'w-[11%] min-w-24';
-
-      // Date column
-      case 'date':
-        return 'w-[14%] min-w-28';
-
-      // Category column
-      case 'category':
-        return 'w-[17%] min-w-32';
-
-      // View column
-      case 'view':
-        return 'w-1/12 min-w-20';
-
-      // Notes column
-      case 'notes':
-        return 'w-[35%] min-w-56';
-
-      // Toggle column (actions with toggle button)
-      case 'toggle':
-        return 'w-1/6 min-w-36 text-center';
-
-      default:
-        // Primary columns
-        if (col.key === 'name' || col.key === 'service') {
-          return 'w-[16%] min-w-40';
-        }
-
-        // Default
-        return 'w-1/10 min-w-24';
-    }
+    return col.type === 'action' || col.type === 'toggle' ? 'text-center' : '';
   }
 
   /* ==========================================================
      ACTION MENU LOGIC
-     Supports:
-     - Single action
-     - Multi-action
      ========================================================== */
 
   emitAction(row: any, actionKey?: string): void {
     const payload = actionKey ? { row, action: actionKey } : row;
-
     this.cancelAction.emit(payload);
-
-    // Close menu
     this.activeMenuRow = null;
     this.replaceActionRow = null;
   }
 
-  /* Get multi-actions if exists */
   getActionConfig() {
     const actionCol = this.columns?.find((col) => col.type === 'action');
-
     return Array.isArray(actionCol?.actionLabel) ? actionCol.actionLabel : null;
   }
 
-  /* Get fallback single action */
   getActionLabel(): string {
     const actionCol = this.columns?.find((col) => col.type === 'action');
-
     return typeof actionCol?.actionLabel === 'string'
       ? actionCol.actionLabel
       : 'Cancel';
@@ -162,10 +138,8 @@ export class TableComponent {
     this.toggleMenu(row);
   }
 
-  /* Get action column header label */
   getActionColumnLabel(): string {
     const actionCol = this.columns?.find((col) => col.type === 'action');
-
     return actionCol?.label || 'Action';
   }
 
@@ -180,21 +154,18 @@ export class TableComponent {
       case 'approved':
       case 'active':
         return 'bg-[#dcfce7] text-[#289839]';
-
       case 'pending':
         return 'bg-[#fb7a4b] text-white';
-
       case 'cancelled':
       case 'inactive':
         return 'bg-[#fee2e2] text-[#b91c1c]';
-
       default:
         return 'text-slate-700';
     }
   }
 
   /* ==========================================================
-     SAFE VALUE ACCESS
+     UTILITIES
      ========================================================== */
 
   getValue(row: any, key: string): any {
@@ -202,10 +173,7 @@ export class TableComponent {
   }
 
   formatName(value: any): string {
-    if (value === null || value === undefined) {
-      return '';
-    }
-
+    if (value === null || value === undefined) return '';
     return String(value)
       .trim()
       .toLowerCase()
@@ -213,23 +181,19 @@ export class TableComponent {
       .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
-  /* Check if action column exists */
   get hasActionColumn(): boolean {
     return this.columns.some((col) => col.type === 'action');
   }
 
-  /* Toggle menu open/close */
   toggleMenu(row: any): void {
     this.replaceActionRow = null;
     this.activeMenuRow = this.activeMenuRow === row ? null : row;
   }
 
-  /* Emit toggle action for status changes */
   emitToggle(row: any): void {
     this.toggleAction.emit(row);
   }
 
-  /* Close menu when clicking outside */
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {

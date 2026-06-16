@@ -9,7 +9,7 @@
     <!-- Toggle Button -->
     <button *ngIf="!shouldReplaceAction(row)" (click)="handleActionTrigger(row, $event)"
       [disabled]="actionColumn?.actionDisplay === 'replace-with-action' && (getValue(row, 'status') || '').toLowerCase() !== 'pending'"
-      class="table-action-trigger inline-flex h-[26px] w-6 items-center justify-center rounded border border-slate-300 bg-slate-100 p-0 text-slate-400 hover:text-slate-600 transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60">
+      class="table-action-trigger inline-flex h-[26px] w-6 items-center justify-center rounded p-0 text-slate-400 hover:text-slate-600 transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 
         <path d="M9.5 13a1.5 1.5 0 1 1-3 0

@@ -65,8 +65,16 @@ export const routes: Routes = [
           ),
       },
       // PUBLIC SERVICE LISTING: Browsable by everyone
-      { path: 'explore/services', component: ServicesListComponent },
-      { path: 'explore/services/:id', component: ServiceDetailComponent },
+      {
+        path: 'explore/services',
+        component: ServicesListComponent,
+        data: { public: true },
+      },
+      {
+        path: 'explore/services/:id',
+        component: ServiceDetailComponent,
+        data: { public: true },
+      },
     ],
   },
 

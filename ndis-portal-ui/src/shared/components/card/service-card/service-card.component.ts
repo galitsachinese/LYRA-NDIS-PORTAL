@@ -7,7 +7,7 @@ export interface ServiceItem {
   name: string;
   category: string;
   description: string;
-  icon: string; 
+  icon: string;
 }
 
 @Component({
@@ -16,15 +16,16 @@ export interface ServiceItem {
   imports: [CommonModule, CardUi],
   templateUrl: './service-card.component.html',
 })
-export class CardComponent {
+export class ServiceCardComponent {
   @Input() services: ServiceItem[] = [];
   @Output() cardSelected = new EventEmitter<ServiceItem>();
 
-  onCardClick(service: ServiceItem) {
-    this.cardSelected.emit(service);
-  }
-
   trackByServiceId(index: number, item: ServiceItem) {
     return item.id;
+  }
+
+  handleClick(event: MouseEvent, item: ServiceItem) {
+    event.stopPropagation();
+    this.cardSelected.emit(item);
   }
 }

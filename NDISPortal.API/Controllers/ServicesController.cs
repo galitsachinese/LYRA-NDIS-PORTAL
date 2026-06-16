@@ -37,10 +37,10 @@ namespace Service.API.Controllers
         // Public endpoint - returns active services only (for participants)
 
         // Optional filter: api/services?categoryId=1
-
+[AllowAnonymous]
         [HttpGet]
 
-        [AllowAnonymous]
+        
 
         public async Task<ActionResult<IEnumerable<ServiceDto>>> GetServices([FromQuery] int? categoryId)
 

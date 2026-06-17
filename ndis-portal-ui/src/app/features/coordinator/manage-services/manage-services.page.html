@@ -36,12 +36,20 @@
 
     <!-- Services table -->
     <div *ngIf="!isLoading && !errorMessage" data-testid="services-table">
-        <app-manage-services-table [bookings]="services"
-          (toggleStatus)="toggleServiceStatus($event)">
+    <app-manage-services-table [bookings]="services"
+          (toggleStatus)="toggleServiceStatus($event)"
+          (editService)="openEditModal($event)">
         </app-manage-services-table>
     </div>
 </div>
 
-<!-- Add the Modal Component here -->
+<!-- Add New Service Modal -->
 <app-service-form-modal *ngIf="isModalOpen" data-testid="service-modal" (onClose)="isModalOpen = false" (onSave)="saveNewService($event)">
 </app-service-form-modal>
+
+<!-- Edit Service Modal -->
+<app-edit-service-modal *ngIf="isEditModalOpen"
+  [service]="selectedServiceForEdit"
+  (onClose)="isEditModalOpen = false"
+  (onSaved)="loadServices()">
+</app-edit-service-modal>

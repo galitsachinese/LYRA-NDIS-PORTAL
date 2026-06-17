@@ -65,7 +65,16 @@
 
     <div class="flex items-center justify-between border-t border-slate-100 gap-4 p-4">
       <span class="text-sm text-slate-500">Actions</span>
-      <ng-container *ngTemplateOutlet="toggleControl; context: { service: service }"></ng-container>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="editService.emit(service)"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                title="Edit service">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        </button>
+        <ng-container *ngTemplateOutlet="toggleControl; context: { service: service }"></ng-container>
+      </div>
     </div>
   </article>
 
@@ -166,7 +175,16 @@
             <ng-container *ngTemplateOutlet="statusBadge; context: { service: service }"></ng-container>
           </td>
           <td class="px-4 py-4 text-center align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
-            <ng-container *ngTemplateOutlet="toggleControl; context: { service: service }"></ng-container>
+            <div class="flex items-center justify-center gap-2">
+              <button type="button" (click)="editService.emit(service)"
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                      title="Edit service">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <ng-container *ngTemplateOutlet="toggleControl; context: { service: service }"></ng-container>
+            </div>
           </td>
         </tr>
       </tbody>

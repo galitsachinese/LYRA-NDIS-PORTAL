@@ -150,6 +150,25 @@ Go
 -- MIGRATION SCRIPTS (idempotent — safe to run on existing DBs)
 -- ============================================================
 
+-- Create 'contact_inquiries' table if missing
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_NAME = 'contact_inquiries'
+)
+BEGIN
+    CREATE TABLE contact_inquiries (
+        id INT PRIMARY KEY IDENTITY(1,1),
+        first_name NVARCHAR(100) NOT NULL,
+        last_name NVARCHAR(100) NOT NULL,
+        email NVARCHAR(150) NOT NULL,
+        phone_number NVARCHAR(20) NULL,
+        message NVARCHAR(1000) NOT NULL,
+        is_read BIT DEFAULT 0,
+        submitted_at DATETIME DEFAULT GETDATE()
+    );
+END
+Go
+
 -- Add 'status' column to support_workers if missing
 IF NOT EXISTS (
     SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS

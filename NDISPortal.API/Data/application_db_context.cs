@@ -37,6 +37,7 @@ namespace NDISPortal.API.Data
         public DbSet<SupportWorkers> SupportWorker => Set<SupportWorkers>();
 
         public DbSet<WorkerBooking> WorkerBookings => Set<WorkerBooking>();
+        public DbSet<ContactEnquiry> ContactInquiries => Set<ContactEnquiry>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
@@ -231,6 +232,23 @@ namespace NDISPortal.API.Data
             });
 
 
+
+            // --- Contact Enquiry Mapping ---
+            modelBuilder.Entity<ContactEnquiry>(entity =>
+            {
+                entity.ToTable("contact_inquiries");
+
+                entity.HasKey(c => c.Id);
+
+                entity.Property(c => c.Id).HasColumnName("id");
+                entity.Property(c => c.FirstName).HasColumnName("first_name");
+                entity.Property(c => c.LastName).HasColumnName("last_name");
+                entity.Property(c => c.Email).HasColumnName("email");
+                entity.Property(c => c.PhoneNumber).HasColumnName("phone_number");
+                entity.Property(c => c.Message).HasColumnName("message");
+                entity.Property(c => c.IsRead).HasColumnName("is_read");
+                entity.Property(c => c.SubmittedAt).HasColumnName("submitted_at");
+            });
 
             // --- Worker Booking Mapping ---
 

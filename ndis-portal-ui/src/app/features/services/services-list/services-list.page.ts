@@ -1,4 +1,3 @@
-// services-list.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 // UI Components
 import { ServiceCardComponent, ServiceItem } from '../../../../shared/components/card/service-card/service-card.component';
 import { FilterBarComponent } from '../../../../shared/components/dropdown/category/filter-bar.component';
+import { AuthModalComponent } from '../../../../shared/components/modals/auth-modal/auth-modal.component';
 
 // Services
 import { ApiService } from '../../../core/services/api-service';
@@ -14,7 +14,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-services-list',
   standalone: true,
-  imports: [CommonModule, ServiceCardComponent, FilterBarComponent],
+  imports: [CommonModule, ServiceCardComponent, FilterBarComponent, AuthModalComponent],
   templateUrl: './services-list.page.html',
 })
 export class ServicesListComponent implements OnInit {
@@ -26,6 +26,9 @@ export class ServicesListComponent implements OnInit {
 
   isLoading = true;
   isPublicView = false;
+
+  showAuthModal = false;
+  pendingServiceId: number | string | null = null;
 
   private categoryIconMap: { [key: string]: string } = {
     'therapy-supports': 'therapy',
@@ -43,7 +46,6 @@ export class ServicesListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // FIXED PUBLIC DETECTION
     this.route.data.subscribe((data) => {
       this.isPublicView = data['public'] === true;
     });
@@ -123,11 +125,24 @@ export class ServicesListComponent implements OnInit {
     const id = String(service.id);
 
     if (this.isPublicView) {
+      // Public route: navigate to detail first
       this.router.navigate(['/explore/services', id]);
     } else if (this.authService.isAuthenticated()) {
       this.router.navigate(['/services', id]);
     } else {
-      this.router.navigate(['/login']);
+      // Not authenticated on protected route → show auth modal with service context
+      this.pendingServiceId = id;
+      this.showAuthModal = true;
     }
+  }
+
+  closeAuthModal() {
+    this.showAuthModal = false;
+    this.pendingServiceId = null;
+  }
+
+  onAuthSuccess() {
+    this.showAuthModal = false;
+    this.pendingServiceId = null;
   }
 }

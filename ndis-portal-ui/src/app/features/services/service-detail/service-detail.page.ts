@@ -1,5 +1,3 @@
-// service-detail.page.ts  ← FIXED
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +7,7 @@ import { ButtonUiComponent } from '../../../../shared/ui/button/button.ui';
 import { ServiceItemComponent } from '../../../../shared/components/service-item/service-item.component';
 import { BookButton } from '../../../../shared/components/button/book-button/book-button.component';
 import { BackButton } from '../../../../shared/components/button/back-button/back-button.component';
+import { AuthModalComponent } from '../../../../shared/components/modals/auth-modal/auth-modal.component';
 
 @Component({
   selector: 'app-service-detail-page',
@@ -19,6 +18,7 @@ import { BackButton } from '../../../../shared/components/button/back-button/bac
     ServiceItemComponent,
     BookButton,
     BackButton,
+    AuthModalComponent,
   ],
   templateUrl: './service-detail.page.html',
 })
@@ -26,34 +26,22 @@ export class ServiceDetailComponent implements OnInit {
   serviceData: any = null;
   includes: any[] = [];
   isLoading = true;
-  isPublicView = false; // ← NEW
-  showAuthModal = false; // ← NEW: controls the login/signup modal
+  isPublicView = false;
+  showAuthModal = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private api: ApiService,
-    private authService: AuthService, // ← NEW
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
-
-    console.log('====================');
-    console.log('SERVICE DETAIL LOADED');
-    console.log('Current URL:', this.router.url);
-
-    this.route.data.subscribe((data) => {
-      console.log('Route Data:', data);
-      this.isPublicView = data['public'] === true;
-    });
-    
-    // Detect public vs protected route via route data (mirrors services-list logic)
     this.route.data.subscribe((data) => {
       this.isPublicView = data['public'] === true;
     });
 
     const serviceId = this.route.snapshot.paramMap.get('id');
-    console.log('Service ID:', serviceId);
     if (serviceId) {
       this.api.getServiceById(Number(serviceId)).subscribe({
         next: (res: any) => {
@@ -79,15 +67,9 @@ export class ServiceDetailComponent implements OnInit {
     window.history.back();
   }
 
-  /**
-   * Smart booking handler:
-   * - Public + not logged in  → show auth modal
-   * - Public + logged in      → proceed to booking
-   * - Protected (participant) → proceed to booking (AuthGuard already confirmed auth)
-   */
   processBooking() {
     if (this.isPublicView && !this.authService.isAuthenticated()) {
-      this.showAuthModal = true; // ← show modal instead of navigating
+      this.showAuthModal = true;
       return;
     }
 
@@ -96,15 +78,11 @@ export class ServiceDetailComponent implements OnInit {
     });
   }
 
-  closeModal() {
+  closeAuthModal() {
     this.showAuthModal = false;
   }
 
-  goToLogin() {
-    this.router.navigate(['/login']);
-  }
-
-  goToSignup() {
-    this.router.navigate(['/signup']);
+  onAuthSuccess() {
+    this.showAuthModal = false;
   }
 }

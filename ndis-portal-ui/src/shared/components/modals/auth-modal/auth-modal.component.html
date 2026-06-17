@@ -1,0 +1,128 @@
+<div class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity"
+     (click)="closeModal()">
+
+  <!-- Modal Card -->
+  <div class="bg-white w-full max-w-[700px] rounded-2xl shadow-2xl flex overflow-hidden animate-in fade-in zoom-in duration-300"
+       (click)="$event.stopPropagation()">
+
+    <!-- LEFT: Compact Slideshow -->
+    <div class="hidden md:block w-[200px] lg:w-[240px] flex-shrink-0 relative overflow-hidden">
+      <app-slideshow [images]="slideImages" [interval]="5000"></app-slideshow>
+    </div>
+
+    <!-- RIGHT: Auth Forms -->
+    <div class="flex-1 p-6 md:p-8 space-y-5 overflow-y-auto max-h-[90vh]">
+
+      <!-- Close Button -->
+      <button type="button" (click)="closeModal()"
+              class="float-right text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Tabs: Login / Sign Up -->
+      <div class="flex border-b border-gray-200 pb-3">
+        <button (click)="setActiveTab('login')"
+                class="flex-1 pb-2 text-sm font-semibold transition-colors"
+                [class.text-[#6F2C91]]="activeTab === 'login'"
+                [class.text-gray-400]="activeTab !== 'login'"
+                [class.border-b-2]="activeTab === 'login'"
+                [class.border-[#6F2C91]]="activeTab === 'login'">
+          Log In
+        </button>
+        <button (click)="setActiveTab('signup')"
+                class="flex-1 pb-2 text-sm font-semibold transition-colors"
+                [class.text-[#6F2C91]]="activeTab === 'signup'"
+                [class.text-gray-400]="activeTab !== 'signup'"
+                [class.border-b-2]="activeTab === 'signup'"
+                [class.border-[#6F2C91]]="activeTab === 'signup'">
+          Sign Up
+        </button>
+      </div>
+
+      <!-- ======================= -->
+      <!-- LOGIN TAB              -->
+      <!-- ======================= -->
+      <div *ngIf="activeTab === 'login'" class="space-y-4">
+        <h2 class="text-xl font-bold text-gray-900">Welcome Back</h2>
+        <p class="text-xs text-gray-500">Sign in to book your support service.</p>
+
+        <div *ngIf="loginError" class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs">
+          {{ loginError }}
+        </div>
+
+        <div class="space-y-3">
+          <input type="email" [(ngModel)]="loginEmail" name="loginEmail" placeholder="Email"
+                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+
+          <input type="password" [(ngModel)]="loginPassword" name="loginPassword" placeholder="Password"
+                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+
+          <button (click)="onLogin()" [disabled]="loginLoading"
+                  class="w-full bg-[#6F2C91] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#5a2375] transition-all disabled:opacity-50">
+            {{ loginLoading ? 'Signing in...' : 'Log In' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ======================= -->
+      <!-- SIGNUP TAB             -->
+      <!-- ======================= -->
+      <div *ngIf="activeTab === 'signup'" class="space-y-4">
+        <h2 class="text-xl font-bold text-gray-900">Create Account</h2>
+        <p class="text-xs text-gray-500">Register to start booking services.</p>
+
+        <div *ngIf="signupError" class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs">
+          {{ signupError }}
+        </div>
+        <div *ngIf="signupSuccess" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-xs">
+          {{ signupSuccess }}
+        </div>
+
+        <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <input type="text" [(ngModel)]="signupData.firstName" name="firstName" placeholder="First Name"
+                   class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+            <input type="text" [(ngModel)]="signupData.lastName" name="lastName" placeholder="Last Name"
+                   class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+          </div>
+
+          <input type="email" [(ngModel)]="signupData.email" name="signupEmail" placeholder="Email"
+                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+
+          <input type="password" [(ngModel)]="signupData.password" name="signupPassword" placeholder="Password (min 8 characters)"
+                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+
+          <input type="password" [(ngModel)]="signupData.confirmPassword" name="confirmPassword" placeholder="Confirm Password"
+                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+
+          <!-- Role Dropdown -->
+          <select [(ngModel)]="signupData.role" name="role"
+                  class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+            <option value="" disabled selected>Select your role</option>
+            <option value="Participant">Participant</option>
+            <option value="Coordinator">Coordinator</option>
+          </select>
+
+          <!-- Terms Checkbox -->
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="signupData.agreeToTerms" name="agreeToTerms"
+                   class="mt-1 accent-[#6F2C91]">
+            <span class="text-xs text-gray-500">
+              I agree to the
+              <a (click)="openTermsModal()" class="text-[#6F2C91] underline cursor-pointer">Terms & Conditions</a>
+            </span>
+          </label>
+
+          <button (click)="onSignUp()" [disabled]="signupLoading"
+                  class="w-full bg-[#6F2C91] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#5a2375] transition-all disabled:opacity-50">
+            {{ signupLoading ? 'Creating account...' : 'Sign Up' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-terms-modal></app-terms-modal>

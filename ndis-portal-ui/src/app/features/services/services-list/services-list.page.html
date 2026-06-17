@@ -21,8 +21,15 @@
             <div *ngFor="let i of [1,2,3]" class="h-64 bg-slate-100 animate-pulse rounded-2xl"></div>
         </div>
 
-        <app-service-card-component *ngIf="!isLoading" [services]="filteredServices"
+    <app-service-card-component *ngIf="!isLoading" [services]="filteredServices"
             (cardSelected)="onCardClick($event)">
         </app-service-card-component>
     </main>
 </div>
+
+<!-- Auth Modal: appears when unauthenticated user clicks a service card on protected route -->
+<app-auth-modal *ngIf="showAuthModal"
+                [serviceId]="pendingServiceId"
+                (close)="closeAuthModal()"
+                (loginSuccess)="onAuthSuccess()">
+</app-auth-modal>

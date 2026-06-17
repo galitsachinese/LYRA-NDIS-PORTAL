@@ -25,3 +25,10 @@
 
   </div>
 </div>
+
+<!-- Auth Modal for Book Now on public view -->
+<app-auth-modal *ngIf="showAuthModal"
+                [serviceId]="serviceData?.id"
+                (close)="closeAuthModal()"
+                (loginSuccess)="onAuthSuccess()">
+</app-auth-modal>

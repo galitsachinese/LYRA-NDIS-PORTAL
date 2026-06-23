@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, map, of, throwError, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Booking } from '../models/booking.model';
+import { Booking, WorkerInfo } from '../models/booking.model';
 
 @Injectable({
   providedIn: 'root',
@@ -180,6 +180,36 @@ export class BookingService {
         return throwError(() => new Error('Failed to create booking. Please try again.'));
       })
     );
+  }
+
+  getBookingWorker(bookingId: number): Observable<WorkerInfo | null> {
+    return this.http
+      .get<WorkerInfo | any>(`${this.apiUrl}/${bookingId}/worker`)
+      .pipe(
+        map((response: any) => {
+          // Handle wrapped response: { Success: true, Data: {...} }
+          const data = response?.Data ?? response;
+          if (!data || data.message) {
+            return null;
+          }
+          return {
+            workerId: data.workerId ?? data.WorkerId ?? 0,
+            workerName: data.workerName ?? data.WorkerName ?? '',
+            workerPhone: data.workerPhone ?? data.WorkerPhone ?? '',
+            assignedServiceId: data.assignedServiceId ?? data.AssignedServiceId ?? 0,
+            assignedServiceName: data.assignedServiceName ?? data.AssignedServiceName ?? '',
+            assignedDate: data.assignedDate ?? data.AssignedDate ?? '',
+          } as WorkerInfo;
+        }),
+        catchError((error) => {
+          // 404 means no worker assigned yet — not an error
+          if (error.status === 404) {
+            return of(null);
+          }
+          console.error('[BookingService] Error fetching worker for booking', bookingId, error);
+          return of(null);
+        })
+      );
   }
 
   updateBookingStatus(

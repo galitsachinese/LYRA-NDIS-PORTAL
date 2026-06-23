@@ -12,6 +12,15 @@ export interface Booking {
   modifiedDate: string;
 }
 
+export interface WorkerInfo {
+  workerId: number;
+  workerName: string;
+  workerPhone: string;
+  assignedServiceId: number;
+  assignedServiceName: string;
+  assignedDate: string;
+}
+
 export interface BookingViewModel {
   id: number;
   name?: string;
@@ -21,4 +30,5 @@ export interface BookingViewModel {
   status: string;
   notes?: string;
   rawData: Booking;
+  workerInfo?: WorkerInfo;
 }

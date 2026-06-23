@@ -23,7 +23,7 @@ import {
   ],
   templateUrl: './service-form-modal.component.html',
 })
-export class ServiceFormModalComponent {
+export class ServiceFormModalComponent implements OnInit {
   // Emits when modal is closed
   @Output() onClose = new EventEmitter<void>();
 

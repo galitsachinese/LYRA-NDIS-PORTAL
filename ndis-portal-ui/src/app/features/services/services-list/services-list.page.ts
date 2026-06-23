@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceCardComponent, ServiceItem } from '../../../../shared/components/card/service-card/service-card.component';
 import { FilterBarComponent } from '../../../../shared/components/dropdown/category/filter-bar.component';
 import { AuthModalComponent } from '../../../../shared/components/modals/auth-modal/auth-modal.component';
+import { ServiceRecommendationModalComponent } from '../../../../shared/components/service-recommendation-modal/service-recommendation-modal.component';
 
 // Services
 import { ApiService } from '../../../core/services/api-service';
@@ -14,12 +15,14 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-services-list',
   standalone: true,
-  imports: [CommonModule, ServiceCardComponent, FilterBarComponent, AuthModalComponent],
+  imports: [CommonModule, ServiceCardComponent, FilterBarComponent, AuthModalComponent, ServiceRecommendationModalComponent],
   templateUrl: './services-list.page.html',
 })
 export class ServicesListComponent implements OnInit {
   allServices: ServiceItem[] = [];
   filteredServices: ServiceItem[] = [];
+
+  @ViewChild(ServiceRecommendationModalComponent) recommendationModal!: ServiceRecommendationModalComponent;
 
   categoryOptions: { label: string; value: string }[] = [];
   selectedCategory = 'all';
@@ -144,5 +147,11 @@ export class ServicesListComponent implements OnInit {
   onAuthSuccess() {
     this.showAuthModal = false;
     this.pendingServiceId = null;
+  }
+
+  openAiRecommendation() {
+    if (this.recommendationModal) {
+      this.recommendationModal.openModal();
+    }
   }
 }

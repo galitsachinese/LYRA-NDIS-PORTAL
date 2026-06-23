@@ -17,12 +17,14 @@ namespace NDISPortal.API.DTOs.Contact
         [MaxLength(150, ErrorMessage = "Email must not exceed 150 characters.")]
         public string Email { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Phone number is required.")]
         [Phone(ErrorMessage = "Phone number must be a valid phone number.")]
         [MaxLength(20, ErrorMessage = "Phone number must not exceed 20 characters.")]
-        public string? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Message is required.")]
-        [MaxLength(1000, ErrorMessage = "Message must not exceed 1000 characters.")]
+        [MinLength(10, ErrorMessage = "Message must be at least 10 characters.")]
+        [MaxLength(500, ErrorMessage = "Message must not exceed 500 characters.")]
         public string Message { get; set; } = string.Empty;
     }
 }

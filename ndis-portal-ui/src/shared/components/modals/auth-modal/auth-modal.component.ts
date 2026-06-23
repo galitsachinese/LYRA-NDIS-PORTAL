@@ -11,11 +11,12 @@ import {
   RegisterRequest,
 } from '../../../../app/core/services/auth.service';
 import { TermsModalComponent } from '../../terms-modal/terms-modal.component';
+import { PasswordFieldComponent } from '../../password-field/password-field.component';
 
 @Component({
   selector: 'app-auth-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, SlideshowComponent, TermsModalComponent],
+  imports: [CommonModule, FormsModule, SlideshowComponent, TermsModalComponent, PasswordFieldComponent],
   templateUrl: './auth-modal.component.html',
   styles: [],
 })
@@ -57,6 +58,9 @@ export class AuthModalComponent {
   loginPassword = '';
   loginError = '';
   loginLoading = false;
+  showLoginPassword = false;
+  showSignupPassword = false;
+  showConfirmPassword = false;
 
   // Signup form
   signupData = {

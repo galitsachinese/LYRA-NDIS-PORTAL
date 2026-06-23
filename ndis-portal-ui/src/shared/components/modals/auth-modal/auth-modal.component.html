@@ -56,8 +56,8 @@
           <input type="email" [(ngModel)]="loginEmail" name="loginEmail" placeholder="Email"
                  class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
 
-          <input type="password" [(ngModel)]="loginPassword" name="loginPassword" placeholder="Password"
-                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+          <app-password-field placeholder="Password" name="loginPassword" [(value)]="loginPassword" [required]="true">
+          </app-password-field>
 
           <button (click)="onLogin()" [disabled]="loginLoading"
                   class="w-full bg-[#6F2C91] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#5a2375] transition-all disabled:opacity-50">
@@ -91,11 +91,11 @@
           <input type="email" [(ngModel)]="signupData.email" name="signupEmail" placeholder="Email"
                  class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
 
-          <input type="password" [(ngModel)]="signupData.password" name="signupPassword" placeholder="Password (min 8 characters)"
-                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+          <app-password-field placeholder="Password (min 8 characters)" name="signupPassword" [(value)]="signupData.password" [required]="true">
+          </app-password-field>
 
-          <input type="password" [(ngModel)]="signupData.confirmPassword" name="confirmPassword" placeholder="Confirm Password"
-                 class="w-full px-4 py-2.5 bg-purple-50/30 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-purple-300 focus:bg-white transition-all">
+          <app-password-field placeholder="Confirm Password" name="confirmPassword" [(value)]="signupData.confirmPassword" [required]="true">
+          </app-password-field>
 
           <!-- Role Dropdown -->
           <select [(ngModel)]="signupData.role" name="role"

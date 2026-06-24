@@ -1,19 +1,26 @@
 <div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto">
-    <div class="flex flex-row items-center justify-between gap-4 w-full">
-        <div>
-            <h1 class="text-lg md:text-xl font-bold text-slate-900">Registered Services Registry</h1>
+    <!-- Header Section -->
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-row items-center justify-between gap-4 w-full">
+            <div>
+                <h1 class="text-lg md:text-2xl font-bold text-slate-900">Registered Services Registry</h1>
+                <p class="text-sm text-slate-500 mt-1">Manage all services and create new ones for your organization</p>
+            </div>
         </div>
-        <div class="flex flex-col items-end gap-3">
-            <button data-testid="add-service-btn" (click)="openModal()" class="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors">
-                +  New Service
-            </button>
-            <div class="flex items-center gap-3">
-                <select [(ngModel)]="selectedStatusFilter" (change)="filterByStatus()" class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="All">All</option>
+
+        <!-- Control Bar -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <!-- Add Service Button - Made Prominent -->
+            <app-add-button data-testid="add-service-btn" label="Add New Service" variant="ghost" (onClick)="openModal()"></app-add-button>
+
+            <!-- Filter and Refresh Controls -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <select [(ngModel)]="selectedStatusFilter" (change)="filterByStatus()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 hover:border-slate-400 transition-colors">
+                    <option value="Active">Active Services</option>
+                    <option value="Inactive">Inactive Services</option>
+                    <option value="All">All Services</option>
                 </select>
-                <button (click)="refreshServices()" class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                <button (click)="refreshServices()" class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors shadow-sm hover:shadow-md">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -21,7 +28,6 @@
                 </button>
             </div>
         </div>
-
     </div>
 
     <div *ngIf="errorMessage" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">

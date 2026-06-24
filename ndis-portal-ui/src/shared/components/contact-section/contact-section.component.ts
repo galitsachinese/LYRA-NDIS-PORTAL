@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { MapIconComponent } from '../../components/icons/svg-icons/map-icon';
 import { PhoneIconComponent } from '../../components/icons/svg-icons/phone-icon';
@@ -23,6 +23,7 @@ interface ContactForm {
   templateUrl: './contact-section.component.html',
 })
 export class ContactSectionComponent {
+  @ViewChild('contactForm') contactForm!: NgForm;
   private apiUrl = environment.apiUrl;
 
   contactInfo = [
@@ -57,6 +58,7 @@ export class ContactSectionComponent {
         next: () => {
           this.successMessage = 'Your enquiry has been submitted successfully. We will get back to you soon.';
           this.formData = { firstName: '', lastName: '', email: '', phoneNumber: '', message: '' };
+          this.contactForm.resetForm();
           this.submitting = false;
         },
         error: (err) => {

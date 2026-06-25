@@ -12,6 +12,7 @@ import { AuthModalComponent } from '../../../../shared/components/modals/auth-mo
 @Component({
   selector: 'app-service-detail-page',
   standalone: true,
+  // Ensure your imports array looks like this:
   imports: [
     CommonModule,
     ButtonUiComponent,
@@ -29,6 +30,9 @@ export class ServiceDetailComponent implements OnInit {
   isPublicView = false;
   showAuthModal = false;
 
+  // Navigation state
+  allServiceIds: number[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -37,30 +41,64 @@ export class ServiceDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Determine view type
     this.route.data.subscribe((data) => {
       this.isPublicView = data['public'] === true;
     });
 
-    const serviceId = this.route.snapshot.paramMap.get('id');
-    if (serviceId) {
-      this.api.getServiceById(Number(serviceId)).subscribe({
-        next: (res: any) => {
-          const data = res.Data;
-          this.serviceData = {
-            id: data.id,
-            title: data.name || data.title,
-            category: data.categoryName,
-            description: data.description,
-          };
-          this.includes = (data.items || []).map((item: any) => ({
-            name: item.name || item,
-            icon: item.icon || 'pi pi-check',
-          }));
-          this.isLoading = false;
-        },
-        error: () => (this.isLoading = false),
-      });
-    }
+    // 1. Fetch all IDs first so we can navigate
+    this.api.getServices().subscribe({
+      next: (res: any) => {
+        this.allServiceIds = (res.Data || []).map((s: any) => s.id);
+
+        // 2. Subscribe to param changes so we reload when clicking Next/Prev
+        this.route.params.subscribe((params) => {
+          this.loadServiceDetail(Number(params['id']));
+        });
+      },
+    });
+  }
+
+  loadServiceDetail(id: number) {
+    this.isLoading = true;
+    this.api.getServiceById(id).subscribe({
+      next: (res: any) => {
+        const data = res.Data;
+        this.serviceData = {
+          id: data.id,
+          title: data.name || data.title,
+          category: data.categoryName,
+          description: data.description,
+        };
+        this.includes = (data.items || []).map((item: any) => ({
+          name: item.name || item,
+          icon: item.icon || 'pi pi-check',
+        }));
+        this.isLoading = false;
+      },
+      error: () => (this.isLoading = false),
+    });
+  }
+
+  // --- Navigation Helpers ---
+
+  getPrevId(): number | null {
+    if (!this.serviceData) return null;
+    const index = this.allServiceIds.indexOf(this.serviceData.id);
+    return index > 0 ? this.allServiceIds[index - 1] : null;
+  }
+
+  getNextId(): number | null {
+    if (!this.serviceData) return null;
+    const index = this.allServiceIds.indexOf(this.serviceData.id);
+    return index < this.allServiceIds.length - 1
+      ? this.allServiceIds[index + 1]
+      : null;
+  }
+
+  navigateTo(id: number) {
+    const path = this.isPublicView ? '/explore/services' : '/services';
+    this.router.navigate([path, id]);
   }
 
   navBack() {

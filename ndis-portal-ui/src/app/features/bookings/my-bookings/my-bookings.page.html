@@ -5,6 +5,28 @@
       (statusChange)="handleStatusFilter($event)"></app-status-dropdown>
   </header>
 
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <p class="text-gray-500 text-[10px] md:text-xs uppercase tracking-wider font-semibold">Total Bookings</p>
+      <p class="text-2xl font-bold text-gray-900 mt-1">{{ bookingStats.total }}</p>
+    </div>
+  
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <p class="text-gray-500 text-[10px] md:text-xs uppercase tracking-wider font-semibold">Pending</p>
+      <p class="text-2xl font-bold text-amber-600 mt-1">{{ bookingStats.pending }}</p>
+    </div>
+  
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <p class="text-gray-500 text-[10px] md:text-xs uppercase tracking-wider font-semibold">Approved</p>
+      <p class="text-2xl font-bold text-green-600 mt-1">{{ bookingStats.approved }}</p>
+    </div>
+  
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <p class="text-gray-500 text-[10px] md:text-xs uppercase tracking-wider font-semibold">Cancelled</p>
+      <p class="text-2xl font-bold text-red-600 mt-1">{{ bookingStats.cancelled }}</p>
+    </div>
+  </div>
+
   <section class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] items-start">
 
     <!-- TABLE SECTION: always rendered, states toggle inside -->

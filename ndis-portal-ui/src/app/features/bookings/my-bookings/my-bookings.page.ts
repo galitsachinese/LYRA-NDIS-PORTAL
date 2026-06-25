@@ -563,5 +563,24 @@ export class MyBookingsComponent implements OnInit {
 
     return 'Support Coordination';
   }
+
+  /**
+   * Getter to calculate booking statistics dynamically.
+   * This ensures the cards always reflect the current state of the 'bookings' array.
+   */
+  get bookingStats() {
+    return {
+      total: this.bookings.length,
+      pending: this.bookings.filter(
+        (b) => b.status?.toLowerCase() === 'pending',
+      ).length,
+      approved: this.bookings.filter(
+        (b) => b.status?.toLowerCase() === 'approved',
+      ).length,
+      cancelled: this.bookings.filter(
+        (b) => b.status?.toLowerCase() === 'cancelled',
+      ).length,
+    };
+  }
 }
 

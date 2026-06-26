@@ -131,7 +131,7 @@
             </div>
 
             <div class="mt-4 flex items-center justify-end gap-2">
-              <ng-container *ngIf="isPending(booking); else mobileMoreActions">
+              <ng-container *ngIf="isPending(booking)">
                 <button
                   type="button"
                   (click)="approve.emit(booking)"
@@ -147,16 +147,6 @@
                   Cancel
                 </button>
               </ng-container>
-
-              <ng-template #mobileMoreActions>
-                <button
-                  type="button"
-                  (click)="viewNotes(booking)"
-                  class="rounded-md bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100"
-                >
-                  View notes
-                </button>
-              </ng-template>
             </div>
           </div>
         </div>
@@ -166,12 +156,13 @@
     <div *ngIf="bookings.length > 0" class="hidden overflow-x-auto md:block">
       <table class="min-w-[1040px] w-full table-fixed border-collapse text-sm 2xl:min-w-[1440px] 2xl:text-base min-[3840px]:min-w-[2400px] min-[3840px]:text-2xl">
         <colgroup>
-          <col [class]="showWorkerAssignment ? 'w-[18%]' : 'w-[21%]'" />
-          <col [class]="showWorkerAssignment ? 'w-[25%]' : 'w-[30%]'" />
-          <col [class]="showWorkerAssignment ? 'w-[16%]' : 'w-[18%]'" />
-          <col [class]="showWorkerAssignment ? 'w-[11%]' : 'w-[13%]'" />
-          <col *ngIf="showWorkerAssignment" class="w-[17%]" />
-          <col [class]="showWorkerAssignment ? 'w-[13%]' : 'w-[18%]'" />
+          <col [class]="showWorkerAssignment ? 'w-[15%]' : 'w-[18%]'" />
+          <col [class]="showWorkerAssignment ? 'w-[20%]' : 'w-[24%]'" />
+          <col [class]="showWorkerAssignment ? 'w-[14%]' : 'w-[16%]'" />
+          <col [class]="showWorkerAssignment ? 'w-[13%]' : 'w-[15%]'" />
+          <col [class]="showWorkerAssignment ? 'w-[14%]' : 'w-[16%]'" />
+          <col *ngIf="showWorkerAssignment" class="w-[14%]" />
+          <col [class]="showWorkerAssignment ? 'w-[10%]' : 'w-[11%]'" />
         </colgroup>
 
         <thead class="bg-slate-50">
@@ -184,6 +175,9 @@
             </th>
             <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Date & Time
+            </th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+              Notes
             </th>
             <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Status
@@ -232,6 +226,22 @@
             </td>
             <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
               <span
+                data-testid="notes-cell"
+                class="block truncate text-sm text-slate-600 cursor-pointer max-w-[200px]"
+                [title]="(booking.notes || '').length > 80 ? booking.notes : ''"
+                (click)="viewNotes(booking)">
+                <ng-container *ngIf="booking.notes; else noNotes">
+                  <span data-testid="notes-truncated">
+                    {{ booking.notes.length > 80 ? (booking.notes | slice:0:80) + '...' : booking.notes }}
+                  </span>
+                </ng-container>
+                <ng-template #noNotes>
+                  <span data-testid="notes-empty" class="text-slate-400">&mdash;</span>
+                </ng-template>
+              </span>
+            </td>
+            <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+              <span
                 class="inline-flex min-w-[82px] justify-center rounded-full px-3 py-1 text-xs font-bold 2xl:min-w-[104px] 2xl:px-4 2xl:text-sm min-[3840px]:min-w-[156px] min-[3840px]:px-6 min-[3840px]:py-2 min-[3840px]:text-xl"
                 [ngClass]="getStatusClass(booking.status)"
               >
@@ -268,7 +278,7 @@
               </ng-template>
             </td>
             <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
-              <ng-container *ngIf="isPending(booking); else desktopMoreActions">
+              <ng-container *ngIf="isPending(booking)">
                 <div class="flex items-center gap-2">
                   <button
                     type="button"
@@ -286,36 +296,6 @@
                   </button>
                 </div>
               </ng-container>
-
-              <ng-template #desktopMoreActions>
-                <div class="relative inline-flex">
-                  <button
-                    type="button"
-                    (click)="toggleMenu(booking)"
-                    class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 2xl:h-10 2xl:w-10 min-[3840px]:h-14 min-[3840px]:w-14"
-                    data-testid="menu-btn"
-                    title="Actions"
-                  >
-                    <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-7 min-[3840px]:w-7" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM10 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM10 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-                    </svg>
-                  </button>
-
-                  <div
-                    *ngIf="activeMenuId === booking.id"
-                    class="absolute right-0 top-full z-[60] mt-2 w-36 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg 2xl:w-44 min-[3840px]:w-64"
-                    [attr.data-testid]="'dropdown-menu-' + booking.id"
-                  >
-                    <button
-                      type="button"
-                      (click)="viewNotes(booking)"
-                      class="block w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 2xl:px-5 2xl:py-3 2xl:text-base min-[3840px]:px-8 min-[3840px]:py-5 min-[3840px]:text-2xl"
-                    >
-                      View notes
-                    </button>
-                  </div>
-                </div>
-              </ng-template>
             </td>
           </tr>
         </tbody>

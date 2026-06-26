@@ -44,6 +44,12 @@ export class SidebarComponent {
       icon: 'support',
       role: 'Coordinator',
     },
+    {
+      label: 'Enquiries',
+      path: '/dashboard/enquiries',
+      icon: 'enquiries',
+      role: 'Coordinator',
+    },
 
     // Participant Links
     {

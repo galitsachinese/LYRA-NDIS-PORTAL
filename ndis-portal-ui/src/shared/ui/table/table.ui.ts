@@ -36,6 +36,7 @@ export class TableComponent {
      =============================== */
   activeMenuRow: any = null;
   replaceActionRow: any = null;
+  expandedNotesRows: Set<any> = new Set();
 
   constructor(private eRef: ElementRef) {}
 
@@ -192,6 +193,27 @@ export class TableComponent {
 
   emitToggle(row: any): void {
     this.toggleAction.emit(row);
+  }
+
+  /* ==========================================================
+     NOTES EXPAND/COLLAPSE LOGIC
+     ========================================================== */
+
+  toggleNotes(row: any): void {
+    if (this.expandedNotesRows.has(row)) {
+      this.expandedNotesRows.delete(row);
+    } else {
+      this.expandedNotesRows.add(row);
+    }
+  }
+
+  isNotesExpanded(row: any): boolean {
+    return this.expandedNotesRows.has(row);
+  }
+
+  truncateNotes(value: string, maxLen: number = 100): string {
+    if (!value) return '';
+    return value.length > maxLen ? value.substring(0, maxLen) + '...' : value;
   }
 
   @HostListener('document:click', ['$event'])

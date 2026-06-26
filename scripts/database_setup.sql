@@ -48,6 +48,7 @@ CREATE TABLE support_workers(
  status NVARCHAR(20) NOT NULL DEFAULT 'Active',
  employment_type NVARCHAR(50) NOT NULL DEFAULT 'Casual',
  wwcc_expiry_date DATETIME NULL,
+ profile_picture NVARCHAR(500) NULL,
  created_date DATETIME NOT NULL DEFAULT GETDATE(),
  modified_date DATETIME NOT NULL DEFAULT GETDATE(),
 
@@ -200,6 +201,16 @@ IF NOT EXISTS (
 )
 BEGIN
     ALTER TABLE support_workers ADD wwcc_expiry_date DATETIME NULL;
+END
+Go
+
+-- Add 'profile_picture' column to support_workers if missing
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'support_workers' AND COLUMN_NAME = 'profile_picture'
+)
+BEGIN
+    ALTER TABLE support_workers ADD profile_picture NVARCHAR(500) NULL;
 END
 Go
 

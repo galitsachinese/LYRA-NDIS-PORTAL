@@ -1,0 +1,228 @@
+<div class="mx-auto max-w-[2560px] space-y-5 p-4 md:space-y-6 md:p-6 2xl:p-8 min-[3840px]:max-w-[3200px] min-[3840px]:p-12" data-testid="enquiries-page">
+  <!-- Header -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <h2 class="text-lg font-bold text-slate-950 2xl:text-2xl min-[3840px]:text-4xl">
+        Enquiries
+      </h2>
+      <span
+        *ngIf="unreadCount > 0"
+        class="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-700 2xl:text-sm min-[3840px]:text-xl"
+        data-testid="unread-badge"
+      >
+        {{ unreadCount }} unread
+      </span>
+    </div>
+
+    <button
+      type="button"
+      (click)="loadEnquiries()"
+      class="inline-flex h-9 items-center gap-2 rounded-md bg-green-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 2xl:h-11 2xl:px-5 2xl:text-base min-[3840px]:h-16 min-[3840px]:px-8 min-[3840px]:text-2xl"
+      data-testid="refresh-btn"
+    >
+      <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-7 min-[3840px]:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" />
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">Status:</label>
+      <select
+        [(ngModel)]="statusFilter"
+        (ngModelChange)="onFilterChange()"
+        class="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100 2xl:h-11 2xl:text-base min-[3840px]:h-14 min-[3840px]:text-xl"
+        data-testid="status-filter"
+      >
+        <option *ngFor="let option of statusOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="relative flex-1 max-w-md">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by name or email..."
+        class="h-9 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-[#6B3293] focus:ring-2 focus:ring-violet-100 2xl:h-11 2xl:text-base min-[3840px]:h-14 min-[3840px]:text-xl"
+        data-testid="search-input"
+      />
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex h-48 flex-col items-center justify-center gap-4 2xl:h-64 min-[3840px]:h-96">
+    <div class="h-8 w-8 animate-spin rounded-full border-4 border-violet-100 border-t-violet-600 2xl:h-10 2xl:w-10 min-[3840px]:h-16 min-[3840px]:w-16"></div>
+    <p class="text-sm font-medium text-slate-400 2xl:text-lg min-[3840px]:text-3xl">Loading enquiries...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && filteredEnquiries.length === 0" class="flex flex-col items-center justify-center py-16 text-center 2xl:py-24 min-[3840px]:py-40">
+    <svg class="mb-4 h-12 w-12 text-slate-300 2xl:h-16 2xl:w-16 min-[3840px]:h-24 min-[3840px]:w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414A1 1 0 0 0 6.586 13H4" />
+    </svg>
+    <p class="text-sm font-medium text-slate-500 2xl:text-xl min-[3840px]:text-4xl">No enquiries found</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && filteredEnquiries.length > 0" class="overflow-hidden rounded-lg border border-slate-100 bg-white shadow-sm" data-testid="enquiries-table">
+    <div class="overflow-x-auto">
+      <table class="min-w-[800px] w-full table-fixed border-collapse text-sm 2xl:min-w-[1100px] 2xl:text-base min-[3840px]:min-w-[1800px] min-[3840px]:text-2xl">
+        <colgroup>
+          <col class="w-[5%]" />
+          <col class="w-[14%]" />
+          <col class="w-[14%]" />
+          <col class="w-[20%]" />
+          <col class="w-[13%]" />
+          <col class="w-[24%]" />
+          <col class="w-[10%]" />
+        </colgroup>
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl"></th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">First Name</th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">Last Name</th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">Email</th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">Phone</th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">Message</th>
+            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr
+            *ngFor="let enquiry of filteredEnquiries"
+            (click)="viewEnquiry(enquiry)"
+            class="cursor-pointer transition-colors hover:bg-slate-50/70"
+            [ngClass]="{ 'font-semibold text-slate-900': !enquiry.isRead, 'text-slate-600': enquiry.isRead }"
+            data-testid="enquiry-row"
+          >
+            <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+              <span
+                *ngIf="!enquiry.isRead"
+                class="inline-block h-2.5 w-2.5 rounded-full bg-rose-500 2xl:h-3 2xl:w-3 min-[3840px]:h-4 min-[3840px]:w-4"
+                data-testid="unread-dot"
+              ></span>
+            </td>
+            <td class="px-4 py-4 align-middle truncate 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8" [class.font-bold]="!enquiry.isRead">
+              {{ enquiry.firstName }}
+            </td>
+            <td class="px-4 py-4 align-middle truncate 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8" [class.font-bold]="!enquiry.isRead">
+              {{ enquiry.lastName }}
+            </td>
+            <td class="px-4 py-4 align-middle truncate 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8" [class.font-bold]="!enquiry.isRead">
+              {{ enquiry.email }}
+            </td>
+            <td class="px-4 py-4 align-middle truncate 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8" [class.font-bold]="!enquiry.isRead">
+              {{ enquiry.phoneNumber || '—' }}
+            </td>
+            <td class="px-4 py-4 align-middle truncate max-w-[200px] 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8" [class.font-bold]="!enquiry.isRead">
+              {{ enquiry.message.length > 80 ? (enquiry.message | slice:0:80) + '...' : enquiry.message }}
+            </td>
+            <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); viewEnquiry(enquiry)"
+                class="rounded-md bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 transition-colors hover:bg-violet-100 2xl:text-sm min-[3840px]:text-xl"
+                data-testid="view-btn"
+              >
+                View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div
+    *ngIf="isModalOpen && selectedEnquiry"
+    class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/20 p-4"
+    (click)="closeModal()"
+    data-testid="enquiry-modal"
+  >
+    <div
+      class="relative w-full max-w-lg overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl 2xl:max-w-2xl min-[3840px]:max-w-4xl"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 2xl:px-7 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+        <div class="flex items-center gap-3">
+          <h2 class="text-base font-semibold text-slate-900 2xl:text-xl min-[3840px]:text-3xl">
+            Enquiry Details
+          </h2>
+          <span
+            *ngIf="!selectedEnquiry.isRead"
+            class="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-bold text-rose-700 2xl:text-xs min-[3840px]:text-lg"
+          >
+            Unread
+          </span>
+        </div>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="text-slate-400 transition-colors hover:text-slate-600 2xl:text-xl min-[3840px]:text-4xl"
+          data-testid="modal-close-btn"
+        >
+          &times;
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="space-y-4 px-5 py-4 2xl:px-7 2xl:py-6 min-[3840px]:px-10 min-[3840px]:py-8">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">First Name</label>
+            <p class="text-sm text-slate-900 2xl:text-base min-[3840px]:text-2xl">{{ selectedEnquiry.firstName }}</p>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">Last Name</label>
+            <p class="text-sm text-slate-900 2xl:text-base min-[3840px]:text-2xl">{{ selectedEnquiry.lastName }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">Email</label>
+            <p class="text-sm text-slate-900 break-all 2xl:text-base min-[3840px]:text-2xl">{{ selectedEnquiry.email }}</p>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">Phone Number</label>
+            <p class="text-sm text-slate-900 2xl:text-base min-[3840px]:text-2xl">{{ selectedEnquiry.phoneNumber || '—' }}</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">Submitted</label>
+          <p class="text-sm text-slate-900 2xl:text-base min-[3840px]:text-2xl">{{ formatDate(selectedEnquiry.submittedAt) }}</p>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-slate-500 2xl:text-sm min-[3840px]:text-xl">Message</label>
+          <p class="whitespace-pre-wrap break-words rounded-md bg-slate-50 p-4 text-sm text-slate-700 2xl:text-base min-[3840px]:text-2xl" data-testid="enquiry-message">
+            {{ selectedEnquiry.message }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end border-t border-slate-200 px-5 py-4 2xl:px-7 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="rounded-md bg-[#6B32A8] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5b2b8f] 2xl:px-5 2xl:py-3 2xl:text-base min-[3840px]:px-8 min-[3840px]:py-5 min-[3840px]:text-2xl"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

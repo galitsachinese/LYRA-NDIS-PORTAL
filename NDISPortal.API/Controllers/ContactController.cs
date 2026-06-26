@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NDISPortal.API.Data;
 using NDISPortal.API.DTOs.Contact;
 using NDISPortal.API.Models;
@@ -70,6 +71,106 @@ namespace NDISPortal.API.Controllers
                     message = "An error occurred while processing your request. Please try again later."
                 });
             }
+        }
+
+        /// <summary>
+        /// GET /api/contact
+        /// Coordinator only — returns all contact enquiries, newest first.
+        /// Supports optional query params: ?status=Unread&search=name or email
+        /// </summary>
+        [Authorize(Roles = "Coordinator")]
+        [HttpGet]
+        public async Task<IActionResult> GetEnquiries([FromQuery] string? status, [FromQuery] string? search)
+        {
+            var query = _context.ContactInquiries.AsQueryable();
+
+            // Filter by read/unread status
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (status.Equals("Unread", StringComparison.OrdinalIgnoreCase))
+                    query = query.Where(e => !e.IsRead);
+                else if (status.Equals("Read", StringComparison.OrdinalIgnoreCase))
+                    query = query.Where(e => e.IsRead);
+            }
+
+            // Search by name or email
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                query = query.Where(e =>
+                    e.FirstName.ToLower().Contains(term) ||
+                    e.LastName.ToLower().Contains(term) ||
+                    e.Email.ToLower().Contains(term));
+            }
+
+            // Newest first
+            query = query.OrderByDescending(e => e.SubmittedAt);
+
+            var enquiries = await query
+                .Select(e => new ContactEnquiryResponseDto
+                {
+                    Id = e.Id,
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Email = e.Email,
+                    PhoneNumber = e.PhoneNumber,
+                    Message = e.Message,
+                    IsRead = e.IsRead,
+                    SubmittedAt = e.SubmittedAt
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                status = 200,
+                data = enquiries
+            });
+        }
+
+        /// <summary>
+        /// GET /api/contact/{id}
+        /// Coordinator only — returns full enquiry detail.
+        /// Automatically marks the enquiry as Read.
+        /// </summary>
+        [Authorize(Roles = "Coordinator")]
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetEnquiryById(int id)
+        {
+            var enquiry = await _context.ContactInquiries.FindAsync(id);
+
+            if (enquiry == null)
+            {
+                return NotFound(new
+                {
+                    status = 404,
+                    message = "Enquiry not found."
+                });
+            }
+
+            // Automatically mark as read
+            if (!enquiry.IsRead)
+            {
+                enquiry.IsRead = true;
+                await _context.SaveChangesAsync();
+            }
+
+            var dto = new ContactEnquiryResponseDto
+            {
+                Id = enquiry.Id,
+                FirstName = enquiry.FirstName,
+                LastName = enquiry.LastName,
+                Email = enquiry.Email,
+                PhoneNumber = enquiry.PhoneNumber,
+                Message = enquiry.Message,
+                IsRead = enquiry.IsRead,
+                SubmittedAt = enquiry.SubmittedAt
+            };
+
+            return Ok(new
+            {
+                status = 200,
+                data = dto
+            });
         }
     }
 }

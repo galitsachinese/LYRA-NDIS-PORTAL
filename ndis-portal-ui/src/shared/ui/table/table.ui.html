@@ -174,11 +174,25 @@
             </button>
 
             <!-- ===========================
-                 NOTES
+                 NOTES (Mobile)
                  =========================== -->
 
-            <span *ngSwitchCase="'notes'" class="block text-sm leading-5 text-slate-600">
-              {{ getValue(row, col.key) || 'No notes provided.' }}
+            <span *ngSwitchCase="'notes'"
+              data-testid="notes-cell"
+              class="block text-sm leading-5 text-slate-600 cursor-pointer"
+              [title]="getValue(row, col.key) || 'No notes provided'"
+              (click)="toggleNotes(row)">
+              <ng-container *ngIf="getValue(row, col.key); else noNotesMobile">
+                <span *ngIf="!isNotesExpanded(row)" data-testid="notes-truncated">
+                  {{ truncateNotes(getValue(row, col.key)) }}
+                </span>
+                <span *ngIf="isNotesExpanded(row)" data-testid="notes-expanded">
+                  {{ getValue(row, col.key) }}
+                </span>
+              </ng-container>
+              <ng-template #noNotesMobile>
+                <span data-testid="notes-empty" class="text-slate-400">&mdash;</span>
+              </ng-template>
             </span>
 
             <!-- ===========================
@@ -331,9 +345,23 @@
               </button>
             </div>
 
-            <!-- Notes -->
-            <span *ngSwitchCase="'notes'" class="block whitespace-normal break-words text-slate-600">
-              {{ getValue(row, col.key) || 'No notes provided.' }}
+            <!-- Notes (Desktop) -->
+            <span *ngSwitchCase="'notes'"
+              data-testid="notes-cell"
+              class="block whitespace-normal break-words text-slate-600 cursor-pointer"
+              [title]="getValue(row, col.key) || 'No notes provided'"
+              (click)="toggleNotes(row)">
+              <ng-container *ngIf="getValue(row, col.key); else noNotesDesktop">
+                <span *ngIf="!isNotesExpanded(row)" data-testid="notes-truncated">
+                  {{ truncateNotes(getValue(row, col.key)) }}
+                </span>
+                <span *ngIf="isNotesExpanded(row)" data-testid="notes-expanded">
+                  {{ getValue(row, col.key) }}
+                </span>
+              </ng-container>
+              <ng-template #noNotesDesktop>
+                <span data-testid="notes-empty" class="text-slate-400">&mdash;</span>
+              </ng-template>
             </span>
 
             <!-- Toggle -->

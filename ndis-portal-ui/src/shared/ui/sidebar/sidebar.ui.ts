@@ -19,7 +19,7 @@ import { SupportIconComponent } from '../../components/icons/svg-icons/support-i
 export interface NavItem {
   label: string;
   path: string;
-  icon: 'home' | 'services' | 'bookings' | 'dashboard' | 'book-new' | 'support';
+  icon: 'home' | 'services' | 'bookings' | 'dashboard' | 'book-new' | 'support' | 'enquiries';
 }
 
 @Component({

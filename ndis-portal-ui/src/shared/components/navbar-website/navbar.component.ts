@@ -62,6 +62,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         { label: 'Dashboard', path: '/dashboard' },
         { label: 'Manage Services', path: '/dashboard/services' },
         { label: 'All Bookings', path: '/dashboard/bookings' },
+        { label: 'Enquiries', path: '/dashboard/enquiries' },
         { label: 'Workers', path: '/dashboard/support-workers' },
       ];
     } else if (role === 'participant') {

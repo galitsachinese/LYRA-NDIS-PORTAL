@@ -49,5 +49,9 @@ namespace NDISPortal.API.Models
 
         [Column("modified_date")]
         public DateTime ModifiedDate { get; set; }
+
+        [Column("profile_picture")]
+        [MaxLength(500)]
+        public string? ProfilePicture { get; set; }
     }
 }

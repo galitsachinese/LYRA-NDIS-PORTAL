@@ -14,5 +14,6 @@ namespace NDISPortal.API.DTOs.SupportWorkers
         public DateTime? WwccExpiryDate { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
+        public string? ProfilePicture { get; set; }
     }
 }

@@ -55,6 +55,12 @@ export class SupportWorkersComponent implements OnInit {
   upcomingAssignedBookingCount = 0;
   bookings: any[] = [];
 
+  // Profile picture upload state
+  isUploadingPicture = false;
+  uploadPictureError: string | null = null;
+  selectedPreviewFile: File | null = null;
+  selectedPreviewUrl: string | null = null;
+
   formErrors: Record<string, string> = {};
 
   workerForm: WorkerForm = {
@@ -493,6 +499,81 @@ export class SupportWorkersComponent implements OnInit {
       .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
+  /* ==========================================================
+     PROFILE PICTURE UPLOAD
+     ========================================================== */
+
+  onFileSelected(event: Event): void {
+    this.uploadPictureError = null;
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      this.selectedPreviewFile = null;
+      this.selectedPreviewUrl = null;
+      return;
+    }
+
+    const file = input.files[0];
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      this.uploadPictureError = 'Invalid file type. Only JPG and PNG files are allowed.';
+      input.value = '';
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.uploadPictureError = 'File size must not exceed 5MB.';
+      input.value = '';
+      return;
+    }
+
+    this.selectedPreviewFile = file;
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.selectedPreviewUrl = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  uploadPicture(): void {
+    if (!this.selectedPreviewFile || !this.editingWorkerId) {
+      return;
+    }
+
+    this.isUploadingPicture = true;
+    this.uploadPictureError = null;
+
+    this.supportWorkersService.uploadProfilePicture(this.editingWorkerId, this.selectedPreviewFile).subscribe({
+      next: (result) => {
+        // Update the worker in the list
+        this.workers = this.workers.map((w) =>
+          w.id === this.editingWorkerId
+            ? { ...w, profilePicture: result.profilePicture }
+            : w
+        );
+        this.isUploadingPicture = false;
+        this.selectedPreviewFile = null;
+        this.selectedPreviewUrl = null;
+        this.toast.show('Profile picture uploaded successfully.', 'success');
+      },
+      error: (error) => {
+        this.isUploadingPicture = false;
+        this.uploadPictureError = error?.message || 'Failed to upload profile picture.';
+      },
+    });
+  }
+
+  clearSelectedPreview(): void {
+    this.selectedPreviewFile = null;
+    this.selectedPreviewUrl = null;
+    this.uploadPictureError = null;
+  }
+
   private resetForm(): void {
     this.workerForm = {
       fullName: '',
@@ -501,6 +582,9 @@ export class SupportWorkersComponent implements OnInit {
       assignedServiceId: '',
     };
     this.formErrors = {};
+    this.selectedPreviewFile = null;
+    this.selectedPreviewUrl = null;
+    this.uploadPictureError = null;
   }
 
   private unwrapBookings(response: any): any[] {

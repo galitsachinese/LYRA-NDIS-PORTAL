@@ -36,8 +36,8 @@ export class AllBookingTable implements OnChanges {
     { key: 'name', label: 'Name', type: 'name' },
     { key: 'service', label: 'Service', type: 'service' },
     { key: 'category', label: 'Category', type: 'category' },
-    { key: 'date', label: 'Date', type: 'date' }, // Changed to 'date' to match your table.ui logic
-    { key: 'view', label: 'Note', type: 'view' },
+    { key: 'date', label: 'Preferred Date', type: 'date' },
+    { key: 'notes', label: 'Notes', type: 'notes' },
     { key: 'status', label: 'Status', type: 'status' },
   ];
   visibleColumns: TableColumn[] = [...this.baseColumns];

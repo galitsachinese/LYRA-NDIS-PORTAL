@@ -11,6 +11,7 @@ export interface SupportWorker {
   assignedServiceId: number;
   assignedServiceName?: string | null;
   status?: string | null;
+  profilePicture?: string | null;
 }
 
 export interface SupportWorkerPayload {
@@ -27,6 +28,7 @@ export type SupportWorkerStatus = 'Active' | 'Inactive';
 })
 export class SupportWorkersService {
   private readonly apiUrl = `${environment.apiUrl}/support-workers`;
+  private readonly apiBaseUrl = environment.apiUrl.replace(/\/api$/, '');
 
   constructor(private http: HttpClient) {}
 
@@ -109,7 +111,44 @@ export class SupportWorkersService {
       assignedServiceName:
         worker?.assignedServiceName ?? worker?.AssignedServiceName ?? worker?.serviceName ?? worker?.ServiceName ?? null,
       status: worker?.status ?? worker?.Status ?? null,
+      profilePicture: this.resolveProfilePictureUrl(worker?.profilePicture ?? worker?.ProfilePicture ?? null),
     };
+  }
+
+  uploadProfilePicture(id: number, file: File): Observable<{ profilePicture: string | null }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<any>(`${this.apiUrl}/${id}/upload-picture`, formData, {
+      headers: this.getAuthHeadersForUpload(),
+    }).pipe(
+      map((response) => ({
+        profilePicture: this.resolveProfilePictureUrl(response?.profilePicture ?? response?.ProfilePicture ?? ''),
+      })),
+      catchError((error) => throwError(() => this.toError(error, 'Failed to upload profile picture.')))
+    );
+  }
+
+  private resolveProfilePictureUrl(value: string | null | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    if (/^https?:\/\//i.test(value)) {
+      return value;
+    }
+
+    return `${this.apiBaseUrl}${value.startsWith('/') ? value : `/${value}`}`;
+  }
+
+  private getAuthHeadersForUpload(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    // Do NOT set Content-Type - let browser set it with boundary for multipart
+    return headers;
   }
 
   private toError(error: any, fallback: string): Error {

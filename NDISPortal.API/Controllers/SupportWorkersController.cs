@@ -94,7 +94,7 @@ namespace NDISPortal.API.Controllers
                 .ThenBy(sw => sw.LastName)
                 .ToListAsync();
 
-            return Ok(workers.Select(ToResponseDto).ToList());
+            return Ok(workers.Select(MapToResponseDto).ToList());
         }
 
         // GET /api/support-workers/{id}
@@ -115,7 +115,7 @@ namespace NDISPortal.API.Controllers
                 });
             }
 
-            return Ok(ToResponseDto(worker));
+            return Ok(MapToResponseDto(worker));
         }
 
         // GET /api/support-workers/{id}/upcoming-bookings/count
@@ -179,7 +179,7 @@ namespace NDISPortal.API.Controllers
             return CreatedAtAction(
                 nameof(GetSupportWorker),
                 new { id = worker.Id },
-                ToResponseDto(createdWorker!)
+                MapToResponseDto(createdWorker!)
             );
         }
 
@@ -219,7 +219,7 @@ namespace NDISPortal.API.Controllers
 
             var updatedWorker = await FindWorkerWithDetailsAsync(worker.Id);
 
-            return Ok(ToResponseDto(updatedWorker!));
+            return Ok(MapToResponseDto(updatedWorker!));
         }
 
         // PATCH or PUT /api/support-workers/{id}/status
@@ -258,7 +258,7 @@ namespace NDISPortal.API.Controllers
 
             var updatedWorker = await FindWorkerWithDetailsAsync(worker.Id);
 
-            return Ok(ToResponseDto(updatedWorker!));
+            return Ok(MapToResponseDto(updatedWorker!));
         }
 
         // DELETE /api/support-workers/{id}
@@ -281,6 +281,73 @@ namespace NDISPortal.API.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // POST /api/support-workers/{id}/upload-picture
+        // Coordinator only - uploads a profile picture
+        [HttpPost("{id:int}/upload-picture")]
+        [RequestSizeLimit(5 * 1024 * 1024)] // 5MB
+        public async Task<IActionResult> UploadPicture(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { message = "No file provided." });
+            }
+
+            // Validate file type
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/jpg" };
+            if (!allowedTypes.Contains(file.ContentType.ToLower()))
+            {
+                return BadRequest(new { message = "Invalid file type. Only JPG and PNG files are allowed." });
+            }
+
+            // Validate file size (max 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest(new { message = "File size must not exceed 5MB." });
+            }
+
+            var worker = await _context.SupportWorker.FindAsync(id);
+            if (worker == null)
+            {
+                return NotFound(new { message = $"Support worker with ID {id} was not found." });
+            }
+
+            try
+            {
+                // Create uploads directory if it doesn't exist
+                var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profile-pictures");
+                Directory.CreateDirectory(uploadsDir);
+
+                // Generate unique filename
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                var fileName = $"worker_{id}_{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadsDir, fileName);
+
+                // Save the file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Update worker's profile_picture field
+                var imagePath = $"/uploads/profile-pictures/{fileName}";
+                worker.ProfilePicture = imagePath;
+                worker.ModifiedDate = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    status = 200,
+                    profilePicture = BuildProfilePictureUrl(imagePath),
+                    message = "Profile picture uploaded successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SupportWorkersController] Upload error: {ex.Message}");
+                return StatusCode(500, new { message = "An error occurred while uploading the file." });
+            }
         }
 
         private async Task<(IActionResult? Error, string FirstName, string LastName, string Email, string Phone)> ValidateWorkerInputAsync(
@@ -336,7 +403,7 @@ namespace NDISPortal.API.Controllers
                 .FirstOrDefaultAsync(sw => sw.Id == id);
         }
 
-        private static SupportWorkerResponseDto ToResponseDto(SupportWorkers worker)
+        private SupportWorkerResponseDto MapToResponseDto(SupportWorkers worker)
         {
             return new SupportWorkerResponseDto
             {
@@ -351,8 +418,24 @@ namespace NDISPortal.API.Controllers
                 EmploymentType = worker.EmploymentType,
                 WwccExpiryDate = worker.WwccExpiryDate,
                 CreatedDate = worker.CreatedDate,
-                ModifiedDate = worker.ModifiedDate
+                ModifiedDate = worker.ModifiedDate,
+                ProfilePicture = BuildProfilePictureUrl(worker.ProfilePicture)
             };
+        }
+
+        private string? BuildProfilePictureUrl(string? profilePicture)
+        {
+            if (string.IsNullOrWhiteSpace(profilePicture))
+            {
+                return null;
+            }
+
+            if (Uri.IsWellFormedUriString(profilePicture, UriKind.Absolute))
+            {
+                return profilePicture;
+            }
+
+            return $"{Request.Scheme}://{Request.Host}{profilePicture}";
         }
 
         private static string? NormalizeStatus(string? status)

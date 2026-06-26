@@ -1,9 +1,7 @@
 <div class="p-4 md:p-6 space-y-6 max-w-[2560px] mx-auto min-h-screen font-sans selection:bg-violet-100">
 
   <header class="flex w-full items-center justify-between">
-    <h1 class="text-lg md:text-xl 2xl:text-3xl font-bold text-slate-900">
-      Service Detail
-    </h1>
+    <h1 class="text-lg md:text-xl 2xl:text-3xl font-bold text-slate-900">Service Detail</h1>
   </header>
 
   <div *ngIf="isLoading" class="flex flex-col items-center justify-center h-[60vh] gap-4">
@@ -11,24 +9,33 @@
     <p class="text-slate-400 font-medium">Fetching details...</p>
   </div>
 
-  <div *ngIf="!isLoading && serviceData" class="flex flex-col items-center justify-center py-20 px-4">
+  <div *ngIf="!isLoading && serviceData" class="flex flex-col items-center py-10 px-4">
+    <main class="max-w-4xl w-full space-y-8">
 
-  <main class="max-w-4xl w-full">
-    <app-service-item [item]="serviceData"></app-service-item>
+      <app-service-item [item]="serviceData"></app-service-item>
 
-    <div class="pt-8 mt-8 flex flex-col-reverse md:flex-row items-center justify-end w-full gap-8 border-t border-slate-50">
-      <app-back-button (onClick)="navBack()"></app-back-button>
+      <div
+        class="pt-8 flex flex-col-reverse md:flex-row items-center justify-end w-full gap-4 border-t border-slate-100">
+        <app-back-button (onClick)="navBack()"></app-back-button>
+        <app-book-button (onClick)="processBooking()"></app-book-button>
+      </div>
 
-      <app-book-button (onClick)="processBooking()"></app-book-button>
-    </div>
-  </main>
+      <div class="flex justify-between items-center py-6 border-t border-slate-100">
+        <button [disabled]="!getPrevId()" (click)="getPrevId() && navigateTo(getPrevId()!)"
+          class="flex items-center gap-2 px-6 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 disabled:opacity-30 transition-all">
+          ← Previous
+        </button>
 
+        <button [disabled]="!getNextId()" (click)="getNextId() && navigateTo(getNextId()!)"
+          class="flex items-center gap-2 px-6 py-2 rounded-full bg-[#6F2C91] text-white text-sm font-medium hover:bg-[#5a2375] disabled:opacity-30 transition-all">
+          Next →
+        </button>
+      </div>
+
+    </main>
   </div>
 </div>
 
-<!-- Auth Modal for Book Now on public view -->
-<app-auth-modal *ngIf="showAuthModal"
-                [serviceId]="serviceData?.id"
-                (close)="closeAuthModal()"
-                (loginSuccess)="onAuthSuccess()">
+<app-auth-modal *ngIf="showAuthModal" [serviceId]="serviceData?.id" (close)="closeAuthModal()"
+  (loginSuccess)="onAuthSuccess()">
 </app-auth-modal>

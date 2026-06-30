@@ -8,12 +8,15 @@ import { CommonModule } from '@angular/common';
   templateUrl: './status-card.component.html',
 })
 export class StatusCardComponent {
-  // Required inputs passed from the parent dashboard
-  @Input({ required: true }) label: string = '';
-  @Input({ required: true }) value: number = 0;
+  @Input({ required: true }) label = '';
+  @Input({ required: true }) value = 0;
 
-  // Optional styling inputs with default fallbacks
-  @Input() iconClass: string = '';
-  @Input() iconColor: string = ''; 
-  @Input() bgColor: string = ''; 
+  // Appearance
+  @Input() accentColor = '#6B3293';
+  @Input() valueColor = '#111827';
+  @Input() iconBackground = '#F3E8FF';
+  @Input() iconColor = '#6B3293';
+
+  // SVG
+  @Input() iconPath = '';
 }

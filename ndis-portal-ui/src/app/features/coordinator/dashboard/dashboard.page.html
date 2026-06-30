@@ -1,22 +1,31 @@
 <div class="mx-auto max-w-[2560px] space-y-5 p-4 md:space-y-6 md:p-6 2xl:p-8 min-[3840px]:max-w-[3200px] min-[3840px]:p-12">
-  <section class="min-w-0 space-y-4 2xl:space-y-6 min-[3840px]:space-y-10">
-    <div *ngIf="isLoading" class="flex h-40 flex-col items-center justify-center gap-4 2xl:h-56 min-[3840px]:h-80">
-      <div class="h-8 w-8 animate-spin rounded-full border-4 border-violet-100 border-t-violet-600 2xl:h-10 2xl:w-10 min-[3840px]:h-16 min-[3840px]:w-16"></div>
-      <p class="text-sm font-medium text-slate-400 2xl:text-lg min-[3840px]:text-3xl">
+  <section class="min-w-0">
+  
+    <div *ngIf="isLoading" class="flex h-40 flex-col items-center justify-center gap-4">
+  
+      <div class="h-8 w-8 animate-spin rounded-full border-4 border-violet-100 border-t-violet-600">
+      </div>
+  
+      <p class="text-sm font-medium text-slate-400">
         Loading stats...
       </p>
+  
     </div>
-
-    <div *ngIf="!isLoading" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:gap-6 min-[3840px]:gap-10" data-testid="stat-card">
-      <app-status-card-component
-        *ngFor="let stat of stats"
-        [label]="stat.label"
-        [value]="stat.value"
-        [iconClass]="stat.icon"
-        [iconColor]="stat.color"
-        [bgColor]="stat.bg">
+  
+    <!-- Status Cards Grid: Fixed - removed nested grid that was causing cards to shrink -->
+    <div *ngIf="!isLoading" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <app-status-card-component 
+        *ngFor="let stat of stats" 
+        [label]="stat.label" 
+        [value]="stat.value" 
+        [accentColor]="stat.accentColor"
+        [valueColor]="stat.valueColor" 
+        [iconBackground]="stat.iconBackground" 
+        [iconColor]="stat.iconColor"
+        [iconPath]="stat.iconPath">
       </app-status-card-component>
     </div>
+  
   </section>
 
   <div

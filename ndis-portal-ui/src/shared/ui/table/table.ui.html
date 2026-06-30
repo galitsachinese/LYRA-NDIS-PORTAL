@@ -1,211 +1,131 @@
 <!-- ==========================================
-     GLOBAL ACTION MENU TEMPLATE (MUST BE TOP)
+     GLOBAL ACTION MENU TEMPLATE
      ========================================== -->
 
 <ng-template #actionMenu let-row="row">
-
   <div class="relative">
 
-    <!-- Toggle Button -->
-    <button *ngIf="!shouldReplaceAction(row)" (click)="handleActionTrigger(row, $event)"
-      [disabled]="actionColumn?.actionDisplay === 'replace-with-action' && (getValue(row, 'status') || '').toLowerCase() !== 'pending'"
-      class="table-action-trigger inline-flex h-[26px] w-6 items-center justify-center rounded p-0 text-slate-400 hover:text-slate-600 transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-
-        <path d="M9.5 13a1.5 1.5 0 1 1-3 0
-             1.5 1.5 0 0 1 3 0zm0-5
-             a1.5 1.5 0 1 1-3 0
-             1.5 1.5 0 0 1 3 0zm0-5
-             a1.5 1.5 0 1 1-3 0
-             1.5 1.5 0 0 1 3 0z" />
+    <button type="button" (click)="toggleMenu(row); $event.stopPropagation()"
+      class="p-1 text-slate-400 hover:text-slate-600 rounded-lg transition-all focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path
+          d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
       </svg>
-
     </button>
 
-    <button *ngIf="shouldReplaceAction(row)" (click)="emitAction(row)"
-      class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700">
-      <svg
-        aria-hidden="true"
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="12" cy="12" r="9"></circle>
-        <path d="M9 9l6 6"></path>
-        <path d="M15 9l-6 6"></path>
-      </svg>
-      <span>{{ getActionLabel() }}</span>
-    </button>
+    <div *ngIf="activeMenuRowId === row?.id"
+      class="absolute right-0 z-[9999] bg-white border border-slate-200 rounded-md p-1 min-w-[140px] shadow-lg"
+      style="position: absolute; z-index: 9999;">
 
-    <!-- Dropdown -->
-    <div *ngIf="activeMenuRow === row && !shouldReplaceAction(row)"
-      class="absolute right-full top-0 mr-2 z-[100] bg-white border border-slate-200 rounded-md p-1 min-w-[120px] shadow-lg">
-
-      <!-- Multi-actions -->
-      <ng-container *ngIf="getActionConfig() as customActions; else defaultAction">
-
-        <button *ngFor="let act of customActions" (click)="emitAction(row, act.actionKey)"
-          [ngClass]="act.class || 'text-slate-600 hover:bg-slate-50'"
-          class="w-full flex items-center gap-3 p-2 text-xs rounded-md text-left font-medium">
-          {{ act.label }}
-        </button>
-
-      </ng-container>
-
-      <!-- Single fallback -->
-      <ng-template #defaultAction>
-
-        <button (click)="emitAction(row)"
-          class="w-full flex items-center gap-3 p-2 text-xs text-rose-500 hover:bg-rose-50 rounded-md text-left font-medium">
-          {{ getActionLabel() }}
-        </button>
-
-      </ng-template>
+      <button *ngFor="let act of actions" type="button" (mousedown)="emitAction(row, act.actionKey)"
+        [ngClass]="act.class || 'text-slate-600 hover:bg-slate-50'"
+        class="w-full flex items-center gap-3 p-2 text-xs rounded-md text-left font-medium cursor-pointer">
+        {{ act.label }}
+      </button>
 
     </div>
-
   </div>
-
 </ng-template>
 
-<ng-template #inlineCancelAction let-row="row">
-  <button
-    type="button"
-    (click)="emitAction(row)"
-    class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700"
-  >
-    <svg
-      aria-hidden="true"
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2.4"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <circle cx="12" cy="12" r="9"></circle>
-      <path d="M9 9l6 6"></path>
-      <path d="M15 9l-6 6"></path>
-    </svg>
-    <span>Cancel</span>
-  </button>
-</ng-template>
 
 <!-- ==========================================
-     MOBILE VIEW (Optimized Layout — No Crowding)
+     MOBILE VIEW
      ========================================== -->
 
 <div class="block md:hidden space-y-4 px-1">
+  <div *ngFor="let row of data" class="bg-white border rounded-xl shadow-sm overflow-hidden">
 
-  <!-- Card -->
-  <div *ngFor="let row of data" class="bg-white border rounded-xl shadow-sm overflow-visible">
-
-    <!-- ==========================================
-         HEADER — ACTION MENU
-         ========================================== -->
-
-    <!-- ==========================================
-         BODY — COLUMN DATA
-         ========================================== -->
+    <div class="flex justify-end items-center p-3 border-b border-slate-100">
+      <div *ngIf="hasActionColumn">
+        <ng-container *ngTemplateOutlet="actionMenu; context: { row: row }"></ng-container>
+      </div>
+    </div>
 
     <div class="divide-y divide-slate-50">
-
       <ng-container *ngFor="let col of columns">
-
-        <!-- Skip action column -->
         <div *ngIf="col.type !== 'action'" class="flex items-start gap-3 p-3 text-sm">
 
-          <!-- ==========================================
-               LABEL (Fixed width)
-               ========================================== -->
-
-          <span class="text-slate-500 w-1/3 shrink-0 text-xs">
-            {{ col.label }}
-          </span>
-
-          <!-- ==========================================
-               VALUE (Flexible width)
-               ========================================== -->
+          <span class="text-slate-500 w-1/3 shrink-0 text-xs">{{ col.label }}</span>
 
           <div [ngSwitch]="col.type" class="flex-1 text-right min-w-0">
 
-            <!-- ===========================
-                 STATUS
-                 =========================== -->
-
-            <div *ngSwitchCase="'status'" [ngClass]="getStatusClasses(getValue(row, col.key))"
-              class="inline-flex max-w-full items-center rounded-full px-2.5 py-1 text-[10px] font-extrabold leading-none">
-
-              <svg class="hidden" width="6" height="6" viewBox="0 0 10 10" fill="currentColor">
-                <circle cx="5" cy="5" r="5" />
-              </svg>
-
-              {{ formatName(getValue(row, col.key)) }}
-
+            <!-- Participant -->
+            <div *ngSwitchCase="'participant'" class="flex items-center justify-end gap-2">
+              <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                [ngClass]="getAvatarClass(row)">
+                {{ getInitials(row) }}
+              </div>
+              <span class="truncate text-sm font-medium text-slate-800">
+                {{ getValue(row, col.key) }}
+              </span>
             </div>
 
-            <!-- ===========================
-                 CATEGORY / BADGE
-                 =========================== -->
+            <!-- Datetime -->
+            <div *ngSwitchCase="'datetime'">
+              <span class="block text-sm font-semibold text-slate-700 whitespace-nowrap">
+                {{ getValue(row, col.key) | date:'MMM dd, yyyy' }}
+              </span>
+              <span class="block text-xs text-slate-500">
+                {{ getValue(row, col.key) | date:'hh:mm a' }}
+              </span>
+            </div>
 
-            <span *ngSwitchCase="'category'"
-              class="block text-sm font-medium leading-5 text-slate-600">
-              {{ formatName(getValue(row, col.key)) }}
-            </span>
-
-            <!-- ===========================
-                 VIEW BUTTON
-                 =========================== -->
-
-            <button
-              *ngSwitchCase="'view'"
-              type="button"
-              (click)="viewAction.emit(row)"
-              [ngClass]="col.actionLabel ? 'px-3 py-1.5 text-sm font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-md transition-colors' : 'text-violet-600 font-medium hover:underline text-sm'"
-            >
-              {{ col.actionLabel || 'View Note' }}
-            </button>
-
-            <!-- ===========================
-                 NOTES (Mobile)
-                 =========================== -->
-
-            <span *ngSwitchCase="'notes'"
-              data-testid="notes-cell"
-              class="block text-sm leading-5 text-slate-600 cursor-pointer"
-              [title]="getValue(row, col.key) || 'No notes provided'"
-              (click)="toggleNotes(row)">
-              <ng-container *ngIf="getValue(row, col.key); else noNotesMobile">
-                <span *ngIf="!isNotesExpanded(row)" data-testid="notes-truncated">
-                  {{ truncateNotes(getValue(row, col.key)) }}
-                </span>
-                <span *ngIf="isNotesExpanded(row)" data-testid="notes-expanded">
-                  {{ getValue(row, col.key) }}
+            <!-- Worker -->
+            <div *ngSwitchCase="'worker'">
+              <ng-container *ngIf="hasAssignedWorker(row); else mobileAssign">
+                <span
+                  class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700">
+                  <span class="truncate">{{ getAssignedWorkerName(row) }}</span>
+                  <button type="button" (click)="unassignWorker.emit(row)"
+                    class="text-slate-400 hover:text-rose-600">&times;</button>
                 </span>
               </ng-container>
+              <ng-template #mobileAssign>
+                <button type="button" (click)="assignWorker.emit(row)"
+                  class="rounded-md bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-100">
+                  Assign Worker
+                </button>
+              </ng-template>
+            </div>
+
+            <!-- Status badge -->
+            <div *ngSwitchCase="'status'" [ngClass]="getStatusClasses(getValue(row, col.key))"
+              class="px-2 py-0.5 border rounded-md text-xs font-medium inline-flex items-center gap-2 max-w-full">
+              <svg width="6" height="6" viewBox="0 0 10 10" fill="currentColor">
+                <circle cx="5" cy="5" r="5" />
+              </svg>
+              {{ getValue(row, col.key) }}
+            </div>
+
+            <!-- Category badge -->
+            <span *ngSwitchCase="'category'"
+              class="inline-block px-2 py-1 text-xs font-medium border rounded-md bg-slate-50 text-slate-600 max-w-full truncate">
+              {{ getValue(row, col.key) }}
+            </span>
+
+            <!-- Notes -->
+            <span *ngSwitchCase="'notes'" class="text-xs text-slate-600 cursor-pointer" (click)="viewAction.emit(row)">
+              <ng-container *ngIf="hasNotes(row, col); else noNotesMobile">
+                {{ getTruncatedNotes(row, col) }}
+              </ng-container>
               <ng-template #noNotesMobile>
-                <span data-testid="notes-empty" class="text-slate-400">&mdash;</span>
+                <span class="text-slate-400">—</span>
               </ng-template>
             </span>
 
-            <!-- ===========================
-                 TOGGLE BUTTON
-                 =========================== -->
+            <!-- View button -->
+            <button *ngSwitchCase="'view'" type="button" (click)="viewAction.emit(row)"
+              class="text-violet-600 font-medium hover:underline text-sm">
+              View Note
+            </button>
 
+            <!-- Toggle switch -->
             <div *ngSwitchCase="'toggle'" class="inline-flex items-center gap-2">
-              <button (click)="emitToggle(row)" data-testid="toggle-btn"
+              <button type="button" (click)="emitToggle(row)"
                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                 [ngClass]="getValue(row, 'status') === 'Active' ? 'bg-violet-600' : 'bg-slate-300'">
                 <span class="sr-only">Toggle status</span>
-                <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
                   [ngClass]="getValue(row, 'status') === 'Active' ? 'translate-x-6' : 'translate-x-1'">
                 </span>
               </button>
@@ -214,101 +134,111 @@
               </span>
             </div>
 
-            <!-- ===========================
-                 DATE
-                 =========================== -->
-
+            <!-- Date -->
             <span *ngSwitchCase="'date'" class="text-slate-600 whitespace-nowrap text-sm">
               {{ getValue(row, col.key) }}
             </span>
 
-            <!-- ===========================
-                 NAME
-                 =========================== -->
-
-            <span *ngSwitchCase="'name'" class="text-slate-800 font-medium truncate block">
+            <!-- Name -->
+            <span *ngSwitchCase="'name'" class="text-slate-900 font-semibold truncate block">
               {{ getValue(row, col.key) }}
             </span>
 
-            <!-- ===========================
-                 SERVICE
-                 =========================== -->
-
-            <span *ngSwitchCase="'service'" class="text-slate-900 font-normal truncate block">
+            <!-- Service -->
+            <span *ngSwitchCase="'service'" class="text-slate-900 font-semibold truncate block">
               {{ getValue(row, col.key) }}
             </span>
 
-            <!-- ===========================
-                 DEFAULT TEXT
-                 =========================== -->
-
+            <!-- Default fallback -->
             <span *ngSwitchDefault class="text-slate-900 font-semibold truncate block">
               {{ getValue(row, col.key) }}
             </span>
 
           </div>
-
         </div>
-
       </ng-container>
-
-    </div>
-
-    <div *ngIf="hasActionColumn" class="relative z-10 flex justify-between items-center p-3 border-t border-slate-100 bg-slate-50/70">
-
-      <span class="text-slate-500 text-xs">
-        {{ getActionColumnLabel() }}
-      </span>
-
-      <ng-container *ngTemplateOutlet="actionMenu; context: { row: row }">
-      </ng-container>
-
     </div>
 
   </div>
-
 </div>
 
-<!-- DESKTOP VIEW -->
+
+<!-- ==========================================
+     DESKTOP VIEW
+     ========================================== -->
+
 <div class="hidden md:block w-full bg-white rounded-md overflow-x-auto">
-  <!-- IMPORTANT: Keep table-fixed -->
-<table class="min-w-full w-full text-sm border-collapse table-fixed">
+
+  <table class="min-w-full w-full text-sm border-collapse table-fixed">
+
     <thead>
       <tr class="bg-slate-50/50">
-
-        <!-- Checkbox placeholder -->
         <th class="w-12 px-4 py-4 border-b border-slate-100"></th>
-
-        <!-- FIXED: Dynamic width logic -->
-        <th *ngFor="let col of columns" [ngClass]="getColumnClass(col)"
-          class="px-4 py-4 text-left border-b border-slate-100 text-slate-900 font-semibold text-sm"
-          [class.text-center]="col.type === 'action' || col.type === 'toggle'">
+        <th *ngFor="let col of columns" [ngClass]="getColumnClass(col)" [style]="getColumnStyle(col)"
+          class="px-4 py-4 text-left border-b border-slate-100 text-slate-900 font-semibold text-sm">
           {{ col.label }}
         </th>
-
       </tr>
     </thead>
 
     <tbody class="divide-y divide-slate-100">
-
       <tr *ngFor="let row of data" class="group transition-colors duration-150 hover:bg-slate-50/80">
 
-        <!-- Checkbox placeholder -->
         <td class="px-4 py-4 text-center border-b border-slate-100"></td>
 
-        <!-- Dynamic Cells -->
-        <td *ngFor="let col of columns" [ngClass]="getColumnClass(col)"
-          class="px-4 py-4 align-middle border-b border-slate-100 overflow-visible" [class.text-center]="col.type === 'action' || col.type === 'toggle'">
+        <td *ngFor="let col of columns" [ngClass]="getColumnClass(col)" [style]="getColumnStyle(col)"
+          class="px-4 py-4 align-middle border-b border-slate-100 overflow-visible">
 
           <ng-container [ngSwitch]="col.type">
 
+            <!-- Participant: avatar + name -->
+            <div *ngSwitchCase="'participant'" class="flex items-center gap-3 min-w-0">
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                [ngClass]="getAvatarClass(row)">
+                {{ getInitials(row) }}
+              </div>
+              <span class="block truncate font-medium text-slate-800">
+                {{ getValue(row, col.key) }}
+              </span>
+            </div>
+
+            <!-- Datetime: date + time stacked -->
+            <div *ngSwitchCase="'datetime'">
+              <span class="block whitespace-nowrap font-semibold text-slate-700">
+                {{ getValue(row, col.key) | date:'MMM dd, yyyy' }}
+              </span>
+              <span class="block whitespace-nowrap text-xs text-slate-500">
+                {{ getValue(row, col.key) | date:'hh:mm a' }}
+              </span>
+            </div>
+
+            <!-- Worker: chip with remove, or assign button -->
+            <div *ngSwitchCase="'worker'">
+              <ng-container *ngIf="hasAssignedWorker(row); else assignBtn">
+                <span
+                  class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  <span class="truncate">{{ getAssignedWorkerName(row) }}</span>
+                  <button type="button" (click)="unassignWorker.emit(row)"
+                    class="text-slate-400 transition hover:text-rose-600" title="Remove worker">
+                    &times;
+                  </button>
+                </span>
+              </ng-container>
+              <ng-template #assignBtn>
+                <button type="button" (click)="assignWorker.emit(row)"
+                  class="rounded-md bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 transition-colors hover:bg-violet-100">
+                  Assign Worker
+                </button>
+              </ng-template>
+            </div>
+
             <!-- Name -->
-            <span *ngSwitchCase="'name'" class="text-slate-800 font-medium block truncate">
+            <span *ngSwitchCase="'name'" class="text-slate-900 font-semibold block truncate">
               {{ getValue(row, col.key) }}
             </span>
 
             <!-- Service -->
-            <span *ngSwitchCase="'service'" class="text-slate-900 font-normal block truncate">
+            <span *ngSwitchCase="'service'" class="text-slate-900 font-semibold block truncate">
               {{ getValue(row, col.key) }}
             </span>
 
@@ -317,88 +247,76 @@
               {{ getValue(row, col.key) }}
             </span>
 
-            <!-- Category -->
+            <!-- Category badge -->
             <span *ngSwitchCase="'category'"
-              class="block whitespace-normal break-words text-slate-600">
+              class="inline-block px-3 py-1 text-xs border rounded-md bg-white text-slate-500 border-slate-200 whitespace-nowrap">
               {{ getValue(row, col.key) }}
             </span>
 
-            <!-- Status -->
+            <!-- Status badge -->
             <div *ngSwitchCase="'status'"
-              class="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-extrabold leading-none"
+              class="inline-flex items-center gap-2 px-3 py-1 border rounded-md bg-white text-xs font-medium"
               [ngClass]="getStatusClasses(getValue(row, col.key))">
-              <svg class="hidden" width="8" height="8" viewBox="0 0 10 10" fill="currentColor">
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor">
                 <circle cx="5" cy="5" r="5" />
               </svg>
-
               {{ getValue(row, col.key) }}
             </div>
 
-            <!-- View -->
-            <div *ngSwitchCase="'view'" class="flex items-center">
-              <button
-                type="button"
-                (click)="viewAction.emit(row)"
-                [ngClass]="col.actionLabel ? 'px-3 py-1.5 text-sm font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-md transition-colors' : 'inline-flex items-center gap-2 px-3 py-1 border rounded-md text-xs hover:bg-slate-50'"
-              >
-                {{ col.actionLabel || 'View' }}
-              </button>
-            </div>
-
-            <!-- Notes (Desktop) -->
-            <span *ngSwitchCase="'notes'"
-              data-testid="notes-cell"
-              class="block whitespace-normal break-words text-slate-600 cursor-pointer"
-              [title]="getValue(row, col.key) || 'No notes provided'"
-              (click)="toggleNotes(row)">
-              <ng-container *ngIf="getValue(row, col.key); else noNotesDesktop">
-                <span *ngIf="!isNotesExpanded(row)" data-testid="notes-truncated">
-                  {{ truncateNotes(getValue(row, col.key)) }}
-                </span>
-                <span *ngIf="isNotesExpanded(row)" data-testid="notes-expanded">
-                  {{ getValue(row, col.key) }}
-                </span>
+            <!-- Notes: truncated, clickable -->
+            <span *ngSwitchCase="'notes'" class="block truncate text-sm text-slate-600 cursor-pointer max-w-[200px]"
+              [title]="getValue(row, col.key)" (click)="viewAction.emit(row)">
+              <ng-container *ngIf="hasNotes(row, col); else noNotesDesktop">
+                {{ getTruncatedNotes(row, col) }}
               </ng-container>
               <ng-template #noNotesDesktop>
-                <span data-testid="notes-empty" class="text-slate-400">&mdash;</span>
+                <span class="text-slate-400">—</span>
               </ng-template>
             </span>
 
-            <!-- Toggle -->
+            <!-- View button -->
+            <div *ngSwitchCase="'view'" class="flex items-center">
+              <button type="button" (click)="viewAction.emit(row)"
+                class="inline-flex items-center gap-2 px-3 py-1 border rounded-md text-xs hover:bg-slate-50">
+                View
+              </button>
+            </div>
+
+            <!-- Toggle switch -->
             <div *ngSwitchCase="'toggle'" class="inline-flex items-center justify-center w-full gap-2">
-              <button (click)="emitToggle(row)" data-testid="toggle-btn"
+              <button type="button" (click)="emitToggle(row)"
                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                 [ngClass]="getValue(row, 'status') === 'Active' ? 'bg-violet-600' : 'bg-slate-300'">
                 <span class="sr-only">Toggle status</span>
-                <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
                   [ngClass]="getValue(row, 'status') === 'Active' ? 'translate-x-6' : 'translate-x-1'">
                 </span>
               </button>
-              
+              <span class="text-xs font-medium text-slate-600">
+                {{ getValue(row, 'status') === 'Active' ? 'Deactivate' : 'Activate' }}
+              </span>
             </div>
 
-            <!-- Action -->
-            <div *ngSwitchCase="'action'" class="inline-flex justify-center w-full">
-              <ng-container *ngTemplateOutlet="actionMenu; context: {row: row}"></ng-container>
+            <!-- Action dropdown -->
+            <div *ngSwitchCase="'action'" class="inline-flex justify-center w-full overflow-visible">
+              <ng-container *ngIf="hasActionColumn">
+                <ng-container *ngTemplateOutlet="actionMenu; context: { row: row }"></ng-container>
+              </ng-container>
             </div>
 
-            <!-- Default -->
+            <!-- Default fallback -->
             <span *ngSwitchDefault class="text-slate-900 block truncate">
               {{ getValue(row, col.key) }}
             </span>
 
           </ng-container>
-
         </td>
 
       </tr>
-
     </tbody>
 
   </table>
 
-  <!-- Prevent layout collapse -->
-  <div *ngIf="fillFewRows && data && data.length <= 2" class="h-32"></div>
+  <div *ngIf="data && data.length <= 2" class="h-32"></div>
 
 </div>

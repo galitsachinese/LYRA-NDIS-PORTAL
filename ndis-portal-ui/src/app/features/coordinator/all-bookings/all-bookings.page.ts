@@ -21,6 +21,7 @@ export class AllBookingsComponent implements OnInit {
   pagedBookings: any[] = [];
   isLoadingBookings = true;
   activeFilter = 'all';
+
   currentPage = 1;
   readonly pageSize = 5;
   pendingAction: BookingAction | null = null;
@@ -31,6 +32,8 @@ export class AllBookingsComponent implements OnInit {
   selectedWorkerId = '';
   workerToUnassignBooking: any | null = null;
   isAssigningWorker = false;
+
+  isFilterDropdownOpen = false;
 
   readonly statusOptions = [
     { label: 'All', value: 'all' },
@@ -114,19 +117,31 @@ export class AllBookingsComponent implements OnInit {
     const worker = this.supportWorkers.find((item) => item.id === workerId);
 
     this.isAssigningWorker = true;
-    this.api.assignWorkerToBooking(this.selectedAssignBooking.id, workerId).subscribe({
-      next: (response) => {
-        this.applyAssignedWorker(this.selectedAssignBooking, worker, response);
-        this.isAssigningWorker = false;
-        this.closeAssignWorker();
-        this.toast.show('Worker assigned successfully. Participant will be notified.', 'success');
-      },
-      error: (error) => {
-        console.error('Error assigning worker:', error);
-        this.isAssigningWorker = false;
-        this.toast.show(error?.message || 'Failed to assign worker. Please try again.', 'error');
-      },
-    });
+    this.api
+      .assignWorkerToBooking(this.selectedAssignBooking.id, workerId)
+      .subscribe({
+        next: (response) => {
+          this.applyAssignedWorker(
+            this.selectedAssignBooking,
+            worker,
+            response,
+          );
+          this.isAssigningWorker = false;
+          this.closeAssignWorker();
+          this.toast.show(
+            'Worker assigned successfully. Participant will be notified.',
+            'success',
+          );
+        },
+        error: (error) => {
+          console.error('Error assigning worker:', error);
+          this.isAssigningWorker = false;
+          this.toast.show(
+            error?.message || 'Failed to assign worker. Please try again.',
+            'error',
+          );
+        },
+      });
   }
 
   requestUnassignWorker(booking: any): void {
@@ -158,7 +173,11 @@ export class AllBookingsComponent implements OnInit {
       error: (error) => {
         console.error('Error removing assigned worker:', error);
         this.isAssigningWorker = false;
-        this.toast.show(error?.message || 'Failed to remove assigned worker. Please try again.', 'error');
+        this.toast.show(
+          error?.message ||
+            'Failed to remove assigned worker. Please try again.',
+          'error',
+        );
       },
     });
   }
@@ -168,12 +187,17 @@ export class AllBookingsComponent implements OnInit {
       return [];
     }
 
-    const bookingServiceId = this.getBookingServiceId(this.selectedAssignBooking);
-    const bookingServiceName = (this.selectedAssignBooking.serviceName || '').toLowerCase();
+    const bookingServiceId = this.getBookingServiceId(
+      this.selectedAssignBooking,
+    );
+    const bookingServiceName = (
+      this.selectedAssignBooking.serviceName || ''
+    ).toLowerCase();
 
     return this.supportWorkers.filter((worker) => {
       const isActive = (worker.status || 'Active').toLowerCase() === 'active';
-      const sameServiceById = bookingServiceId > 0 && worker.assignedServiceId === bookingServiceId;
+      const sameServiceById =
+        bookingServiceId > 0 && worker.assignedServiceId === bookingServiceId;
       const sameServiceByName =
         !sameServiceById &&
         Boolean(worker.assignedServiceName) &&
@@ -242,10 +266,14 @@ export class AllBookingsComponent implements OnInit {
 
   get confirmationButtonText(): string {
     if (this.isUpdatingBooking) {
-      return this.pendingAction === 'approve' ? 'Approving...' : 'Cancelling...';
+      return this.pendingAction === 'approve'
+        ? 'Approving...'
+        : 'Cancelling...';
     }
 
-    return this.pendingAction === 'approve' ? 'Approve Booking' : 'Cancel Booking';
+    return this.pendingAction === 'approve'
+      ? 'Approve Booking'
+      : 'Cancel Booking';
   }
 
   private approveBooking(booking: any): void {
@@ -261,7 +289,10 @@ export class AllBookingsComponent implements OnInit {
       error: (err) => {
         console.error('Error approving booking:', err);
         this.isUpdatingBooking = false;
-        this.toast.show('Failed to approve booking. Please try again.', 'error');
+        this.toast.show(
+          'Failed to approve booking. Please try again.',
+          'error',
+        );
       },
     });
   }
@@ -368,7 +399,10 @@ export class AllBookingsComponent implements OnInit {
   }
 
   private getBookingParticipantName(booking: any): string {
-    const name = booking?.participantName || booking?.name || `User ${booking?.userId || ''}`;
+    const name =
+      booking?.participantName ||
+      booking?.name ||
+      `User ${booking?.userId || ''}`;
 
     return String(name)
       .trim()
@@ -404,13 +438,18 @@ export class AllBookingsComponent implements OnInit {
       .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
-  private applyAssignedWorker(booking: any, worker?: SupportWorker, response?: any): void {
+  private applyAssignedWorker(
+    booking: any,
+    worker?: SupportWorker,
+    response?: any,
+  ): void {
     if (!worker && !response) {
       return;
     }
 
     const workerId = response?.workerId ?? response?.WorkerId ?? worker?.id;
-    const workerName = response?.workerName ?? response?.WorkerName ?? worker?.fullName;
+    const workerName =
+      response?.workerName ?? response?.WorkerName ?? worker?.fullName;
 
     booking.assignedWorkerId = workerId;
     booking.AssignedWorkerId = workerId;
@@ -435,5 +474,14 @@ export class AllBookingsComponent implements OnInit {
     booking.SupportWorkerName = null;
     booking.workerName = null;
     booking.WorkerName = null;
+  }
+
+  toggleFilterDropdown(): void {
+    this.isFilterDropdownOpen = !this.isFilterDropdownOpen;
+  }
+
+  selectStatus(status: string): void {
+    this.isFilterDropdownOpen = false;
+    this.handleStatusFilter(status);
   }
 }

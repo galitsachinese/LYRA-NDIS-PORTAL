@@ -162,7 +162,7 @@
           <col [class]="showWorkerAssignment ? 'w-[13%]' : 'w-[15%]'" />
           <col [class]="showWorkerAssignment ? 'w-[14%]' : 'w-[16%]'" />
           <col *ngIf="showWorkerAssignment" class="w-[14%]" />
-          <col [class]="showWorkerAssignment ? 'w-[10%]' : 'w-[11%]'" />
+          <col *ngIf="shouldShowActionsColumn" [class]="showWorkerAssignment ? 'w-[10%]' : 'w-[11%]'" />
         </colgroup>
 
         <thead class="bg-slate-50">

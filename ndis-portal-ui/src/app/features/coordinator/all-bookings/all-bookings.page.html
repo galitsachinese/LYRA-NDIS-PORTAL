@@ -1,4 +1,58 @@
 <div class="mx-auto max-w-[2560px] space-y-5 p-4 md:space-y-6 md:p-6 2xl:p-8 min-[3840px]:max-w-[3200px] min-[3840px]:p-12">
+  <!-- Booking Queue Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-lg font-bold text-slate-950 2xl:text-2xl min-[3840px]:text-4xl">
+      Booking Queue
+    </h2>
+  
+    <div class="flex items-center gap-2 2xl:gap-3 min-[3840px]:gap-5">
+  
+      <!-- Status Filter -->
+      <div class="relative" data-testid="status-filter">
+        <button type="button" (click)="toggleFilterDropdown()"
+          class="inline-flex h-9 items-center gap-1.5 rounded-md bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-slate-50 2xl:h-11 2xl:px-4 2xl:text-base min-[3840px]:h-16 min-[3840px]:gap-2.5 min-[3840px]:px-6 min-[3840px]:text-2xl">
+  
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h12M4 12h8M4 17h4" />
+          </svg>
+  
+          <span>{{ activeFilterLabel }}</span>
+  
+          <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+  
+        <div *ngIf="isFilterDropdownOpen"
+          class="absolute right-0 top-full z-50 mt-2 w-40 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+  
+          <button *ngFor="let option of statusOptions" type="button" (click)="selectStatus(option.value)"
+            class="block w-full px-4 py-2 text-left text-sm hover:bg-slate-50" [ngClass]="{
+              'bg-slate-50 font-semibold text-slate-900':
+                activeFilter === option.value
+            }">
+  
+            {{ option.label }}
+  
+          </button>
+        </div>
+      </div>
+  
+      <!-- Refresh -->
+      <button type="button" (click)="refreshBookings()"
+        class="inline-flex h-9 items-center gap-2 rounded-md bg-green-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700">
+  
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" />
+        </svg>
+  
+        Refresh
+      </button>
+  
+    </div>
+  </div>
+  
   <app-booking-queue-table
     [bookings]="bookings"
     [pagedBookings]="pagedBookings"

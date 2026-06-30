@@ -179,7 +179,11 @@ export class BookingQueueTableComponent implements OnInit, OnChanges {
     this.updateColumns();
   }
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['showWorkerAssignment'] || changes['showActions']) {
+    if (
+      changes['showWorkerAssignment'] ||
+      changes['showActions'] ||
+      changes['selectedFilter']
+    ) {
       this.updateColumns();
     }
   }
@@ -227,11 +231,18 @@ export class BookingQueueTableComponent implements OnInit, OnChanges {
         return false;
       }
 
-      if (!this.showActions && col.type === 'action') {
+      if (
+        col.type === 'action' &&
+        (!this.showActions || this.selectedFilter.toLowerCase() !== 'pending')
+      ) {
         return false;
       }
 
       return true;
     });
+  }
+
+  get shouldShowActionsColumn(): boolean {
+    return this.selectedFilter.toLowerCase() === 'pending';
   }
 }

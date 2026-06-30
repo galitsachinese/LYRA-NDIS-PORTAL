@@ -30,7 +30,9 @@
     <!-- DESKTOP NAV LINKS -->
     <div class="hidden md:flex gap-8 font-base text-sm">
         <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="font-bold border-b-2 border-white"
-            class="py-1">
+            [routerLinkActiveOptions]="{
+                exact: link.path === '/dashboard'
+            }" class="py-1">
             {{ link.label }}
         </a>
     </div>

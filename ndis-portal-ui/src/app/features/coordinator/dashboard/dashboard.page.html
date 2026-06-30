@@ -46,6 +46,7 @@
     [totalPages]="totalPages"
     [pageNumbers]="pageNumbers"
     [showingEnd]="showingEnd"
+    [showActions]="false">
     (refresh)="refreshBookings()"
     (statusChange)="filterByStatus($event)"
     (previousPage)="previousPage()"
@@ -53,6 +54,7 @@
     (pageChange)="goToPage($event)"
     (approve)="requestApproveBooking($event)"
     (cancel)="requestCancelBooking($event)">
+    
   </app-booking-queue-table>
 
   <app-dialog-ui

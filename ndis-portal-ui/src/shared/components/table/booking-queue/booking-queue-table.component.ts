@@ -86,7 +86,8 @@ export class BookingQueueTableComponent implements OnInit, OnChanges {
    * Used in admin views where workers can be assigned to bookings.
    */
   @Input() showWorkerAssignment = false;
-
+  /** Show or hide the Actions column. */
+  @Input() showActions = true;
   /* ==========================================================
      OUTPUTS
      ========================================================== */
@@ -123,16 +124,6 @@ export class BookingQueueTableComponent implements OnInit, OnChanges {
       label: 'Cancel',
       actionKey: 'cancel',
       class: 'text-rose-500 hover:bg-rose-50',
-    },
-    {
-      label: 'Assign Worker',
-      actionKey: 'assignWorker',
-      class: 'text-violet-600 hover:bg-violet-50',
-    },
-    {
-      label: 'Unassign Worker',
-      actionKey: 'unassignWorker',
-      class: 'text-slate-500 hover:bg-slate-50',
     },
   ];
 
@@ -187,9 +178,8 @@ export class BookingQueueTableComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.updateColumns();
   }
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['showWorkerAssignment']) {
+    if (changes['showWorkerAssignment'] || changes['showActions']) {
       this.updateColumns();
     }
   }
@@ -232,12 +222,16 @@ export class BookingQueueTableComponent implements OnInit, OnChanges {
      ========================================================== */
 
   private updateColumns(): void {
-    if (this.showWorkerAssignment) {
-      this.visibleColumns = [...this.baseColumns];
-    } else {
-      this.visibleColumns = this.baseColumns.filter(
-        (col) => col.type !== 'worker',
-      );
-    }
+    this.visibleColumns = this.baseColumns.filter((col) => {
+      if (!this.showWorkerAssignment && col.type === 'worker') {
+        return false;
+      }
+
+      if (!this.showActions && col.type === 'action') {
+        return false;
+      }
+
+      return true;
+    });
   }
 }

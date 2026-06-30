@@ -33,6 +33,7 @@ export class ManageServicesComponent implements OnInit {
   isModalOpen = false;
   isEditModalOpen = false;
   selectedServiceForEdit: any = null;
+  openEditModalInDeleteMode = false;
 
   selectedStatusFilter = 'Active';
 
@@ -91,6 +92,13 @@ export class ManageServicesComponent implements OnInit {
 
   openEditModal(service: any) {
     this.selectedServiceForEdit = service;
+    this.openEditModalInDeleteMode = false;
+    this.isEditModalOpen = true;
+  }
+
+  openDeleteConfirmation(service: any) {
+    this.selectedServiceForEdit = service;
+    this.openEditModalInDeleteMode = true;
     this.isEditModalOpen = true;
   }
 

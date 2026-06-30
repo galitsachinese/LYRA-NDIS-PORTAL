@@ -13,6 +13,7 @@ import { DialogUi } from '../../../ui/dialog/dialog.ui';
 })
 export class EditServiceModalComponent implements OnInit {
   @Input() service: any = null;
+  @Input() openDeleteConfirmOnInit = false;
   @Output() onClose = new EventEmitter<void>();
   @Output() onSaved = new EventEmitter<void>();
 
@@ -51,6 +52,10 @@ export class EditServiceModalComponent implements OnInit {
         console.error('Failed to load categories', err);
       },
     });
+
+    if (this.openDeleteConfirmOnInit) {
+      this.showDeleteConfirm = true;
+    }
   }
 
   close() {

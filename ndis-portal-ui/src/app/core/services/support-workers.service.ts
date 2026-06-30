@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -115,18 +115,22 @@ export class SupportWorkersService {
     };
   }
 
-  uploadProfilePicture(id: number, file: File): Observable<{ profilePicture: string | null }> {
+  uploadProfilePicture(id: number, file: File): Observable<HttpEvent<any>> {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<any>(`${this.apiUrl}/${id}/upload-picture`, formData, {
+    const request = new HttpRequest('POST', `${this.apiUrl}/${id}/upload-picture`, formData, {
       headers: this.getAuthHeadersForUpload(),
-    }).pipe(
-      map((response) => ({
-        profilePicture: this.resolveProfilePictureUrl(response?.profilePicture ?? response?.ProfilePicture ?? ''),
-      })),
+      reportProgress: true,
+    });
+
+    return this.http.request(request).pipe(
       catchError((error) => throwError(() => this.toError(error, 'Failed to upload profile picture.')))
     );
+  }
+
+  resolveWorkerProfilePictureUrl(value: string | null | undefined): string | null {
+    return this.resolveProfilePictureUrl(value);
   }
 
   private resolveProfilePictureUrl(value: string | null | undefined): string | null {

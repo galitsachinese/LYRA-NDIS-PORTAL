@@ -44,7 +44,8 @@
     <div *ngIf="!isLoading && !errorMessage" data-testid="services-table">
     <app-manage-services-table [bookings]="services"
           (toggleStatus)="toggleServiceStatus($event)"
-          (editService)="openEditModal($event)">
+          (editService)="openEditModal($event)"
+          (deleteService)="openDeleteConfirmation($event)">
         </app-manage-services-table>
     </div>
 </div>
@@ -56,6 +57,7 @@
 <!-- Edit Service Modal -->
 <app-edit-service-modal *ngIf="isEditModalOpen"
   [service]="selectedServiceForEdit"
-  (onClose)="isEditModalOpen = false"
+  [openDeleteConfirmOnInit]="openEditModalInDeleteMode"
+  (onClose)="isEditModalOpen = false; openEditModalInDeleteMode = false"
   (onSaved)="loadServices()">
 </app-edit-service-modal>

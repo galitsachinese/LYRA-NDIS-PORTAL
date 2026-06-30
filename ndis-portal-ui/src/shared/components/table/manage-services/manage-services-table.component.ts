@@ -37,6 +37,8 @@ export class ManageServicesTableComponent implements OnChanges {
   @Output() toggleStatus = new EventEmitter<any>();
   // Emits when edit button is clicked
   @Output() editService = new EventEmitter<any>();
+  // Emits when delete button is clicked
+  @Output() deleteService = new EventEmitter<any>();
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['bookings'] && this.currentPage > this.totalPages) {

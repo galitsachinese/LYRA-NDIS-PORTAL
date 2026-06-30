@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { HttpEventType } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { AddButtonComponent } from '../../../../shared/components/button/add-button/add-button.component';
 import { ApiService } from '../../../core/services/api-service';
@@ -33,6 +34,7 @@ export class SupportWorkersComponent implements OnInit {
   statusFilter = 'all';
   serviceFilter = 'all';
   searchTerm = '';
+  activeActionMenuId: number | null = null;
 
   isLoading = true;
   isSaving = false;
@@ -57,6 +59,7 @@ export class SupportWorkersComponent implements OnInit {
 
   // Profile picture upload state
   isUploadingPicture = false;
+  uploadProgress = 0;
   uploadPictureError: string | null = null;
   selectedPreviewFile: File | null = null;
   selectedPreviewUrl: string | null = null;
@@ -161,6 +164,7 @@ export class SupportWorkersComponent implements OnInit {
   openModal(): void {
     this.isEditMode = false;
     this.editingWorkerId = null;
+    this.selectedWorker = null;
     this.resetForm();
     this.showModal = true;
   }
@@ -173,10 +177,12 @@ export class SupportWorkersComponent implements OnInit {
     this.showModal = false;
     this.isEditMode = false;
     this.editingWorkerId = null;
+    this.selectedWorker = null;
     this.resetForm();
   }
 
   viewWorker(worker: SupportWorker): void {
+    this.closeActionMenu();
     this.selectedWorker = worker;
     this.showViewModal = true;
   }
@@ -187,8 +193,10 @@ export class SupportWorkersComponent implements OnInit {
   }
 
   editWorker(worker: SupportWorker): void {
+    this.closeActionMenu();
     this.isEditMode = true;
     this.editingWorkerId = worker.id;
+    this.selectedWorker = { ...worker };
     this.workerForm = {
       fullName: worker.fullName,
       email: worker.email,
@@ -205,6 +213,7 @@ export class SupportWorkersComponent implements OnInit {
   }
 
   openStatusConfirmation(worker: SupportWorker): void {
+    this.closeActionMenu();
     this.workerToChangeStatus = worker;
     this.selectedStatus =
       this.getWorkerStatus(worker).toLowerCase() === 'inactive'
@@ -327,7 +336,7 @@ export class SupportWorkersComponent implements OnInit {
   }
 
   saveWorker(): void {
-    if (!this.validateForm()) {
+    if (!this.validateForm() || this.isUploadingPicture) {
       return;
     }
 
@@ -345,17 +354,15 @@ export class SupportWorkersComponent implements OnInit {
         : this.supportWorkersService.createSupportWorker(payload);
 
     request.subscribe({
-      next: () => {
-        this.toast.show(
-          this.isEditMode ? 'Support worker updated successfully.' : 'Support worker added successfully.',
-          'success'
-        );
-        this.isSaving = false;
-        this.showModal = false;
-        this.isEditMode = false;
-        this.editingWorkerId = null;
-        this.resetForm();
-        this.loadWorkers();
+      next: (worker) => {
+        const savedWorker = this.mergeProfilePicture(worker);
+
+        if (this.selectedPreviewFile) {
+          this.uploadSelectedPicture(savedWorker);
+          return;
+        }
+
+        this.finishWorkerSave(savedWorker);
       },
       error: (error) => {
         this.isSaving = false;
@@ -477,6 +484,14 @@ export class SupportWorkersComponent implements OnInit {
     this.searchTerm = '';
   }
 
+  toggleActionMenu(workerId: number): void {
+    this.activeActionMenuId = this.activeActionMenuId === workerId ? null : workerId;
+  }
+
+  closeActionMenu(): void {
+    this.activeActionMenuId = null;
+  }
+
   getInitials(name: string): string {
     return name
       .split(' ')
@@ -499,6 +514,16 @@ export class SupportWorkersComponent implements OnInit {
       .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const clickedActionMenu = target.closest('[data-testid="worker-action-menu"]');
+
+    if (!clickedActionMenu) {
+      this.closeActionMenu();
+    }
+  }
+
   /* ==========================================================
      PROFILE PICTURE UPLOAD
      ========================================================== */
@@ -518,6 +543,8 @@ export class SupportWorkersComponent implements OnInit {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
+      this.selectedPreviewFile = null;
+      this.selectedPreviewUrl = null;
       this.uploadPictureError = 'Invalid file type. Only JPG and PNG files are allowed.';
       input.value = '';
       return;
@@ -525,6 +552,8 @@ export class SupportWorkersComponent implements OnInit {
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
+      this.selectedPreviewFile = null;
+      this.selectedPreviewUrl = null;
       this.uploadPictureError = 'File size must not exceed 5MB.';
       input.value = '';
       return;
@@ -538,34 +567,6 @@ export class SupportWorkersComponent implements OnInit {
       this.selectedPreviewUrl = e.target?.result as string;
     };
     reader.readAsDataURL(file);
-  }
-
-  uploadPicture(): void {
-    if (!this.selectedPreviewFile || !this.editingWorkerId) {
-      return;
-    }
-
-    this.isUploadingPicture = true;
-    this.uploadPictureError = null;
-
-    this.supportWorkersService.uploadProfilePicture(this.editingWorkerId, this.selectedPreviewFile).subscribe({
-      next: (result) => {
-        // Update the worker in the list
-        this.workers = this.workers.map((w) =>
-          w.id === this.editingWorkerId
-            ? { ...w, profilePicture: result.profilePicture }
-            : w
-        );
-        this.isUploadingPicture = false;
-        this.selectedPreviewFile = null;
-        this.selectedPreviewUrl = null;
-        this.toast.show('Profile picture uploaded successfully.', 'success');
-      },
-      error: (error) => {
-        this.isUploadingPicture = false;
-        this.uploadPictureError = error?.message || 'Failed to upload profile picture.';
-      },
-    });
   }
 
   clearSelectedPreview(): void {
@@ -582,9 +583,96 @@ export class SupportWorkersComponent implements OnInit {
       assignedServiceId: '',
     };
     this.formErrors = {};
+    this.isUploadingPicture = false;
+    this.uploadProgress = 0;
     this.selectedPreviewFile = null;
     this.selectedPreviewUrl = null;
     this.uploadPictureError = null;
+  }
+
+  private uploadSelectedPicture(worker: SupportWorker): void {
+    if (!this.selectedPreviewFile) {
+      this.finishWorkerSave(worker);
+      return;
+    }
+
+    this.updateWorkerInList(worker);
+    this.selectedWorker = { ...worker };
+    this.editingWorkerId = worker.id;
+    this.isEditMode = true;
+    this.isUploadingPicture = true;
+    this.uploadProgress = 0;
+    this.uploadPictureError = null;
+
+    this.supportWorkersService.uploadProfilePicture(worker.id, this.selectedPreviewFile).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.UploadProgress) {
+          const total = event.total ?? this.selectedPreviewFile?.size ?? 0;
+          this.uploadProgress = total > 0 ? Math.round((event.loaded / total) * 100) : 0;
+          return;
+        }
+
+        if (event.type === HttpEventType.Response) {
+          const uploadedProfilePicture = this.supportWorkersService.resolveWorkerProfilePictureUrl(
+            event.body?.profilePicture ?? event.body?.ProfilePicture ?? null
+          );
+          const updatedWorker = {
+            ...worker,
+            profilePicture: uploadedProfilePicture,
+          };
+
+          this.finishWorkerSave(updatedWorker, true);
+        }
+      },
+      error: (error) => {
+        this.isUploadingPicture = false;
+        this.uploadProgress = 0;
+        this.isSaving = false;
+        this.uploadPictureError = error?.message || 'Failed to upload profile picture.';
+      },
+    });
+  }
+
+  private finishWorkerSave(worker: SupportWorker, pictureUploaded = false): void {
+    this.updateWorkerInList(worker);
+    this.selectedWorker = { ...worker };
+    this.isSaving = false;
+    this.isUploadingPicture = false;
+    this.uploadProgress = 0;
+
+    this.toast.show(
+      pictureUploaded
+        ? 'Support worker and profile picture saved successfully.'
+        : this.isEditMode
+          ? 'Support worker updated successfully.'
+          : 'Support worker added successfully.',
+      'success'
+    );
+
+    this.showModal = false;
+    this.isEditMode = false;
+    this.editingWorkerId = null;
+    this.selectedWorker = null;
+    this.resetForm();
+  }
+
+  private updateWorkerInList(worker: SupportWorker): void {
+    const workerExists = this.workers.some((item) => item.id === worker.id);
+    this.workers = workerExists
+      ? this.workers.map((item) => (item.id === worker.id ? worker : item))
+      : [worker, ...this.workers];
+  }
+
+  private mergeProfilePicture(worker: SupportWorker): SupportWorker {
+    const existingProfilePicture =
+      this.workers.find((item) => item.id === worker.id)?.profilePicture ??
+      this.selectedWorker?.profilePicture ??
+      null;
+
+    return {
+      ...worker,
+      profilePicture: worker.profilePicture ?? existingProfilePicture,
+    };
   }
 
   private unwrapBookings(response: any): any[] {

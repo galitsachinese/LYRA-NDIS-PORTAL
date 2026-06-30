@@ -1,48 +1,41 @@
 <section class="overflow-hidden rounded-lg border border-slate-100 bg-white shadow-sm">
-  <div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+  <div
+    class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
     <h2 class="text-lg font-bold text-slate-950 2xl:text-2xl min-[3840px]:text-4xl">
       Booking Queue
     </h2>
 
     <div class="flex items-center gap-2 2xl:gap-3 min-[3840px]:gap-5">
       <div class="relative" data-testid="status-filter">
-        <button
-          type="button"
-          (click)="toggleFilterDropdown()"
-          class="inline-flex h-9 items-center gap-1.5 rounded-md bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-slate-50 2xl:h-11 2xl:px-4 2xl:text-base min-[3840px]:h-16 min-[3840px]:gap-2.5 min-[3840px]:px-6 min-[3840px]:text-2xl"
-        >
-          <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button type="button" (click)="toggleFilterDropdown()"
+          class="inline-flex h-9 items-center gap-1.5 rounded-md bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-slate-50 2xl:h-11 2xl:px-4 2xl:text-base min-[3840px]:h-16 min-[3840px]:gap-2.5 min-[3840px]:px-6 min-[3840px]:text-2xl">
+          <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h12M4 12h8M4 17h4" />
           </svg>
           <span>Status</span>
-          <svg class="h-3.5 w-3.5 text-slate-400 2xl:h-4 2xl:w-4 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-3.5 w-3.5 text-slate-400 2xl:h-4 2xl:w-4 min-[3840px]:h-6 min-[3840px]:w-6" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" />
           </svg>
         </button>
 
-        <div
-          *ngIf="isFilterDropdownOpen"
-          class="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg 2xl:w-52 min-[3840px]:w-72"
-        >
-          <button
-            *ngFor="let option of statusOptions"
-            type="button"
-            (click)="selectStatus(option.value)"
+        <div *ngIf="isFilterDropdownOpen"
+          class="absolute right-0 top-full z-[60] mt-2 w-40 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg 2xl:w-52 min-[3840px]:w-72">
+          <button *ngFor="let option of statusOptions" type="button" (click)="selectStatus(option.value)"
             class="block w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 2xl:px-5 2xl:py-3 2xl:text-base min-[3840px]:px-8 min-[3840px]:py-5 min-[3840px]:text-2xl"
-            [ngClass]="{ 'bg-slate-50 font-semibold text-slate-950': selectedFilter === option.value }"
-          >
+            [ngClass]="{ 'bg-slate-50 font-semibold text-slate-950': selectedFilter === option.value }">
             {{ option.label }}
           </button>
         </div>
       </div>
 
-      <button
-        type="button"
-        (click)="refresh.emit()"
-        class="inline-flex h-9 items-center gap-2 rounded-md bg-green-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 2xl:h-11 2xl:px-5 2xl:text-base min-[3840px]:h-16 min-[3840px]:px-8 min-[3840px]:text-2xl"
-      >
-        <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-7 min-[3840px]:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" />
+      <button type="button" (click)="refresh.emit()"
+        class="inline-flex h-9 items-center gap-2 rounded-md bg-green-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 2xl:h-11 2xl:px-5 2xl:text-base min-[3840px]:h-16 min-[3840px]:px-8 min-[3840px]:text-2xl">
+        <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-7 min-[3840px]:w-7" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" />
         </svg>
         Refresh
       </button>
@@ -50,32 +43,27 @@
   </div>
 
   <div *ngIf="isLoading" class="flex h-48 flex-col items-center justify-center gap-4 2xl:h-64 min-[3840px]:h-96">
-    <div class="h-8 w-8 animate-spin rounded-full border-4 border-violet-100 border-t-violet-600 2xl:h-10 2xl:w-10 min-[3840px]:h-16 min-[3840px]:w-16"></div>
+    <div
+      class="h-8 w-8 animate-spin rounded-full border-4 border-violet-100 border-t-violet-600 2xl:h-10 2xl:w-10 min-[3840px]:h-16 min-[3840px]:w-16">
+    </div>
     <p class="text-sm font-medium text-slate-400 2xl:text-lg min-[3840px]:text-3xl">
       Loading bookings...
     </p>
   </div>
 
   <div *ngIf="!isLoading" data-testid="bookings-table">
-    <div
-      *ngIf="bookings.length === 0"
-      class="border-t border-slate-100 px-4 py-16 text-center 2xl:py-24 min-[3840px]:py-40"
-    >
+    <div *ngIf="bookings.length === 0"
+      class="border-t border-slate-100 px-4 py-16 text-center 2xl:py-24 min-[3840px]:py-40">
       <p class="text-sm font-medium text-slate-500 2xl:text-xl min-[3840px]:text-4xl">
         No bookings found
       </p>
     </div>
 
     <div *ngIf="bookings.length > 0" class="divide-y divide-slate-100 md:hidden">
-      <article
-        *ngFor="let booking of pagedBookings"
-        class="px-4 py-4"
-      >
+      <article *ngFor="let booking of pagedBookings" class="px-4 py-4">
         <div class="flex items-start gap-3">
-          <div
-            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-            [ngClass]="getAvatarClass(booking)"
-          >
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+            [ngClass]="getAvatarClass(booking)">
             {{ getInitials(booking) }}
           </div>
           <div class="min-w-0 flex-1">
@@ -91,10 +79,8 @@
                   {{ booking.serviceCategory || 'Uncategorized' }}
                 </p>
               </div>
-              <span
-                class="inline-flex min-w-[82px] shrink-0 justify-center rounded-full px-3 py-1 text-xs font-bold"
-                [ngClass]="getStatusClass(booking.status)"
-              >
+              <span class="inline-flex min-w-[82px] shrink-0 justify-center rounded-full px-3 py-1 text-xs font-bold"
+                [ngClass]="getStatusClass(booking.status)">
                 {{ booking.status }}
               </span>
             </div>
@@ -104,27 +90,22 @@
               <span>{{ booking.preferredDate | date:'hh:mm a' }}</span>
             </div>
 
-            <div *ngIf="showWorkerAssignment && isApproved(booking)" class="mt-3 flex items-center justify-between gap-3 text-xs">
+            <div *ngIf="showWorkerAssignment && isApproved(booking)"
+              class="mt-3 flex items-center justify-between gap-3 text-xs">
               <span class="text-slate-500">Worker</span>
               <ng-container *ngIf="hasAssignedWorker(booking); else mobileAssignWorker">
-                <span class="inline-flex max-w-[70%] items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">
+                <span
+                  class="inline-flex max-w-[70%] items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">
                   <span class="truncate">{{ getAssignedWorkerName(booking) }}</span>
-                  <button
-                    type="button"
-                    (click)="unassignWorker.emit(booking)"
-                    class="text-slate-400 transition hover:text-rose-600"
-                    title="Remove worker"
-                  >
+                  <button type="button" (click)="unassignWorker.emit(booking)"
+                    class="text-slate-400 transition hover:text-rose-600" title="Remove worker">
                     &times;
                   </button>
                 </span>
               </ng-container>
               <ng-template #mobileAssignWorker>
-                <button
-                  type="button"
-                  (click)="assignWorker.emit(booking)"
-                  class="rounded-md bg-violet-50 px-3 py-1.5 font-semibold text-violet-700 transition-colors hover:bg-violet-100"
-                >
+                <button type="button" (click)="assignWorker.emit(booking)"
+                  class="rounded-md bg-violet-50 px-3 py-1.5 font-semibold text-violet-700 transition-colors hover:bg-violet-100">
                   Assign Worker
                 </button>
               </ng-template>
@@ -132,18 +113,12 @@
 
             <div class="mt-4 flex items-center justify-end gap-2">
               <ng-container *ngIf="isPending(booking)">
-                <button
-                  type="button"
-                  (click)="approve.emit(booking)"
-                  class="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-600"
-                >
+                <button type="button" (click)="approve.emit(booking)"
+                  class="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-600">
                   Approve
                 </button>
-                <button
-                  type="button"
-                  (click)="cancel.emit(booking)"
-                  class="rounded-full bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-rose-600"
-                >
+                <button type="button" (click)="cancel.emit(booking)"
+                  class="rounded-full bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-rose-600">
                   Cancel
                 </button>
               </ng-container>
@@ -154,7 +129,8 @@
     </div>
 
     <div *ngIf="bookings.length > 0" class="hidden overflow-x-auto md:block">
-      <table class="min-w-[1040px] w-full table-fixed border-collapse text-sm 2xl:min-w-[1440px] 2xl:text-base min-[3840px]:min-w-[2400px] min-[3840px]:text-2xl">
+      <table
+        class="min-w-[1040px] w-full table-fixed border-collapse text-sm 2xl:min-w-[1440px] 2xl:text-base min-[3840px]:min-w-[2400px] min-[3840px]:text-2xl">
         <colgroup>
           <col [class]="showWorkerAssignment ? 'w-[15%]' : 'w-[18%]'" />
           <col [class]="showWorkerAssignment ? 'w-[20%]' : 'w-[24%]'" />
@@ -162,30 +138,37 @@
           <col [class]="showWorkerAssignment ? 'w-[13%]' : 'w-[15%]'" />
           <col [class]="showWorkerAssignment ? 'w-[14%]' : 'w-[16%]'" />
           <col *ngIf="showWorkerAssignment" class="w-[14%]" />
-          <col *ngIf="shouldShowActionsColumn" [class]="showWorkerAssignment ? 'w-[10%]' : 'w-[11%]'" />
+          <col [class]="showWorkerAssignment ? 'w-[10%]' : 'w-[11%]'" />
         </colgroup>
 
         <thead class="bg-slate-50">
           <tr>
-            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Participant
             </th>
-            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Service
             </th>
-            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Date & Time
             </th>
-            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Notes
             </th>
-            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Status
             </th>
-            <th *ngIf="showWorkerAssignment" class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th *ngIf="showWorkerAssignment"
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Worker
             </th>
-            <th class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
+            <th
+              class="border-y border-slate-100 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400 2xl:px-6 2xl:py-4 2xl:text-sm min-[3840px]:px-10 min-[3840px]:py-7 min-[3840px]:text-xl">
               Actions
             </th>
           </tr>
@@ -197,8 +180,7 @@
               <div class="flex min-w-0 items-center gap-3">
                 <div
                   class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold 2xl:h-11 2xl:w-11 2xl:text-sm min-[3840px]:h-16 min-[3840px]:w-16 min-[3840px]:text-2xl"
-                  [ngClass]="getAvatarClass(booking)"
-                >
+                  [ngClass]="getAvatarClass(booking)">
                   {{ getInitials(booking) }}
                 </div>
                 <span class="block truncate font-medium text-slate-800">
@@ -225,11 +207,8 @@
               </span>
             </td>
             <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
-              <span
-                data-testid="notes-cell"
-                class="block truncate text-sm text-slate-600 cursor-pointer max-w-[200px]"
-                [title]="(booking.notes || '').length > 80 ? booking.notes : ''"
-                (click)="viewNotes(booking)">
+              <span data-testid="notes-cell" class="block truncate text-sm text-slate-600 cursor-pointer max-w-[200px]"
+                [title]="(booking.notes || '').length > 80 ? booking.notes : ''" (click)="viewNotes(booking)">
                 <ng-container *ngIf="booking.notes; else noNotes">
                   <span data-testid="notes-truncated">
                     {{ booking.notes.length > 80 ? (booking.notes | slice:0:80) + '...' : booking.notes }}
@@ -243,32 +222,26 @@
             <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
               <span
                 class="inline-flex min-w-[82px] justify-center rounded-full px-3 py-1 text-xs font-bold 2xl:min-w-[104px] 2xl:px-4 2xl:text-sm min-[3840px]:min-w-[156px] min-[3840px]:px-6 min-[3840px]:py-2 min-[3840px]:text-xl"
-                [ngClass]="getStatusClass(booking.status)"
-              >
+                [ngClass]="getStatusClass(booking.status)">
                 {{ booking.status }}
               </span>
             </td>
-            <td *ngIf="showWorkerAssignment" class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+            <td *ngIf="showWorkerAssignment"
+              class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
               <ng-container *ngIf="isApproved(booking); else noWorkerAction">
                 <ng-container *ngIf="hasAssignedWorker(booking); else assignWorkerButton">
-                  <span class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 2xl:text-sm min-[3840px]:text-xl">
+                  <span
+                    class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 2xl:text-sm min-[3840px]:text-xl">
                     <span class="truncate">{{ getAssignedWorkerName(booking) }}</span>
-                    <button
-                      type="button"
-                      (click)="unassignWorker.emit(booking)"
-                      class="text-slate-400 transition hover:text-rose-600"
-                      title="Remove worker"
-                    >
+                    <button type="button" (click)="unassignWorker.emit(booking)"
+                      class="text-slate-400 transition hover:text-rose-600" title="Remove worker">
                       &times;
                     </button>
                   </span>
                 </ng-container>
                 <ng-template #assignWorkerButton>
-                  <button
-                    type="button"
-                    (click)="assignWorker.emit(booking)"
-                    class="rounded-md bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 transition-colors hover:bg-violet-100 2xl:text-sm min-[3840px]:text-xl"
-                  >
+                  <button type="button" (click)="assignWorker.emit(booking)"
+                    class="rounded-md bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 transition-colors hover:bg-violet-100 2xl:text-sm min-[3840px]:text-xl">
                     Assign Worker
                   </button>
                 </ng-template>
@@ -280,18 +253,12 @@
             <td class="px-4 py-4 align-middle 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
               <ng-container *ngIf="isPending(booking)">
                 <div class="flex items-center gap-2">
-                  <button
-                    type="button"
-                    (click)="approve.emit(booking)"
-                    class="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-600 2xl:px-5 2xl:py-2 2xl:text-sm min-[3840px]:px-8 min-[3840px]:py-3 min-[3840px]:text-xl"
-                  >
+                  <button type="button" (click)="approve.emit(booking)"
+                    class="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-600 2xl:px-5 2xl:py-2 2xl:text-sm min-[3840px]:px-8 min-[3840px]:py-3 min-[3840px]:text-xl">
                     Approve
                   </button>
-                  <button
-                    type="button"
-                    (click)="cancel.emit(booking)"
-                    class="rounded-full bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-rose-600 2xl:px-5 2xl:py-2 2xl:text-sm min-[3840px]:px-8 min-[3840px]:py-3 min-[3840px]:text-xl"
-                  >
+                  <button type="button" (click)="cancel.emit(booking)"
+                    class="rounded-full bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-rose-600 2xl:px-5 2xl:py-2 2xl:text-sm min-[3840px]:px-8 min-[3840px]:py-3 min-[3840px]:text-xl">
                     Cancel
                   </button>
                 </div>
@@ -302,43 +269,34 @@
       </table>
     </div>
 
-    <div *ngIf="bookings.length > 0" class="flex flex-col gap-3 border-t border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+    <div *ngIf="bookings.length > 0"
+      class="flex flex-col gap-3 border-t border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between 2xl:px-6 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
       <p class="text-sm text-slate-500 2xl:text-base min-[3840px]:text-2xl">
         Showing {{ showingEnd }} of {{ bookings.length }} bookings
       </p>
 
       <div class="flex items-center gap-1 2xl:gap-2 min-[3840px]:gap-4">
-        <button
-          type="button"
-          (click)="previousPage.emit()"
-          [disabled]="currentPage === 1"
+        <button type="button" (click)="previousPage.emit()" [disabled]="currentPage === 1"
           class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 2xl:h-10 2xl:w-10 min-[3840px]:h-14 min-[3840px]:w-14"
-          title="Previous page"
-        >
-          <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          title="Previous page">
+          <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
           </svg>
         </button>
-        <button
-          *ngFor="let page of pageNumbers"
-          type="button"
-          (click)="pageChange.emit(page)"
+        <button *ngFor="let page of pageNumbers" type="button" (click)="pageChange.emit(page)"
           class="inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm font-semibold transition-colors 2xl:h-10 2xl:min-w-10 2xl:text-base min-[3840px]:h-14 min-[3840px]:min-w-14 min-[3840px]:text-2xl"
           [ngClass]="{
             'bg-[#2446C0] text-white': currentPage === page,
             'bg-slate-50 text-slate-500 hover:bg-slate-100': currentPage !== page
-          }"
-        >
+          }">
           {{ page }}
         </button>
-        <button
-          type="button"
-          (click)="nextPage.emit()"
-          [disabled]="currentPage === totalPages"
+        <button type="button" (click)="nextPage.emit()" [disabled]="currentPage === totalPages"
           class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-50 text-slate-400 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 2xl:h-10 2xl:w-10 min-[3840px]:h-14 min-[3840px]:w-14"
-          title="Next page"
-        >
-          <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          title="Next page">
+          <svg class="h-4 w-4 2xl:h-5 2xl:w-5 min-[3840px]:h-6 min-[3840px]:w-6" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
           </svg>
         </button>
@@ -347,21 +305,17 @@
   </div>
 </section>
 
-<div
-  *ngIf="selectedNotesBooking"
-  class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/20 p-4"
->
-  <div class="relative w-full max-w-md overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl 2xl:max-w-xl min-[3840px]:max-w-3xl">
-    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 2xl:px-7 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+<div *ngIf="selectedNotesBooking" class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/20 p-4">
+  <div
+    class="relative w-full max-w-md overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl 2xl:max-w-xl min-[3840px]:max-w-3xl">
+    <div
+      class="flex items-center justify-between border-b border-slate-200 px-5 py-4 2xl:px-7 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
       <h2 class="text-base font-semibold text-slate-900 2xl:text-xl min-[3840px]:text-3xl">
         Booking Notes
       </h2>
 
-      <button
-        type="button"
-        (click)="closeNotes()"
-        class="text-slate-400 transition-colors hover:text-slate-600 2xl:text-xl min-[3840px]:text-4xl"
-      >
+      <button type="button" (click)="closeNotes()"
+        class="text-slate-400 transition-colors hover:text-slate-600 2xl:text-xl min-[3840px]:text-4xl">
         &times;
       </button>
     </div>
@@ -372,12 +326,10 @@
       </p>
     </div>
 
-    <div class="flex justify-end border-t border-slate-200 px-5 py-4 2xl:px-7 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
-      <button
-        type="button"
-        (click)="closeNotes()"
-        class="rounded-md bg-[#6B32A8] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5b2b8f] 2xl:px-5 2xl:py-3 2xl:text-base min-[3840px]:px-8 min-[3840px]:py-5 min-[3840px]:text-2xl"
-      >
+    <div
+      class="flex justify-end border-t border-slate-200 px-5 py-4 2xl:px-7 2xl:py-5 min-[3840px]:px-10 min-[3840px]:py-8">
+      <button type="button" (click)="closeNotes()"
+        class="rounded-md bg-[#6B32A8] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5b2b8f] 2xl:px-5 2xl:py-3 2xl:text-base min-[3840px]:px-8 min-[3840px]:py-5 min-[3840px]:text-2xl">
         Close
       </button>
     </div>

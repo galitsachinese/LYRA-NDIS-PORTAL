@@ -8,8 +8,40 @@ import {
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { TableColumn } from '../../models/table.model';
+import { TableColumn, TableAction } from '../../models/table.model';
 
+/**
+ * Generic, reusable table UI component.
+ *
+ * This component is intentionally "dumb" — it knows nothing about
+ * bookings, admins, or any domain. It renders columns and rows, and
+ * delegates all action logic back to the parent via events.
+ *
+ * SUPPORTED COLUMN TYPES:
+ * -----------------------
+ * name        → bold text, truncated
+ * service     → bold text, truncated
+ * participant → avatar initials + name
+ * date        → formatted date string
+ * datetime    → date on top, time below (uses pipe in parent)
+ * category    → grey badge
+ * status      → colored dot badge
+ * notes       → truncated text, click to view (emits viewAction)
+ * worker      → assigned worker chip or assign button
+ * view        → "View" button (emits viewAction)
+ * toggle      → on/off switch (emits toggleAction)
+ * action      → three-dot dropdown menu (emits actionTriggered)
+ *
+ * HOW TO USE:
+ * -----------
+ * 1. Pass [columns] to define what columns are visible.
+ * 2. Pass [data] with the row objects to display.
+ * 3. Pass [actions] to define what appears in the action dropdown menu.
+ * 4. Listen to (actionTriggered) → { row, actionKey }
+ * 5. Listen to (viewAction) for 'view' and 'notes' column types.
+ * 6. Listen to (toggleAction) for the 'toggle' column type.
+ * 7. Listen to (assignWorker) / (unassignWorker) for the 'worker' column type.
+ */
 @Component({
   selector: 'app-table-ui',
   standalone: true,
@@ -20,31 +52,36 @@ export class TableComponent {
   /* ===============================
      INPUTS
      =============================== */
+
   @Input() columns: TableColumn[] = [];
   @Input() data: any[] = [];
+  @Input() actions: TableAction[] = [];
   @Input() fillFewRows = true;
 
   /* ===============================
-     OUTPUT EVENTS
+     OUTPUTS
      =============================== */
+
+  @Output() actionTriggered = new EventEmitter<{
+    row: any;
+    actionKey: string;
+  }>();
   @Output() viewAction = new EventEmitter<any>();
-  @Output() cancelAction = new EventEmitter<any>();
   @Output() toggleAction = new EventEmitter<any>();
+  @Output() assignWorker = new EventEmitter<any>();
+  @Output() unassignWorker = new EventEmitter<any>();
 
   /* ===============================
      LOCAL STATE
      =============================== */
-  activeMenuRow: any = null;
-  replaceActionRow: any = null;
-  expandedNotesRows: Set<any> = new Set();
+
+  /** Tracks the ID of the row whose dropdown is open. */
+  activeMenuRowId: any = null;
 
   constructor(private eRef: ElementRef) {}
 
   /* ==========================================================
      COLUMN WIDTH SYSTEM
-     Each type gets a relative weight. Widths are calculated
-     as percentages of the total weight of active columns,
-     so any combination always fills 100% of the table.
      ========================================================== */
 
   private readonly columnWeights: Record<string, number> = {
@@ -53,10 +90,13 @@ export class TableComponent {
     status: 2,
     view: 2,
     date: 2.5,
+    datetime: 3,
     category: 3,
     name: 3.5,
     service: 3.5,
-    notes: 5,
+    participant: 4,
+    worker: 3.5,
+    notes: 2.5,
   };
 
   private readonly columnMinWidths: Record<string, string> = {
@@ -65,10 +105,13 @@ export class TableComponent {
     status: '90px',
     view: '72px',
     date: '110px',
+    datetime: '130px',
     category: '120px',
     name: '140px',
     service: '140px',
-    notes: '180px',
+    participant: '160px',
+    worker: '140px',
+    notes: '100px',
   };
 
   getColumnStyle(col: TableColumn): { [key: string]: string } {
@@ -77,7 +120,6 @@ export class TableComponent {
         sum + (this.columnWeights[c.type] ?? this.columnWeights[c.key] ?? 3)
       );
     }, 0);
-
     const weight =
       this.columnWeights[col.type] ?? this.columnWeights[col.key] ?? 3;
     const pct =
@@ -85,7 +127,6 @@ export class TableComponent {
         ? `${((weight / totalWeight) * 100).toFixed(2)}%`
         : 'auto';
     const minW = this.columnMinWidths[col.type] ?? '80px';
-
     return { width: pct, minWidth: minW };
   }
 
@@ -94,75 +135,103 @@ export class TableComponent {
   }
 
   /* ==========================================================
-     ACTION MENU LOGIC
+     ACTION MENU
      ========================================================== */
 
-  emitAction(row: any, actionKey?: string): void {
-    const payload = actionKey ? { row, action: actionKey } : row;
-    this.cancelAction.emit(payload);
-    this.activeMenuRow = null;
-    this.replaceActionRow = null;
+  toggleMenu(row: any): void {
+    const id = row?.id ?? row;
+    this.activeMenuRowId = this.activeMenuRowId === id ? null : id;
   }
 
-  getActionConfig() {
-    const actionCol = this.columns?.find((col) => col.type === 'action');
-    return Array.isArray(actionCol?.actionLabel) ? actionCol.actionLabel : null;
+  emitAction(row: any, actionKey: string): void {
+    console.log('[TableUI] emitAction', actionKey, row);
+    this.actionTriggered.emit({ row, actionKey });
+    this.activeMenuRowId = null;
   }
 
-  getActionLabel(): string {
-    const actionCol = this.columns?.find((col) => col.type === 'action');
-    return typeof actionCol?.actionLabel === 'string'
-      ? actionCol.actionLabel
-      : 'Cancel';
-  }
-
-  get actionColumn(): TableColumn | undefined {
-    return this.columns?.find((col) => col.type === 'action');
-  }
-
-  shouldReplaceAction(row: any): boolean {
-    return (
-      this.actionColumn?.actionDisplay === 'replace-with-action' &&
-      this.replaceActionRow === row
-    );
-  }
-
-  handleActionTrigger(row: any, event: MouseEvent): void {
-    event.stopPropagation();
-
-    if (this.actionColumn?.actionDisplay === 'replace-with-action') {
-      this.activeMenuRow = null;
-      this.replaceActionRow = this.replaceActionRow === row ? null : row;
-      return;
-    }
-
-    this.toggleMenu(row);
-  }
-
-  getActionColumnLabel(): string {
-    const actionCol = this.columns?.find((col) => col.type === 'action');
-    return actionCol?.label || 'Action';
+  get hasActionColumn(): boolean {
+    return this.columns.some((col) => col.type === 'action');
   }
 
   /* ==========================================================
-     STATUS COLOR LOGIC
+     STATUS COLOR
      ========================================================== */
 
   getStatusClasses(status: string): string {
-    const s = status?.toLowerCase();
-
-    switch (s) {
+    switch (status?.toLowerCase()) {
       case 'approved':
       case 'active':
         return 'bg-[#dcfce7] text-[#289839]';
       case 'pending':
-        return 'bg-[#fb7a4b] text-white';
+        return 'bg-[#fef9c3] text-[#a16207]';
       case 'cancelled':
       case 'inactive':
         return 'bg-[#fee2e2] text-[#b91c1c]';
       default:
         return 'text-slate-700';
     }
+  }
+
+  /* ==========================================================
+     PARTICIPANT HELPERS
+     ========================================================== */
+
+  /** Returns 1-2 uppercase initials from a participant name. */
+  getInitials(row: any): string {
+    const name = row?.participantName || `U${row?.userId || '?'}`;
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p: string) => p.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  /** Returns a deterministic avatar color class based on row id. */
+  getAvatarClass(row: any): string {
+    const colors = [
+      'bg-rose-100 text-rose-600',
+      'bg-violet-100 text-violet-600',
+      'bg-sky-100 text-sky-600',
+      'bg-emerald-100 text-emerald-600',
+      'bg-orange-100 text-orange-600',
+    ];
+    return colors[Math.abs(Number(row?.id) || 0) % colors.length];
+  }
+
+  /* ==========================================================
+     WORKER HELPERS
+     ========================================================== */
+
+  getAssignedWorkerName(row: any): string {
+    return (
+      row?.assignedWorkerName ??
+      row?.AssignedWorkerName ??
+      row?.supportWorkerName ??
+      row?.workerName ??
+      ''
+    );
+  }
+
+  hasAssignedWorker(row: any): boolean {
+    return Boolean(
+      row?.assignedWorkerId ??
+      row?.supportWorkerId ??
+      this.getAssignedWorkerName(row),
+    );
+  }
+
+  /* ==========================================================
+     NOTES HELPERS
+     ========================================================== */
+
+  getTruncatedNotes(row: any, col: TableColumn): string {
+    const notes = row?.[col.key] || '';
+    return notes.length > 80 ? notes.slice(0, 80) + '...' : notes;
+  }
+
+  hasNotes(row: any, col: TableColumn): boolean {
+    return Boolean(row?.[col.key]);
   }
 
   /* ==========================================================
@@ -173,54 +242,18 @@ export class TableComponent {
     return row ? row[key] : '';
   }
 
-  formatName(value: any): string {
-    if (value === null || value === undefined) return '';
-    return String(value)
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
-  }
-
-  get hasActionColumn(): boolean {
-    return this.columns.some((col) => col.type === 'action');
-  }
-
-  toggleMenu(row: any): void {
-    this.replaceActionRow = null;
-    this.activeMenuRow = this.activeMenuRow === row ? null : row;
-  }
-
   emitToggle(row: any): void {
     this.toggleAction.emit(row);
   }
 
   /* ==========================================================
-     NOTES EXPAND/COLLAPSE LOGIC
+     CLICK OUTSIDE
      ========================================================== */
-
-  toggleNotes(row: any): void {
-    if (this.expandedNotesRows.has(row)) {
-      this.expandedNotesRows.delete(row);
-    } else {
-      this.expandedNotesRows.add(row);
-    }
-  }
-
-  isNotesExpanded(row: any): boolean {
-    return this.expandedNotesRows.has(row);
-  }
-
-  truncateNotes(value: string, maxLen: number = 100): string {
-    if (!value) return '';
-    return value.length > maxLen ? value.substring(0, maxLen) + '...' : value;
-  }
 
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
-      this.activeMenuRow = null;
-      this.replaceActionRow = null;
+      this.activeMenuRowId = null;
     }
   }
 }

@@ -11,40 +11,60 @@ type BookingAction = 'approve' | 'cancel';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, StatusCardComponent, BookingQueueTableComponent, DialogUi],
+  imports: [
+    CommonModule,
+    StatusCardComponent,
+    BookingQueueTableComponent,
+    DialogUi,
+  ],
   templateUrl: './dashboard.page.html',
 })
 export class DashboardComponent implements OnInit {
-  stats: any[] = [
+  // Status cards configuration with valid SVG paths
+  stats = [
     {
       label: 'TOTAL BOOKINGS',
       value: 0,
-      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
-      color: '#7C3AED',
-      bg: '#FAF5FF',
+      accentColor: '#6B3293',
+      valueColor: '#111827',
+      iconBackground: '#F3E8FF',
+      iconColor: '#6B3293',
+      // Calendar icon SVG path
+      iconPath: 'M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z',
     },
     {
       label: 'PENDING APPROVAL',
       value: 0,
-      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
-      color: '#F59E0B',
-      bg: '#FFFBEB',
+      accentColor: '#F59E0B',
+      valueColor: '#D97706',
+      iconBackground: '#FEF3C7',
+      iconColor: '#D97706',
+      // Clock icon SVG path
+      iconPath: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z',
     },
     {
       label: 'APPROVED',
       value: 0,
-      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
-      color: '#10B981',
-      bg: '#ECFDF5',
+      accentColor: '#10B981',
+      valueColor: '#10B981',
+      iconBackground: '#D1FAE5',
+      iconColor: '#059669',
+      // Check/checkmark icon SVG path
+      iconPath: 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z',
     },
     {
       label: 'CANCELLED',
       value: 0,
-      icon: 'h-6 w-6 2xl:h-8 2xl:w-8 min-[3840px]:h-12 min-[3840px]:w-12',
-      color: '#EF4444',
-      bg: '#FEF2F2',
+      accentColor: '#EF4444',
+      valueColor: '#DC2626',
+      iconBackground: '#FEE2E2',
+      iconColor: '#DC2626',
+      // X/close icon SVG path
+      iconPath: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z',
     },
   ];
+
+  //
 
   bookings: any[] = [];
   filteredBookings: any[] = [];
@@ -167,10 +187,14 @@ export class DashboardComponent implements OnInit {
 
   get confirmationButtonText(): string {
     if (this.isUpdatingBooking) {
-      return this.pendingAction === 'approve' ? 'Approving...' : 'Cancelling...';
+      return this.pendingAction === 'approve'
+        ? 'Approving...'
+        : 'Cancelling...';
     }
 
-    return this.pendingAction === 'approve' ? 'Approve Booking' : 'Cancel Booking';
+    return this.pendingAction === 'approve'
+      ? 'Approve Booking'
+      : 'Cancel Booking';
   }
 
   private approveBooking(booking: any): void {
@@ -309,7 +333,10 @@ export class DashboardComponent implements OnInit {
   }
 
   private getBookingParticipantName(booking: any): string {
-    const name = booking?.participantName || booking?.name || `User ${booking?.userId || ''}`;
+    const name =
+      booking?.participantName ||
+      booking?.name ||
+      `User ${booking?.userId || ''}`;
 
     return String(name)
       .trim()

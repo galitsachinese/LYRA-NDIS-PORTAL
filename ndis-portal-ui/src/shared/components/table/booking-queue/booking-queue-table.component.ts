@@ -1,157 +1,243 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
-  EventEmitter,
-  HostListener,
   Input,
   Output,
+  EventEmitter,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
 } from '@angular/core';
 
+import { TableComponent } from '../../../ui/table/table.ui';
+import { TableColumn, TableAction } from '../../../models/table.model';
+
+/**
+ * BookingQueueTableComponent
+ *
+ * Admin-facing wrapper around <app-table-ui>.
+ * Handles the booking queue with Approve/Cancel inline actions
+ * and optional worker assignment column.
+ *
+ * COLUMN VISIBILITY:
+ * - Worker column only shown when [showWorkerAssignment]="true"
+ * - Actions column shows Approve + Cancel for pending bookings
+ *
+ * OUTPUTS:
+ * - approve        → emitted when Approve is clicked
+ * - cancel         → emitted when Cancel is clicked
+ * - assignWorker   → emitted when Assign Worker is clicked
+ * - unassignWorker → emitted when worker is removed
+ * - refresh        → emitted when Refresh button is clicked
+ * - statusChange   → emitted when filter changes
+ */
 @Component({
   selector: 'app-booking-queue-table',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './booking-queue-table.component.html',
+  imports: [TableComponent],
+  template: `
+    <app-table-ui
+      [columns]="visibleColumns"
+      [data]="pagedBookings"
+      [actions]="queueActions"
+      [fillFewRows]="false"
+      (actionTriggered)="handleAction($event)"
+      (viewAction)="handleView($event)"
+    >
+    </app-table-ui>
+  `,
 })
-export class BookingQueueTableComponent {
+export class BookingQueueTableComponent implements OnInit, OnChanges {
+  /* ==========================================================
+     INPUTS
+     ========================================================== */
+
+  /** All bookings (used for count display). */
   @Input() bookings: any[] = [];
+
+  /** Current page of bookings to display in the table. */
   @Input() pagedBookings: any[] = [];
+
+  /** Shows a loading state. */
   @Input() isLoading = false;
+
+  /** Label of the active filter (e.g. 'All', 'Pending'). */
   @Input() activeFilterLabel = 'All';
+
+  /** Value of the active filter. */
   @Input() selectedFilter = 'All';
+
+  /** Status filter options for the dropdown. */
   @Input() statusOptions: Array<{ label: string; value: string }> = [];
+
+  /** Current page number. */
   @Input() currentPage = 1;
+
+  /** Total number of pages. */
   @Input() totalPages = 1;
+
+  /** Page number buttons to render. */
   @Input() pageNumbers: number[] = [];
+
+  /** Last item index on the current page. */
   @Input() showingEnd = 0;
+
+  /**
+   * When true, shows the Worker assignment column.
+   * Used in admin views where workers can be assigned to bookings.
+   */
   @Input() showWorkerAssignment = false;
+
+  /* ==========================================================
+     OUTPUTS
+     ========================================================== */
 
   @Output() refresh = new EventEmitter<void>();
   @Output() statusChange = new EventEmitter<string>();
   @Output() previousPage = new EventEmitter<void>();
   @Output() nextPage = new EventEmitter<void>();
   @Output() pageChange = new EventEmitter<number>();
+
+  /** Emitted when Approve action is triggered for a booking. */
   @Output() approve = new EventEmitter<any>();
+
+  /** Emitted when Cancel action is triggered for a booking. */
   @Output() cancel = new EventEmitter<any>();
+
+  /** Emitted when Assign Worker is triggered for a booking. */
   @Output() assignWorker = new EventEmitter<any>();
+
+  /** Emitted when a worker is removed from a booking. */
   @Output() unassignWorker = new EventEmitter<any>();
 
-  activeMenuId: number | null = null;
-  isFilterDropdownOpen = false;
-  selectedNotesBooking: any | null = null;
+  /* ==========================================================
+     ACTION MENU CONFIGURATION
+     ========================================================== */
 
-  toggleMenu(booking: any): void {
-    this.activeMenuId = this.activeMenuId === booking.id ? null : booking.id;
+  readonly queueActions: TableAction[] = [
+    {
+      label: 'Approve',
+      actionKey: 'approve',
+      class: 'text-emerald-600 hover:bg-emerald-50',
+    },
+    {
+      label: 'Cancel',
+      actionKey: 'cancel',
+      class: 'text-rose-500 hover:bg-rose-50',
+    },
+    {
+      label: 'Assign Worker',
+      actionKey: 'assignWorker',
+      class: 'text-violet-600 hover:bg-violet-50',
+    },
+    {
+      label: 'Unassign Worker',
+      actionKey: 'unassignWorker',
+      class: 'text-slate-500 hover:bg-slate-50',
+    },
+  ];
+
+  /* ==========================================================
+     COLUMN CONFIGURATION
+     ========================================================== */
+
+  private readonly baseColumns: TableColumn[] = [
+    {
+      key: 'participantName',
+      label: 'Participant',
+      type: 'participant',
+    },
+    {
+      key: 'serviceName',
+      label: 'Service',
+      type: 'service',
+    },
+    {
+      key: 'preferredDate',
+      label: 'Date & Time',
+      type: 'datetime',
+    },
+    {
+      key: 'notes',
+      label: 'Notes',
+      type: 'notes',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'status',
+    },
+    {
+      key: 'assignedWorkerName',
+      label: 'Worker',
+      type: 'worker',
+    },
+    {
+      key: 'action',
+      label: 'Actions',
+      type: 'action',
+    },
+  ];
+
+  visibleColumns: TableColumn[] = [];
+
+  /* ==========================================================
+     LIFECYCLE
+     ========================================================== */
+
+  ngOnInit(): void {
+    this.updateColumns();
   }
 
-  toggleFilterDropdown(): void {
-    this.isFilterDropdownOpen = !this.isFilterDropdownOpen;
-  }
-
-  selectStatus(status: string): void {
-    this.isFilterDropdownOpen = false;
-    this.activeMenuId = null;
-    this.statusChange.emit(status);
-  }
-
-  viewNotes(booking: any): void {
-    this.selectedNotesBooking = booking;
-    this.activeMenuId = null;
-  }
-
-  closeNotes(): void {
-    this.selectedNotesBooking = null;
-  }
-
-  getInitials(booking: any): string {
-    const name = booking.participantName || `User ${booking.userId}`;
-    return name
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part: string) => part.charAt(0).toUpperCase())
-      .join('');
-  }
-
-  formatName(value: any): string {
-    if (value === null || value === undefined) {
-      return '';
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['showWorkerAssignment']) {
+      this.updateColumns();
     }
-
-    return String(value)
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
   }
 
-  getAvatarClass(booking: any): string {
-    const colors = [
-      'bg-rose-100 text-rose-600',
-      'bg-violet-100 text-violet-600',
-      'bg-sky-100 text-sky-600',
-      'bg-emerald-100 text-emerald-600',
-      'bg-orange-100 text-orange-600',
-    ];
+  /* ==========================================================
+     ACTION HANDLER
+     ========================================================== */
 
-    return colors[Math.abs(Number(booking.id) || 0) % colors.length];
-  }
+  handleAction(event: { row: any; actionKey: string }): void {
+    console.log('[BookingQueueTable] handleAction:', event);
 
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'Approved':
-        return 'bg-emerald-100 text-emerald-700';
-      case 'Cancelled':
-        return 'bg-rose-100 text-rose-700';
-      case 'Pending':
-        return 'bg-amber-100 text-amber-700';
+    switch (event.actionKey) {
+      case 'approve':
+        this.approve.emit(event.row);
+        break;
+      case 'cancel':
+        this.cancel.emit(event.row);
+        break;
+      case 'assignWorker':
+        this.assignWorker.emit(event.row);
+        break;
+      case 'unassignWorker':
+        this.unassignWorker.emit(event.row);
+        break;
       default:
-        return 'bg-slate-100 text-slate-600';
+        console.warn(
+          '[BookingQueueTable] Unhandled actionKey:',
+          event.actionKey,
+        );
     }
   }
 
-  isPending(booking: any): boolean {
-    return booking.status === 'Pending';
+  handleView(row: any): void {
+    // Notes view — parent can listen to this if needed
+    console.log('[BookingQueueTable] viewNotes:', row);
   }
 
-  isApproved(booking: any): boolean {
-    return booking.status === 'Approved';
-  }
+  /* ==========================================================
+     COLUMN VISIBILITY
+     ========================================================== */
 
-  getAssignedWorkerName(booking: any): string {
-    const name =
-      booking?.assignedWorkerName ??
-      booking?.AssignedWorkerName ??
-      booking?.supportWorkerName ??
-      booking?.SupportWorkerName ??
-      booking?.workerName ??
-      booking?.WorkerName ??
-      '';
-
-    return this.formatName(name);
-  }
-
-  hasAssignedWorker(booking: any): boolean {
-    return Boolean(
-      booking?.assignedWorkerId ??
-        booking?.AssignedWorkerId ??
-        booking?.supportWorkerId ??
-        booking?.SupportWorkerId ??
-        this.getAssignedWorkerName(booking),
-    );
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const clickedMenu = target.closest('[data-testid="menu-btn"]');
-    const clickedFilter = target.closest('[data-testid="status-filter"]');
-
-    if (!clickedMenu) {
-      this.activeMenuId = null;
-    }
-    if (!clickedFilter) {
-      this.isFilterDropdownOpen = false;
+  private updateColumns(): void {
+    if (this.showWorkerAssignment) {
+      this.visibleColumns = [...this.baseColumns];
+    } else {
+      this.visibleColumns = this.baseColumns.filter(
+        (col) => col.type !== 'worker',
+      );
     }
   }
 }
